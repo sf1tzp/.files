@@ -1,11 +1,12 @@
-export PS1="\[\e[1;33m\]\u\[\e[m\]:\[\e[1;32m\]\w\[\e[m\]: "
-
 alias ll='ls -la'
 alias git-log='git log --date=short --pretty="%h  %cd  %s"'
 alias git-out='git commit --amend --no-edit; git push --force'
+alias gs='git status'
 alias watch="watch "
-
 alias pipes="pipes.sh"
+
+export PS1="\[\e[1;33m\]\u\[\e[m\]:\[\e[1;32m\]\w\[\e[m\]: "
+export PATH="/opt/homebrew/bin:$PATH"
 
 export GOPATH=$HOME/go
 export PATH="$PATH:$GOPATH/bin"
