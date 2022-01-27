@@ -51,3 +51,8 @@ function aks-creds {
   CLUSTER=$2
   az aks get-credentials --resource-group $RG --name $CLUSTER
 }
+
+function local-creds {
+  sudo cp -r /root/.kube /home/steven/
+  sudo chown -R steven:steven /home/steven/.kube
+}
