@@ -1,0 +1,133 @@
+#!/bin/bash
+
+function install_docker() {
+    if ! command -v docker &> /dev/null; then
+        echo "Installing Docker ..."
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        sudo add-apt-repository \
+        "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+        $(lsb_release -cs) \
+        stable"
+        sudo apt-get update
+        sudo apt-get install -y docker-ce bridge-utils docker-ce-cli containerd.io
+        sudo usermod -aG docker $USER
+        echo "'$USER' was added to the docker group. Please log out and back in for change to take effect"
+    fi
+}
+
+function install_kubectl() {
+    if ! command -v kubectl &> /dev/null; then
+        echo "Installing Kubernetes ..."
+        : "${KUBERNETES_VERSION:=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)}"
+        sudo curl -L "https://storage.googleapis.com/kubernetes-release/release/$KUBERNETES_VERSION/bin/linux/amd64/kubectl" -o /usr/local/bin/kubectl
+        sudo chmod +x /usr/local/bin/kubectl
+        kubectl version --short --client
+    fi
+}
+
+function install_kind() {
+    if ! command -v kind &> /dev/null; then
+        echo "Installing Kind ..."
+        curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.11.1/kind-linux-amd64
+        chmod +x ./kind
+        sudo mv ./kind /usr/local/bin/kind
+    fi
+}
+
+function install_helm() {
+    if ! command -v helm &> /dev/null; then
+        echo "Installing Helm ..."
+        curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+        chmod 700 get_helm.sh
+        if [ "x$HELM_VERSION" == "x" ]; then
+            ./get_helm.sh
+        else
+            ./get_helm.sh --version $HELM_VERSION
+        fi
+        rm get_helm.sh
+    fi
+}
+
+function install_go() {
+    if ! command -v go &> /dev/null; then
+        : "${GO_VERSION:="1.17.6"}"
+        wget -c https://golang.org/dl/go$GO_VERSION.linux-amd64.tar.gz -O - | sudo tar -xz -C /usr/local
+        echo "export PATH=$PATH:/usr/local/go/bin" >> /home/$USER/.bashrc
+    fi
+}
+
+function install_rust() {
+    if ! command -v rustup &> /dev/null; then
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y -q
+    fi
+}
+
+function install_jq() {
+    if ! command -v jq &> /dev/null; then
+        sudo wget -qO /usr/local/bin/jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
+        sudo chmod +x /usr/local/bin/jq
+    fi
+}
+
+function install_yq() {
+    if ! command -v yq &> /dev/null; then
+        echo "Installing yq ..."
+        sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+        sudo chmod a+x /usr/local/bin/yq
+    fi
+}
+
+function install_az() {
+    if ! command -v az &> /dev/null; then
+        echo "Installing Azure CLI ..."
+        curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+    fi
+}
+
+function install_kustomize() {
+    if ! command -v kustomize &> /dev/null; then
+        curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
+        sudo mv ./kustomize /usr/local/bin/kustomize
+    fi
+}
+
+function install-kubectx {
+    : "${VERSION:="v0.9.4"}"
+    if ! command -v kubectx &> /dev/null; then
+        wget -c https://github.com/ahmetb/kubectx/releases/download/${VERSION}/kubectx_${VERSION}_linux_x86_64.tar.gz -O - | sudo tar -xz -C /usr/local/bin
+    fi
+
+    if ! command -v kubens &> /dev/null; then
+        wget -c https://github.com/ahmetb/kubectx/releases/download/${VERSION}/kubens_${VERSION}_linux_x86_64.tar.gz -O - | sudo tar -xz -C /usr/local/bin
+    fi
+}
+
+function install_base() {
+    # Install base packages
+    sudo apt-get update
+    sudo apt-get install -y \
+        apt-transport-https \
+        ca-certificates \
+        curl \
+        make \
+        wget \
+        unzip \
+        gnupg-agent \
+        gcc \
+        software-properties-common \
+        yamllint
+}
+
+function install_stuff() {
+    install_base
+    install_docker
+    install_kubectl
+    install_kind
+    install_helm
+    install_go
+    install_rust
+    install_yq
+    install_az
+    install_kustomize
+    echo "Please log out and back in for all changes to take effect"
+}
