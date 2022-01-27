@@ -126,6 +126,7 @@ function install_stuff() {
     install_helm
     install_go
     install_rust
+    install_jq
     install_yq
     install_az
     install_kustomize
