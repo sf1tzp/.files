@@ -9,6 +9,8 @@ source <(kubectl completion bash)
 complete -F __start_kubectl k
 complete -F __start_kubectl kc
 
+source <(helm completion bash)
+
 function kstat {
     if [ -z "$1" ]; then
         namespace="-A"
