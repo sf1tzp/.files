@@ -6,11 +6,12 @@ alias watch="watch "
 alias pipes="pipes.sh"
 
 export PS1="\[\e[1;33m\]\u\[\e[m\]:\[\e[1;32m\]\w\[\e[m\]: "
-export PATH="/opt/homebrew/bin:$PATH"
 
 export GOPATH=$HOME/go
 export PATH="$PATH:$GOPATH/bin"
 alias go-here='export GOPATH=$GOPATH:$(pwd)'
+
+export PATH="/opt/homebrew/bin:/home/linuxbrew/.linuxbrew/bin:$PATH"
 
 if command -v pyenv &> /dev/null; then
     export PYENV_ROOT="$HOME/.pyenv"
@@ -20,5 +21,7 @@ if command -v pyenv &> /dev/null; then
     eval "$(pyenv virtualenv-init -)"
 fi
 
-source "$HOME/.cargo/env"
+if command -v cargo &> /dev/null; then
+    source "$HOME/.cargo/env"
+fi
 source $HOME/.files/k8s
