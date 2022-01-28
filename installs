@@ -115,7 +115,8 @@ function install_base() {
         gnupg-agent \
         gcc \
         software-properties-common \
-        yamllint
+        yamllint \
+        shellcheck
 }
 
 function install_stuff() {
