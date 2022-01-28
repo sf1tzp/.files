@@ -91,7 +91,7 @@ function install_kustomize() {
     fi
 }
 
-function install-kubectx {
+function install_kubectx() {
     : "${VERSION:="v0.9.4"}"
     if ! command -v kubectx &> /dev/null; then
         wget -c https://github.com/ahmetb/kubectx/releases/download/${VERSION}/kubectx_${VERSION}_linux_x86_64.tar.gz -O - | sudo tar -xz -C /usr/local/bin
@@ -130,5 +130,6 @@ function install_stuff() {
     install_yq
     install_az
     install_kustomize
+    install_kubectx
     echo "Please log out and back in for all changes to take effect"
 }
