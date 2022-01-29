@@ -1,5 +1,3 @@
-#!/bin/bash
-
 export PATH="$PATH:/usr/local/opt/kubernetes-cli/bin/"
 
 alias k=kubectl

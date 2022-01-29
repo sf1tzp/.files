@@ -20,9 +20,9 @@ export PATH="/opt/homebrew/bin:/home/linuxbrew/.linuxbrew/bin:$PATH"
 if command -v pyenv &> /dev/null; then
     export PYENV_ROOT="$HOME/.pyenv"
     export PATH="$PYENV_ROOT/bin:$PATH"
-    eval "$(pyenv init --path)"
-    eval "$(pyenv init -)"
-    eval "$(pyenv virtualenv-init -)"
+    eval "$(pyenv init --path --no-rehash)"
+    eval "$(pyenv init - --no-rehash)"
+    eval "$(pyenv virtualenv-init - --no-rehash)"
 fi
 
 if command -v cargo &> /dev/null; then
