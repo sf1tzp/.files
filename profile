@@ -1,6 +1,6 @@
 alias ll='ls -la'
 alias git-log='git log --date=short --pretty="%h  %cd  %s"'
-alias git-out='git commit --amend --no-edit; git push --force'
+alias git-out='git commit --amend --date="$(date -R)" --no-edit; git push --force'
 alias gs='git status'
 alias watch="watch "
 alias pipes="pipes.sh"
