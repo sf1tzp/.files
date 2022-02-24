@@ -54,3 +54,13 @@ function local-creds {
   sudo cp -r /root/.kube /home/steven/
   sudo chown -R steven:steven /home/steven/.kube
 }
+
+function merge-kubeconfig {
+  set -x	
+  new_config=$1
+  cp ~/.kube/config ~/.kube/config.bak
+  KUBECONFIG=~/.kube/config:$new_config kubectl config view --flatten > ~/.kube/wtf
+  chmod 600 ~/.kube/wtf
+  mv ~/.kube/wtf ~/.kube/config
+  set +x
+}
