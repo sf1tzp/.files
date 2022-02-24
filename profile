@@ -1,7 +1,14 @@
 alias ll='ls -la'
+alias get='git'
 alias git-log='git log --date=short --pretty="%h  %cd  %s"'
-alias git-out='git commit --amend --date="$(date -R)" --no-edit; git push --force'
+alias git-out='git commit --amend --date="$(date -R)" --no-edit; git push --force"'
+alias git-fetch-checkout='git fetch; git checkout'
+alias git-fetch-rebase='git fetch; git rebase -i'
 alias gs='git status'
+alias gfs='git fetch; git status'
+alias gfc='git-fetch-checkout'
+alias gfr='git-fetch-rebase'
+alias gl='git-log'
 alias watch="watch "
 alias pipes="pipes.sh"
 
