@@ -1,6 +1,7 @@
 alias ll='ls -la'
 alias get='git'
 alias git-log='git log --date=short --pretty="%h  %cd  %s"'
+alias gl='git-log'
 alias git-out='git commit --amend --date="$(date -R)" --no-edit; git push --force"'
 alias git-fetch-checkout='git fetch; git checkout'
 alias git-fetch-rebase='git fetch; git rebase -i'
@@ -17,6 +18,9 @@ if [[ ${HOSTNAME: -9} == 'mac.local' ]]; then
 else
     export PS1="\[\e[1;33m\]\u\[\e[1;37m\]@\[\e[1;32m\]\h\[\e[m\]:\[\e[1;37m\]\w\[\e[m\]: "
 fi
+
+export EDITOR='vim'
+export VISUAL='vim'
 
 export GOPATH=$HOME/go
 export PATH="$PATH:$GOPATH/bin"
