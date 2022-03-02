@@ -151,7 +151,7 @@ function install_pipes() {
         pushd /tmp
         git clone https://github.com/pipeseroni/pipes.sh.git
         cd pipes.sh
-        make install
+        sudo make install
         popd
     fi
 }
