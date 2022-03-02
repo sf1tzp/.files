@@ -108,6 +108,7 @@ function install_base() {
     sudo apt-get install -y \
         apt-transport-https \
         ca-certificates \
+        fzf \
         curl \
         make \
         wget \
