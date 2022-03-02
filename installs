@@ -146,6 +146,16 @@ function install_python() {
     pyenv global $PYTHON_VERSION
 }
 
+function install_pipes() {
+    if ! command -v pipes.sh &> /dev/null; then
+        pushd /tmp
+        git clone https://github.com/pipeseroni/pipes.sh.git
+        cd pipes.sh
+        make install
+        popd
+    fi
+}
+
 function install_stuff() {
     install_base
     install_docker
@@ -159,5 +169,6 @@ function install_stuff() {
     install_az
     install_kustomize
     install_kubectx
+    install_pipes
     echo "Please log out and back in for all changes to take effect"
 }
