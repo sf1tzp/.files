@@ -10,9 +10,9 @@ function install_docker() {
         stable"
         sudo apt-get update
         sudo apt-get install -y docker-ce bridge-utils docker-ce-cli containerd.io
-        sudo usermod -aG docker $USER
-        echo "'$USER' was added to the docker group. Please log out and back in for change to take effect"
     fi
+    sudo usermod -aG docker $USER
+    echo "'$USER' was added to the docker group. Please log out and back in for change to take effect"
 }
 
 function install_kubectl() {
