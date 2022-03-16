@@ -50,7 +50,7 @@ function install_helm() {
 
 function install_go() {
     if ! command -v go &> /dev/null; then
-        : "${GO_VERSION:="1.16.7"}"
+        : "${GO_VERSION:="1.17.6"}"
         wget -c https://golang.org/dl/go$GO_VERSION.linux-amd64.tar.gz -O - | sudo tar -xz -C /usr/local
         echo "export PATH=$PATH:/usr/local/go/bin" >> /home/$USER/.bashrc
     fi
