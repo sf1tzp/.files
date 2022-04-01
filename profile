@@ -13,7 +13,7 @@ alias gl='git-log'
 alias watch="watch "
 alias pipes="pipes.sh"
 
-if [[ ${HOSTNAME: -9} == 'mac.local' ]]; then
+if [[ ${HOSTNAME} == *mac* ]]; then
     export PS1="\[\e[1;33m\]\u\[\e[m\]:\[\e[1;32m\]\w\[\e[m\]: "
 else
     export PS1="\[\e[1;33m\]\u\[\e[1;37m\]@\[\e[1;32m\]\h\[\e[m\]:\[\e[1;37m\]\w\[\e[m\]: "
