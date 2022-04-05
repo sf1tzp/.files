@@ -12,6 +12,7 @@ alias gfr='git-fetch-rebase'
 alias gl='git-log'
 alias watch="watch "
 alias pipes="pipes.sh"
+alias tf="fuck"
 
 if [[ ${HOSTNAME} == *mac* ]]; then
     export PS1="\[\e[1;33m\]\u\[\e[m\]:\[\e[1;32m\]\w\[\e[m\]: "
