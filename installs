@@ -35,17 +35,15 @@ function install_kind() {
 }
 
 function install_helm() {
-    if ! command -v helm &> /dev/null; then
-        echo "Installing Helm ..."
-        curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
-        chmod 700 get_helm.sh
-        if [ "x$HELM_VERSION" == "x" ]; then
-            ./get_helm.sh
-        else
-            ./get_helm.sh --version $HELM_VERSION
-        fi
-        rm get_helm.sh
+    echo "Installing Helm ..."
+    curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+    chmod 700 get_helm.sh
+    if [ "x$HELM_VERSION" == "x" ]; then
+        ./get_helm.sh
+    else
+        ./get_helm.sh --version $HELM_VERSION
     fi
+    rm get_helm.sh
 }
 
 function install_go() {
