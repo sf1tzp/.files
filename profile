@@ -39,5 +39,7 @@ fi
 
 if command -v cargo &> /dev/null; then
     source "$HOME/.cargo/env"
+    alias cargo-watch='cargo watch -q -c -w src/ -x run'
 fi
+
 source $HOME/.files/k8s
