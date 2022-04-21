@@ -2,6 +2,7 @@ export PATH="$PATH:/usr/local/opt/kubernetes-cli/bin/"
 
 alias k=kubectl
 alias kc=kubectl
+alias kx=kubectx
 
 source <(kubectl completion bash)
 complete -F __start_kubectl k
@@ -57,10 +58,18 @@ function local-creds {
 
 function merge-kubeconfig {
   set -x	
+  if [[ ! -f ~/.kube/config.bak ]]; then
+    cp ~/.kube/config ~/.kube/config.bak
+  fi
   new_config=$1
-  cp ~/.kube/config ~/.kube/config.bak
   KUBECONFIG=~/.kube/config:$new_config kubectl config view --flatten > ~/.kube/wtf
   chmod 600 ~/.kube/wtf
   mv ~/.kube/wtf ~/.kube/config
   set +x
+}
+
+function reset-kubeconfig {
+  if [[ -f ~/.kube/config.bak ]]; then
+    cp ~/.kube/config.bak ~/.kube/config
+  fi
 }
