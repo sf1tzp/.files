@@ -73,3 +73,10 @@ function reset-kubeconfig {
     cp ~/.kube/config.bak ~/.kube/config
   fi
 }
+
+function simulator-reset {
+  rm ~/.ssh/known_hosts
+  rm ~/.kube/bootstrap-kubeconfig.yaml
+  rm ~/.kube/undercloud-kubeconfig.yaml
+  reset-kubeconfig
+}
