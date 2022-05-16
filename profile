@@ -1,4 +1,5 @@
-alias ll='ls -la'
+alias ls='ls -la'
+alias g='grep'
 alias get='git'
 alias git-log='git log --date=short --pretty="%h  %cd  %s"'
 alias gl='git-log'
@@ -12,7 +13,6 @@ alias gfr='git-fetch-rebase'
 alias gl='git-log'
 alias watch="watch "
 alias pipes="pipes.sh"
-alias tf="fuck"
 
 if [[ ${HOSTNAME} == *mac* ]]; then
     export PS1="\[\e[1;33m\]\u\[\e[m\]:\[\e[1;32m\]\w\[\e[m\]: "
@@ -40,10 +40,6 @@ fi
 if command -v cargo &> /dev/null; then
     source "$HOME/.cargo/env"
     alias cargo-watch='cargo watch -q -c -w src/ -x run'
-fi
-
-if command -v tf &> /dev/null; then
-    eval "$(thefuck --alias)" 
 fi
 
 source $HOME/.files/k8s

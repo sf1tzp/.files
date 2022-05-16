@@ -154,12 +154,6 @@ function install_pipes() {
     fi
 }
 
-function install_thefuck() {
-    sudo apt update
-    sudo apt install python3-dev python3-pip python3-setuptools -y
-    pip3 install thefuck
-}
-
 function install_stuff() {
     install_base
     install_docker
@@ -167,13 +161,11 @@ function install_stuff() {
     install_kind
     install_helm
     install_go
-    install_rust
     install_jq
     install_yq
     install_az
     install_kustomize
     install_kubectx
     install_pipes
-    install_thefuck
     echo "Please log out and back in for all changes to take effect"
 }
