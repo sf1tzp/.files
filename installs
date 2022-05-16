@@ -157,15 +157,15 @@ function install_pipes() {
 function install_stuff() {
     install_base
     install_docker
-    install_kubectl
-    install_kind
-    install_helm
-    install_go
-    install_jq
-    install_yq
-    install_az
-    install_kustomize
-    install_kubectx
-    install_pipes
+    install_kind &
+    install_helm &
+    install_go &
+    install_jq &
+    install_yq &
+    install_az &
+    install_kubectl &
+    install_kustomize &
+    install_kubectx &
+    install_pipes &
     echo "Please log out and back in for all changes to take effect"
 }
