@@ -154,6 +154,15 @@ function install_pipes() {
     fi
 }
 
+function install_clusterctl() {
+    if ! command -v clusterctl &> /dev/null; then
+        : "${CLUSTERCTL_VERSION:="v0.4.4"}"
+        sudo wget https://github.com/kubernetes-sigs/cluster-api/releases/download/${CLUSTERCTL_VERSION}/clusterctl-linux-amd64
+        sudo chmod +x clusterctl-linux-amd64
+        sudo mv clusterctl-linux-amd64 /usr/local/bin/clusterctl
+    fi
+}
+
 function install_stuff() {
     install_base
     install_docker
@@ -166,6 +175,7 @@ function install_stuff() {
     install_kubectl &
     install_kustomize &
     install_kubectx &
+    install_clusterctl &
     install_pipes &
     echo "Please log out and back in for all changes to take effect"
 }
