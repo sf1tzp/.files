@@ -42,4 +42,8 @@ if command -v cargo &> /dev/null; then
     alias cargo-watch='cargo watch -q -c -w src/ -x run'
 fi
 
+if command -v just &> /dev/null; then
+    source <(just --completions bash)
+fi
+
 source $HOME/.files/k8s
