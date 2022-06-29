@@ -25,4 +25,9 @@ function vm_create () {
         --access Allow \
         --destination-port-ranges 22222 \
         --protocol Tcp
+
+    az network public-ip update \
+        --name "${vm_name}PublicIP" \
+        --resource-group "$resource_group" \
+        --dns-name "sfitzpatrick-${vm_name}"
 }
