@@ -1,3 +1,5 @@
+#!/bin/bash
+
 alias ls='ls -la'
 alias g='grep'
 alias get='git'
@@ -47,3 +49,4 @@ if command -v just &> /dev/null; then
 fi
 
 source $HOME/.files/k8s
+source $HOME/.files/functions
