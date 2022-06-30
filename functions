@@ -31,3 +31,17 @@ function vm_create () {
         --resource-group "$resource_group" \
         --dns-name "sfitzpatrick-${vm_name}"
 }
+
+function rg_create () {
+    rg_name=$1
+    region=$2
+    rg_name=${rg_name:-"sfitzpatrick-rg"}
+    region=${region:-"southcentralus"}
+    az group create -n "$rg_name" --location "$region"
+}
+
+function rg_delete () {
+    rg_name=$1
+    rg_name=${rg_name:-"sfitzpatrick-rg"}
+    az group delete -y -n "$rg_name"
+}
