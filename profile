@@ -13,6 +13,7 @@ alias gfs='git fetch; git status'
 alias gfc='git-fetch-checkout'
 alias gfr='git-fetch-rebase'
 alias gl='git-log'
+alias grc='git rebase --continue'
 alias watch="watch "
 alias pipes="pipes.sh"
 
