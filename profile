@@ -51,3 +51,7 @@ fi
 
 source $HOME/.files/k8s
 source $HOME/.files/functions
+
+if [ ! -f $HOME/.vimrc ] ; then
+    ln -s $HOME/.files/vimrc $HOME/.vimrc
+fi
