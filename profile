@@ -17,9 +17,9 @@ alias grc='git rebase --continue'
 alias watch="watch "
 alias pipes="pipes.sh"
 alias gm="create-rg; dev64"
-alias bs-log="ssh rack1-control-node-01 -- sudo tail -f /var/log/cloud-init-output.log"
-alias bs-kc="merge-kubeconfig ~/.kube/bootstrap-kubeconfig.yaml"
-alias uc-kc="merge-kubeconfig ~/.kube/undercloud-kubeconfig.yaml"
+alias bslog="ssh rack1-control-node-01 -- sudo tail -f /var/log/cloud-init-output.log"
+alias bskc="merge-kubeconfig ~/.kube/bootstrap-kubeconfig.yaml"
+alias uckc="merge-kubeconfig ~/.kube/undercloud-kubeconfig.yaml"
 
 if [[ ${HOSTNAME} == *mac* || ${HOSTNAME} == *V-* || ${HOSTNAME} == *DESKTOP* ]]; then
     export PS1="\[\e[1;33m\]\u\[\e[m\]:\[\e[1;32m\]\w\[\e[m\]: "
