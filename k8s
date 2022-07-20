@@ -59,7 +59,6 @@ function local-creds {
 }
 
 function merge-kubeconfig {
-  set -x	
   if [[ ! -f ~/.kube/config.bak ]]; then
     cp ~/.kube/config ~/.kube/config.bak
   fi
@@ -67,7 +66,6 @@ function merge-kubeconfig {
   KUBECONFIG=~/.kube/config:$new_config kubectl config view --flatten > ~/.kube/wtf
   chmod 600 ~/.kube/wtf
   mv ~/.kube/wtf ~/.kube/config
-  set +x
 }
 
 function reset-kubeconfig {
