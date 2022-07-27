@@ -16,6 +16,7 @@ alias gl='git-log'
 alias grc='git rebase --continue'
 alias watch="watch "
 alias pipes="pipes.sh"
+alias neofetch="neofetch --config ~/.files/neofetch.conf"
 alias gm="create-rg; dev64"
 alias bslog="ssh rack1-control-node-01 -- sudo tail -f /var/log/cloud-init-output.log"
 alias bskc="merge-kubeconfig ~/.kube/bootstrap-kubeconfig.yaml"
