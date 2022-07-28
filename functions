@@ -19,7 +19,8 @@ function vm_create () {
         --admin-username "$USER" \
         --ssh-key-values ~/.ssh/id_rsa.pub \
         --custom-data "$cloud_init" \
-        --assign-identity "$managed_identity"
+        --assign-identity "$managed_identity" \
+        --os-disk-size-gb 1000
 
     az network nsg rule create --name ObfuscatedSSH \
         --nsg-name "${vm_name}NSG" \
