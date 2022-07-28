@@ -158,7 +158,7 @@ function install_pipes() {
 
 function install_clusterctl() {
     if ! command -v clusterctl &> /dev/null; then
-        : "${CLUSTERCTL_VERSION:="v0.4.4"}"
+        : "${CLUSTERCTL_VERSION:="v1.4.4"}"
         sudo wget https://github.com/kubernetes-sigs/cluster-api/releases/download/${CLUSTERCTL_VERSION}/clusterctl-linux-amd64
         sudo chmod +x clusterctl-linux-amd64
         sudo mv clusterctl-linux-amd64 /usr/local/bin/clusterctl
