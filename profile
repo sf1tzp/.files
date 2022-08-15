@@ -21,6 +21,7 @@ alias gm="create-rg; dev64"
 alias bslog="ssh rack1-control-node-01 -- sudo tail -f /var/log/cloud-init-output.log"
 alias bskc="merge-kubeconfig ~/.kube/bootstrap-kubeconfig.yaml"
 alias uckc="merge-kubeconfig ~/.kube/undercloud-kubeconfig.yaml"
+alias vim="nvim"
 
 if [[ ${HOSTNAME} == *mac* || ${HOSTNAME} == *V-* || ${HOSTNAME} == *DESKTOP* ]]; then
     export PS1="\[\e[1;33m\]\u\[\e[m\]:\[\e[1;32m\]\w\[\e[m\]: "
@@ -57,6 +58,7 @@ fi
 source $HOME/.files/k8s
 source $HOME/.files/functions
 
-if [ ! -f $HOME/.vimrc ] ; then
-    ln -s $HOME/.files/vimrc $HOME/.vimrc
+set -o vi
+if [ ! -f $HOME/.config/nvim ] ; then
+  ln -s $HOME/.files/nvim $HOME/.config/nvim || true
 fi
