@@ -165,6 +165,19 @@ function install_clusterctl() {
     fi
 }
 
+function install_neovim() {
+    if ! command -v nvim &> /dev/null; then
+        : "${NEOVIM_VERSION:="0.7.2"}"
+        pushd $(mktemp -d)
+            wget -c https://github.com/neovim/neovim/releases/download/v${NEOVIM_VERSION}/nvim-linux64.tar.gz
+            tar -xzvf nvim-linux64.tar.gz nvim-linux64/bin/nvim
+            sudo mv nvim-linux64/bin/nvim /usr/local/bin
+        popd
+        if [ ! -f $HOME/.config/nvim ] ; then
+            ln -s $HOME/.files/nvim $HOME/.config/nvim
+        fi
+    fi
+}
 function install_stuff() {
     install_base
     install_docker

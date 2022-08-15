@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -o vi
+
 alias ls='ls -la'
 alias g='grep'
 alias get='git'
@@ -58,7 +60,3 @@ fi
 source $HOME/.files/k8s
 source $HOME/.files/functions
 
-set -o vi
-if [ ! -f $HOME/.config/nvim ] ; then
-  ln -s $HOME/.files/nvim $HOME/.config/nvim || true
-fi
