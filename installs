@@ -57,6 +57,12 @@ function install_go() {
 function install_rust() {
     if ! command -v rustup &> /dev/null; then
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y -q
+        source "$HOME/.cargo/env"
+    fi
+
+    : "${EXTRA_RUST_CLI_TOOLS="true"}"
+    if [[ $EXTRA_RUST_CLI_TOOLS == "true" ]]; then
+        cargo install bat ripgrep fd-find
     fi
 }
 
