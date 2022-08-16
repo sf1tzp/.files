@@ -112,7 +112,6 @@ function install_base() {
     sudo apt-get install -y \
         apt-transport-https \
         ca-certificates \
-        fzf \
         curl \
         make \
         wget \
@@ -197,6 +196,13 @@ function install_kubebuilder() {
     fi
 }
 
+function install_fzf() {
+    if ! command -v fzf &> /dev/null; then
+        git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+        ~/.fzf/install --completion --update-rc
+    fi
+}
+
 function install_stuff() {
     install_base
     install_docker
@@ -204,6 +210,7 @@ function install_stuff() {
     install_jq &
     install_yq &
     install_az &
+    install_fzf &
     install_kind &
     install_helm &
     install_rust &
