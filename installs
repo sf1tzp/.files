@@ -186,13 +186,9 @@ function install_neovim() {
 
 function install_kubebuilder() {
     if ! command -v kubebuilder &> /dev/null; then
-        : "${KUBEBUILDER_VERSION:="2.3.2"}"
-        tmp_dir=$(mktemp -d)
-        pushd $tmp_dir 
-            wget -c https://github.com/kubernetes-sigs/kubebuilder/releases/download/v${KUBEBUILDER_VERSION}/kubebuilder_${KUBEBUILDER_VERSION}_linux_amd64.tar.gz
-            tar -xzvf kubebuilder_${KUBEBUILDER_VERSION}_linux_amd64 kubebuilder_${KUBEBUILDER_VERSION}_linux_amd64/bin/kubebuilder
-            mv kubebuilder_${KUBEBUILDER_VERSION}_linux_amd64/bin/kubebuilder /usr/local/bin/
-        popd
+        # download kubebuilder and install locally.
+        curl -L -o kubebuilder https://go.kubebuilder.io/dl/latest/$(go env GOOS)/$(go env GOARCH)
+        chmod +x kubebuilder && sudo mv kubebuilder /usr/local/bin/
     fi
 }
 
