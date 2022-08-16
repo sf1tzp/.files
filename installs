@@ -178,19 +178,36 @@ function install_neovim() {
         fi
     fi
 }
+
+function install_kubebuilder() {
+    if ! command -v kubebuilder &> /dev/null; then
+        : "${KUBEBUILDER_VERSION:="2.3.2"}"
+        tmp_dir=$(mktemp -d)
+        pushd $tmp_dir 
+            wget -c https://github.com/kubernetes-sigs/kubebuilder/releases/download/v${KUBEBUILDER_VERSION}/kubebuilder_${KUBEBUILDER_VERSION}_linux_amd64.tar.gz
+            tar -xzvf kubebuilder_${KUBEBUILDER_VERSION}_linux_amd64 kubebuilder_${KUBEBUILDER_VERSION}_linux_amd64/bin/kubebuilder
+            mv kubebuilder_${KUBEBUILDER_VERSION}_linux_amd64/bin/kubebuilder /usr/local/bin/
+        popd
+    fi
+}
+
 function install_stuff() {
     install_base
     install_docker
-    install_kind &
-    install_helm &
     install_go &
     install_jq &
     install_yq &
     install_az &
-    install_kubectl &
-    install_kustomize &
-    install_kubectx &
-    install_clusterctl &
+    install_kind &
+    install_helm &
+    install_rust &
     install_pipes &
+    install_neovim &
+    install_kubectl &
+    install_kubectx &
+    install_kustomize &
+    install_kubebuilder &
+    install_clusterctl &
+    
     echo "Please log out and back in for all changes to take effect"
 }
