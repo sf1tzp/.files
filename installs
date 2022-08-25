@@ -62,7 +62,7 @@ function install_rust() {
 
     : "${EXTRA_RUST_CLI_TOOLS="true"}"
     if [[ $EXTRA_RUST_CLI_TOOLS == "true" ]]; then
-        cargo install bat ripgrep fd-find
+        cargo install bat ripgrep fd-find exa
     fi
 }
 
