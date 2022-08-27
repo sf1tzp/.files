@@ -10,8 +10,8 @@ else
     export PS1="\[\e[1;33m\]\u\[\e[1;37m\]@\[\e[1;32m\]\h\[\e[m\]:\[\e[1;37m\]\w\[\e[m\]: "
 fi
 
-export EDITOR='vim'
-export VISUAL='vim'
+export EDITOR='nvim'
+export VISUAL='nvim'
 
 export GOPATH=$HOME/go
 export PATH="$PATH:$GOPATH/bin"
