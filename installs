@@ -198,21 +198,14 @@ function install_fzf() {
 function install_stuff() {
     install_base
     install_docker
-    install_go &
-    install_jq &
-    install_yq &
-    install_az &
-    install_fzf &
-    install_kind &
-    install_helm &
-    install_rust &
-    install_pipes &
-    install_neovim &
-    install_kubectl &
-    install_kubectx &
-    install_kustomize &
-    install_kubebuilder &
-    install_clusterctl &
+    install_brew
+    brew install \
+        z jq yq fd bat exa fzf ripgrep git-delta \
+        just neovim neofetch pipes-sh \
+        rust go@1.18 pyenv pyenv-virtualenv \
+        azure-cli make yamllint shellcheck \
+        kind kubectx kubernetes-cli@1.22 \
+        clusterctl kustomize kubebuilder
     
-    echo "Please log out and back in for all changes to take effect"
+    $(brew --prefix)/opt/fzf/install --all
 }
