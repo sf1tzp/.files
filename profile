@@ -2,8 +2,10 @@
 
 set -o vi
 
-alias ls='ls -la'
-alias g='grep'
+alias azl='az login --use-device-code'
+alias ls='exa -la'
+alias lt='exa -lDTL 2'
+alias grep='rg'
 alias get='git'
 alias git-log='git log --date=short --pretty="%h  %cd  %s"'
 alias gl='git-log'
