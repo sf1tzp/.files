@@ -8,8 +8,6 @@ function vm_create () {
     image=$5
     cloud_init=$6
 
-    managed_identity=$(az identity show -g sfitzpatrick-kv-rg -n sfitzpatrick-mi | jq -r '.id')
-
     az vm create --name "$vm_name" \
         --resource-group "$resource_group" \
         --size "$size" \
@@ -19,7 +17,6 @@ function vm_create () {
         --admin-username "$USER" \
         --ssh-key-values ~/.ssh/id_rsa.pub \
         --custom-data "$cloud_init" \
-        --assign-identity "$managed_identity" \
         --os-disk-size-gb 1000
 
     az network nsg rule create --name ObfuscatedSSH \
