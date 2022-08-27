@@ -1,0 +1,59 @@
+# Get editor completions based on the config schema
+"$schema" = 'https://starship.rs/config-schema.json'
+
+add_newline = false
+
+format = """
+$username\
+$hostname\
+$directory\
+$fill\
+$git_branch\
+$git_status\
+$time $cmd_duration\
+$line_break $character"""
+
+[username]
+show_always = true
+style_user = "green"
+format = "[$user]($style)"
+
+[hostname]
+ssh_only = true
+style = "yellow"
+format = "[@](white)[$hostname]($style)"
+
+[directory]
+style = "white"
+truncation_length = 3
+truncate_to_repo = false
+format = "[:]()[$path]($style):"
+
+[character]
+
+[fill]
+symbol = " "
+
+[git_branch]
+format = "[branch $branch(:$remote_branch)]($style) "
+style = "bright-blue"
+
+[git_status]
+style = "green"
+untracked = "[$count U](red italic)[ / ](white)"
+modified = "[$count M](yellow italic)"
+staged = "[ / ](white)[$count S](green italic)"
+diverged = '\[!!!\] '
+ahead = '\[$count ahead\] '
+behind = '\[$count behind\] '
+format = '[$ahead_behind](purple)$untracked$modified$staged'
+
+[cmd_duration]
+format = '[\($duration\)]($style)'
+style = "bright-yellow italic"
+
+[time]
+disabled = false
+style = "orange"
+utc_time_offset = "0"
+format = '[ --](bright-black) [$time UTC]($style)'

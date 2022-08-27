@@ -59,6 +59,14 @@ if command -v just &> /dev/null; then
     source <(just --completions bash)
 fi
 
+
+if command -v starship &> /dev/null; then
+    eval "$(starship init bash)"
+    if [ ! -f "$HOME/.config/starship.toml" ] ; then
+        ln -s $HOME/.files/starship.toml $HOME/.config/starship.toml
+    fi
+fi
+
 source $HOME/.files/k8s
 source $HOME/.files/functions
 

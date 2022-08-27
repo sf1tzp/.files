@@ -201,7 +201,7 @@ function install_stuff() {
     install_brew
     brew install \
         z jq yq fd bat exa fzf ripgrep git-delta \
-        just neovim neofetch pipes-sh \
+        just neovim neofetch starship pipes-sh \
         rust go@1.18 pyenv pyenv-virtualenv \
         azure-cli make yamllint shellcheck \
         kind kubectx kubernetes-cli@1.22 \
