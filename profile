@@ -16,6 +16,7 @@ export VISUAL='nvim'
 export GOPATH=$HOME/go
 export PATH="$PATH:$GOPATH/bin"
 export PATH="/opt/homebrew/bin:/home/linuxbrew/.linuxbrew/bin:$PATH"
+mkdir -p "$HOME/.config"
 
 alias azl='az login --use-device-code'
 alias cat='bat -p'
