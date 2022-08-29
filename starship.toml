@@ -9,27 +9,30 @@ $hostname\
 $directory\
 $fill\
 $git_branch\
+$git_state\
 $git_status\
 $time $cmd_duration\
 $line_break $character"""
 
 [username]
 show_always = true
-style_user = "green"
+style_user = "bright-yellow"
 format = "[$user]($style)"
 
 [hostname]
 ssh_only = true
-style = "yellow"
-format = "[@](white)[$hostname]($style)"
+style = "bright-green"
+format = "[@](bright-black)[$hostname]($style)"
 
 [directory]
 style = "white"
 truncation_length = 3
 truncate_to_repo = false
-format = "[:]()[$path]($style):"
+format = "[: ](bright-black)[$path]($style)"
 
 [character]
+success_symbol = "[:](bright-black) "
+error_symbol = "[:](bright-black) "
 
 [fill]
 symbol = " "
@@ -37,6 +40,9 @@ symbol = " "
 [git_branch]
 format = "[branch $branch(:$remote_branch)]($style) "
 style = "bright-blue"
+
+[git_state]
+format = '[$state \($progress_current/$progress_total\)]($style) '
 
 [git_status]
 style = "green"
@@ -57,3 +63,4 @@ disabled = false
 style = "orange"
 utc_time_offset = "0"
 format = '[ --](bright-black) [$time UTC]($style)'
+
