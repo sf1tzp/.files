@@ -27,7 +27,7 @@ function install_base() {
         wget \
         unzip \
         gnupg-agent \
-        gcc
+        build-essential
 }
 
 function install_brew() {
@@ -58,7 +58,8 @@ function install_stuff() {
         rust go@1.18 pyenv pyenv-virtualenv \
         azure-cli make yamllint shellcheck \
         kind kubectx kubernetes-cli@1.22 \
-        clusterctl kustomize kubebuilder
+        clusterctl kustomize kubebuilder \
+        gcc@5
     
     $(brew --prefix)/opt/fzf/install --all
 }
