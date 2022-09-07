@@ -15,6 +15,97 @@ function install_docker() {
     echo "'$USER' was added to the docker group. Please log out and back in for change to take effect"
 }
 
+function install_kubectl() {
+    if ! command -v kubectl &> /dev/null; then
+        echo "Installing Kubernetes ..."
+        : "${KUBERNETES_VERSION:=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)}"
+        sudo curl -L "https://storage.googleapis.com/kubernetes-release/release/$KUBERNETES_VERSION/bin/linux/amd64/kubectl" -o /usr/local/bin/kubectl
+        sudo chmod +x /usr/local/bin/kubectl
+        kubectl version --short --client
+    fi
+}
+
+function install_kind() {
+    if ! command -v kind &> /dev/null; then
+        echo "Installing Kind ..."
+        curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.11.1/kind-linux-amd64
+        chmod +x ./kind
+        sudo mv ./kind /usr/local/bin/kind
+    fi
+}
+
+function install_helm() {
+    echo "Installing Helm ..."
+    curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+    chmod 700 get_helm.sh
+    if [ "x$HELM_VERSION" == "x" ]; then
+        ./get_helm.sh
+    else
+        ./get_helm.sh --version $HELM_VERSION
+    fi
+    rm get_helm.sh
+}
+
+function install_go() {
+    if ! command -v go &> /dev/null; then
+        : "${GO_VERSION:="1.17.6"}"
+        wget -c https://golang.org/dl/go$GO_VERSION.linux-amd64.tar.gz -O - | sudo tar -xz -C /usr/local
+        echo "export PATH=$PATH:/usr/local/go/bin" >> /home/$USER/.bashrc
+    fi
+}
+
+function install_rust() {
+    if ! command -v rustup &> /dev/null; then
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y -q
+        source "$HOME/.cargo/env"
+    fi
+
+    : "${EXTRA_RUST_CLI_TOOLS="true"}"
+    if [[ $EXTRA_RUST_CLI_TOOLS == "true" ]]; then
+        cargo install bat ripgrep fd-find exa
+    fi
+}
+
+function install_jq() {
+    if ! command -v jq &> /dev/null; then
+        sudo wget -qO /usr/local/bin/jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
+        sudo chmod +x /usr/local/bin/jq
+    fi
+}
+
+function install_yq() {
+    if ! command -v yq &> /dev/null; then
+        echo "Installing yq ..."
+        sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+        sudo chmod a+x /usr/local/bin/yq
+    fi
+}
+
+function install_az() {
+    if ! command -v az &> /dev/null; then
+        echo "Installing Azure CLI ..."
+        curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+    fi
+}
+
+function install_kustomize() {
+    if ! command -v kustomize &> /dev/null; then
+        curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
+        sudo mv ./kustomize /usr/local/bin/kustomize
+    fi
+}
+
+function install_kubectx() {
+    : "${VERSION:="v0.9.4"}"
+    if ! command -v kubectx &> /dev/null; then
+        wget -c https://github.com/ahmetb/kubectx/releases/download/${VERSION}/kubectx_${VERSION}_linux_x86_64.tar.gz -O - | sudo tar -xz -C /usr/local/bin
+    fi
+
+    if ! command -v kubens &> /dev/null; then
+        wget -c https://github.com/ahmetb/kubectx/releases/download/${VERSION}/kubens_${VERSION}_linux_x86_64.tar.gz -O - | sudo tar -xz -C /usr/local/bin
+    fi
+}
+
 function install_base() {
     # Install base packages
     sudo apt-get update
@@ -36,8 +127,16 @@ function install_brew() {
     fi
 }
 
+function install_pyenv() {
+    if ! command -v pyenv &> /dev/null; then
+        brew install pyenv pyenv-virtualenv
+    fi
+}
 
 function install_python() {
+    install_brew
+    install_pyenv
+
     export PYENV_ROOT="$HOME/.pyenv"
     export PATH="$PYENV_ROOT/bin:$PATH"
     eval "$(pyenv init --path)"
@@ -46,6 +145,54 @@ function install_python() {
     : "${PYTHON_VERSION:="3.10.2"}"
     pyenv install $PYTHON_VERSION
     pyenv global $PYTHON_VERSION
+}
+
+function install_pipes() {
+    if ! command -v pipes.sh &> /dev/null; then
+        pushd /tmp
+        git clone https://github.com/pipeseroni/pipes.sh.git
+        cd pipes.sh
+        sudo make install
+        popd
+    fi
+}
+
+function install_clusterctl() {
+    if ! command -v clusterctl &> /dev/null; then
+        : "${CLUSTERCTL_VERSION:="v1.4.4"}"
+        sudo wget https://github.com/kubernetes-sigs/cluster-api/releases/download/${CLUSTERCTL_VERSION}/clusterctl-linux-amd64
+        sudo chmod +x clusterctl-linux-amd64
+        sudo mv clusterctl-linux-amd64 /usr/local/bin/clusterctl
+    fi
+}
+
+function install_neovim() {
+    if ! command -v nvim &> /dev/null; then
+        : "${NEOVIM_VERSION:="0.7.2"}"
+        pushd $(mktemp -d)
+            wget -c https://github.com/neovim/neovim/releases/download/v${NEOVIM_VERSION}/nvim-linux64.tar.gz
+            tar -xzvf nvim-linux64.tar.gz nvim-linux64/bin/nvim
+            sudo mv nvim-linux64/bin/nvim /usr/local/bin
+        popd
+        if [ ! -f $HOME/.config/nvim ] ; then
+            ln -s $HOME/.files/nvim $HOME/.config/nvim
+        fi
+    fi
+}
+
+function install_kubebuilder() {
+    if ! command -v kubebuilder &> /dev/null; then
+        # download kubebuilder and install locally.
+        curl -L -o kubebuilder https://go.kubebuilder.io/dl/latest/$(go env GOOS)/$(go env GOARCH)
+        chmod +x kubebuilder && sudo mv kubebuilder /usr/local/bin/
+    fi
+}
+
+function install_fzf() {
+    if ! command -v fzf &> /dev/null; then
+        git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+        ~/.fzf/install --completion --update-rc
+    fi
 }
 
 function install_stuff() {
