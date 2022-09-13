@@ -231,6 +231,17 @@ function install_exa() {
     fi
 }
 
+function install_shellcheck() {
+    if ! command -v shellcheck &> /dev/null; then
+        : "${SHELLCHECK_VERSION:="0.8.0"}"
+        pushd $(mktemp -d)
+            wget -c "https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VERSION}/shellcheck-v${SHELLCHECK_VERSION}.linux.x86_64.tar.xz"
+            tar -xvf shellcheck-v${SHELLCHECK_VERSION}.linux.x86_64.tar.xz
+            sudo mv shellcheck-v${SHELLCHECK_VERSION}/shellcheck /usr/local/bin/
+        popd
+    fi
+}
+
 function install_stuff() {
     mkdir -p $HOME/.config
 
@@ -242,6 +253,7 @@ function install_stuff() {
     install_fzf
     install_neovim
     install_starship
+    install_shellcheck
 
     FORCE_GO_INSTALL=true GO_VERSION=1.18.5 install_go
     HELM_VERSION=v3.6.3 install_helm
