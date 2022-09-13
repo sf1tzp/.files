@@ -47,7 +47,7 @@ function install_helm() {
 }
 
 function install_go() {
-    : "${FORCE_GO_INSTALL:=true}"
+    : "${FORCE_GO_INSTALL:=false}"
     if ! command -v go &> /dev/null || $FORCE_GO_INSTALL; then
         : "${GO_VERSION:="1.17.6"}"
         wget -c https://golang.org/dl/go$GO_VERSION.linux-amd64.tar.gz -O - | sudo tar -xz -C /usr/local
@@ -222,7 +222,7 @@ function install_stuff() {
     install_neovim
     install_starship
 
-    GO_VERSION=1.18.5 install_go
+    FORCE_GO_INSTALL=true GO_VERSION=1.18.5 install_go
     HELM_VERSION=v3.6.3 install_helm
 
     install_kubebuilder
