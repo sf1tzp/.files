@@ -31,8 +31,8 @@ truncate_to_repo = false
 format = "[: ](bright-black)[$path]($style)"
 
 [character]
-success_symbol = "[:](bright-black) "
-error_symbol = "[:](bright-black) "
+success_symbol = "[>](bold bright-black) "
+error_symbol = "[>](bold bright-black) "
 
 [fill]
 symbol = " "
