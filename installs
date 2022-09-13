@@ -51,7 +51,6 @@ function install_go() {
     if ! command -v go &> /dev/null || $FORCE_GO_INSTALL; then
         : "${GO_VERSION:="1.17.6"}"
         wget -c https://golang.org/dl/go$GO_VERSION.linux-amd64.tar.gz -O - | sudo tar -xz -C /usr/local
-        echo "export PATH=$PATH:/usr/local/go/bin" >> $HOME/.bashrc
     fi
 }
 
