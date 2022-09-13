@@ -191,22 +191,39 @@ function install_kubebuilder() {
 function install_fzf() {
     if ! command -v fzf &> /dev/null; then
         git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-        ~/.fzf/install --completion --update-rc
+        ~/.fzf/install --completion
+        echo ". $HOME/.fzf.bash"
+    fi
+}
+
+function install_starship() {
+    if ! command -v starship &> /dev/null; then
+        pushd $(mktemp -d)
+            curl -sSO https://starship.rs/install.sh
+            sudo chmod +x install.sh
+            # 🕊
+            sudo ./install.sh -y
+            if [ ! -f "$HOME/.config/starship.toml" ] ; then
+                ln -s $HOME/.files/starship.toml $HOME/.config/starship.toml
+            fi
+        popd
     fi
 }
 
 function install_stuff() {
+    mkdir -p $HOME/.config
+
     install_base
-    install_docker
-    install_brew
-    brew install \
-        z jq yq fd bat exa fzf ripgrep git-delta \
-        just neovim neofetch starship pipes-sh \
-        rust go@1.18 pyenv pyenv-virtualenv \
-        azure-cli make yamllint shellcheck \
-        kind kubectx kubernetes-cli@1.22 \
-        clusterctl kustomize kubebuilder \
-        gcc@5
-    
-    $(brew --prefix)/opt/fzf/install --all
+    install_yq
+    install_jq
+    install_fzf
+    install_neovim
+    install_starship
+
+    GO_VERSION=1.18.5 install_go
+    HELM_VERSION=v3.6.3 install_helm
+
+    install_kubebuilder
+    install_kubectx
 }
+
