@@ -83,9 +83,5 @@ if command -v rf &> /dev/null; then
     alias grep='rg'
 fi
 
-if [ -f $HOME/.fzf.bash ]; then
-    source $HOME/.fzf.bash
-fi
-
 source $HOME/.files/k8s
 source $HOME/.files/functions
