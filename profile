@@ -16,13 +16,6 @@ export VISUAL='nvim'
 export GOPATH=$HOME/go
 export PATH="$PATH:$GOPATH/bin"
 
-# alias cat='bat -p'
-# alias less='bat'
-# alias ls='exa -la'
-# alias lt='exa -lDTL 2'
-# alias tree='exa -T'
-# alias grep='rg'
-# alias vim="nvim"
 
 alias get='git'
 alias git-log='git log --date=short --pretty="%h  %cd  %s"'
@@ -65,9 +58,25 @@ fi
 
 if command -v starship &> /dev/null; then
     eval "$(starship init bash)"
-    if [ ! -f "$HOME/.config/starship.toml" ] ; then
-        ln -s $HOME/.files/starship.toml $HOME/.config/starship.toml
-    fi
+fi
+
+if command -v nvim &> /dev/null; then
+    alias vim='nvim'
+fi
+
+if command -v bat &> /dev/null; then
+    alias cat='bat -p'
+    alias less='bat'
+fi
+
+if command -v exa &> /dev/null; then
+    alias ls='exa -la'
+    alias lt='exa -lDTL 2'
+    alias tree='exa -T'
+fi
+
+if command -v rf &> /dev/null; then
+    alias grep='rg'
 fi
 
 source $HOME/.files/k8s
