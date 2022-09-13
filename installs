@@ -224,6 +224,17 @@ function install_bat() {
     fi
 }
 
+function install_exa() {
+    if ! command -v exa &> /dev/null; then
+        : "${EXA_VERSION:="0.10.1"}"
+        pushd $(mktemp -d)
+            wget -c "https://github.com/ogham/exa/releases/download/v${EXA_VERSION}/exa-linux-x86_64-v${EXA_VERSION}.zip"
+            sudo unzip exa-linux-x86_64-v0.10.1.zip -d /usr/local/exa
+            echo "export PATH=$PATH:/usr/local/exa/bin" >> $HOME/.bashrc
+        popd
+    fi
+}
+
 function install_stuff() {
     mkdir -p $HOME/.config
 
@@ -231,6 +242,7 @@ function install_stuff() {
     install_yq
     install_jq
     install_bat
+    install_exa
     install_fzf
     install_neovim
     install_starship
