@@ -212,12 +212,25 @@ function install_starship() {
     fi
 }
 
+function install_bat() {
+    if ! command -v bat &> /dev/null; then
+        : "${BAT_VERSION:="0.22.1"}"
+        pushd $(mktemp -d)
+            wget -c "https://github.com/sharkdp/bat/releases/download/v${BAT_VERSION}/bat-v${BAT_VERSION}-x86_64-unknown-linux-gnu.tar.gz"
+            tar -xzvf bat-v${BAT_VERSION}-x86_64-unknown-linux-gnu.tar.gz
+            sudo mv bat-v${BAT_VERSION}-x86_64-unknown-linux-gnu /usr/local/bat
+            echo "export PATH=$PATH:/usr/local/bat/bin" >> $HOME/.bashrc
+        popd
+    fi
+}
+
 function install_stuff() {
     mkdir -p $HOME/.config
 
     install_base
     install_yq
     install_jq
+    install_bat
     install_fzf
     install_neovim
     install_starship
