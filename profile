@@ -16,6 +16,9 @@ export VISUAL='nvim'
 export GOPATH=$HOME/go
 export PATH="$PATH:$GOPATH/bin"
 
+export PATH="${PATH:+${PATH}:}/usr/local/bat"
+export PATH="${PATH:+${PATH}:}/usr/local/exa/bin"
+export PATH="${PATH:+${PATH}:}/usr/local/neovim/bin"
 
 alias get='git'
 alias git-log='git log --date=short --pretty="%h  %cd  %s"'
@@ -79,6 +82,9 @@ if command -v rf &> /dev/null; then
     alias grep='rg'
 fi
 
+if [ -f $HOME/.fzf.bash ]; then
+    source $HOME/.fzf.bash
+fi
+
 source $HOME/.files/k8s
 source $HOME/.files/functions
-
