@@ -243,22 +243,51 @@ function install_shellcheck() {
 }
 
 function install_stuff() {
-    mkdir -p $HOME/.config
+    mkdir -p "$HOME/.config"
 
-    install_base
-    install_yq
-    install_jq
-    install_bat
-    install_exa
-    install_fzf
-    install_neovim
-    install_starship
-    install_shellcheck
+    pid_array=()
 
-    FORCE_GO_INSTALL=true GO_VERSION=1.18.5 install_go
-    HELM_VERSION=v3.6.3 install_helm
+    install_base &
+    pid_array+=($!)
 
-    install_kubebuilder
-    install_kubectx
+    install_yq &
+    pid_array+=($!)
+
+    install_jq &
+    pid_array+=($!)
+
+    install_bat &
+    pid_array+=($!)
+
+    install_exa &
+    pid_array+=($!)
+
+    install_fzf &
+    pid_array+=($!)
+
+    install_neovim &
+    pid_array+=($!)
+
+    install_starship &
+    pid_array+=($!)
+
+    install_shellcheck &
+    pid_array+=($!)
+
+    FORCE_GO_INSTALL=true GO_VERSION=1.18.5 install_g &
+    pid_array+=($!)
+
+    HELM_VERSION=v3.6.3 install_helm &
+    pid_array+=($!)
+
+    install_kubebuilder &
+    pid_array+=($!)
+
+    install_kubectx &
+    pid_array+=($!)
+
+    for pid in "${pid_array[@]}"; do
+      wait "${pid}"
+    done
 }
 
