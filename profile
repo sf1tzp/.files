@@ -39,9 +39,6 @@ alias watch="watch "
 alias pipes="pipes.sh"
 alias neofetch="neofetch --config ~/.files/neofetch.conf"
 
-alias gm="create-rg; dev64"
-alias bskc="merge-kubeconfig ~/.kube/bootstrap-kubeconfig.yaml"
-alias uckc="merge-kubeconfig ~/.kube/undercloud-kubeconfig.yaml"
 alias azl='az login --use-device-code'
 
 if command -v pyenv &> /dev/null; then
@@ -86,3 +83,4 @@ fi
 source $HOME/.files/k8s
 source $HOME/.files/k8s-logs.sh
 source $HOME/.files/functions
+
