@@ -247,8 +247,7 @@ function install_stuff() {
 
     pid_array=()
 
-    install_base &
-    pid_array+=($!)
+    install_base
 
     install_yq &
     pid_array+=($!)
@@ -264,6 +263,9 @@ function install_stuff() {
 
     install_fzf &
     pid_array+=($!)
+    
+    install_pipes &
+    pid_array+=($!)
 
     install_neovim &
     pid_array+=($!)
@@ -274,7 +276,7 @@ function install_stuff() {
     install_shellcheck &
     pid_array+=($!)
 
-    FORCE_GO_INSTALL=true GO_VERSION=1.18.5 install_g &
+    FORCE_GO_INSTALL=true GO_VERSION=1.18.5 install_go &
     pid_array+=($!)
 
     HELM_VERSION=v3.6.3 install_helm &
