@@ -130,8 +130,12 @@ function describe_bmo_resources() {
 
 function describe_afo_resources() {
   describe_resources baremetalmachines
+  describe_resources baremetalmachineactionpoweroffs
+  describe_resources baremetalmachineactionstarts
+  describe_resources baremetalmachineactioncordons
+  describe_resources baremetalmachineactionuncordons
+  describe_resources baremetalmachineactionrestarts
   describe_resources capiclusters
-  describe_resources configs
   describe_resources nodepools
   describe_resources platformclusters
   describe_resources racks
