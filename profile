@@ -76,7 +76,7 @@ if command -v exa &> /dev/null; then
     alias tree='exa -T'
 fi
 
-if command -v rf &> /dev/null; then
+if command -v rg &> /dev/null; then
     alias grep='rg'
 fi
 
