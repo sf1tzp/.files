@@ -242,6 +242,16 @@ function install_shellcheck() {
     fi
 }
 
+function install_z() {
+    if ! command -v z &> /dev/null; then
+        pushd $(mktemp -d)
+            git clone https://github.com/rupa/z
+            sudo chmod +x z/z.sh
+            sudo cp z/z.sh /usr/local/bin
+        popd
+    fi
+}
+
 function install_stuff() {
     mkdir -p "$HOME/.config"
 
@@ -286,6 +296,9 @@ function install_stuff() {
     pid_array+=($!)
 
     install_kubectx &
+    pid_array+=($!)
+
+    install_z &
     pid_array+=($!)
 
     for pid in "${pid_array[@]}"; do

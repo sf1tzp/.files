@@ -80,6 +80,14 @@ if command -v rg &> /dev/null; then
     alias grep='rg'
 fi
 
+if command -v fzf &> /dev/null; then
+    [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+fi
+
+if [ -f /usr/local/bin/z.sh ]; then
+    source /usr/local/bin/z.sh
+fi
+
 source $HOME/.files/k8s
 source $HOME/.files/k8s-logs.sh
 source $HOME/.files/functions
