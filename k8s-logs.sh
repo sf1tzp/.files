@@ -138,6 +138,7 @@ function describe_afo_resources() {
   describe_resources capiclusters
   describe_resources nodepools
   describe_resources platformclusters
+  describe_resources platformnetworkdata
   describe_resources racks
   describe_resources virtualmachineactionpoweroffs
   describe_resources virtualmachineactionreimages
