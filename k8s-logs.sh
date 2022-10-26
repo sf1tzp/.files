@@ -122,8 +122,8 @@ function describe_bmo_resources() {
   describe_resources baremetalhosts
   describe_resources firmwareschemas
   describe_resources hostfirmwaresettings
-  describe_resources ipaddresses
-  describe_resources ipclaims
+  describe_resources ipaddresses.ipam.metal3.io
+  describe_resources ipclaims.ipam.metal3.io
   describe_resources ippools.ipam.metal3.io
   describe_resources preprovisioningimages
 }
