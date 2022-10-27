@@ -252,6 +252,18 @@ function install_z() {
     fi
 }
 
+function install_k9s() {
+    if ! command -v k9s &> /dev/null; then
+        pushd $(mktemp -d)
+            git clone https://github.com/derailed/k9s.git
+            make -C k9s build
+            sudo mv k9s/execs/k9s /usr/local/bin
+            mkdir -p ~/.config/k9s/
+            mv k9s/skins/gruvbox-dark.yml ~/.config/k9s/skin.yml
+        popd
+    fi
+}
+
 function install_stuff() {
     mkdir -p "$HOME/.config"
 
@@ -299,6 +311,9 @@ function install_stuff() {
     pid_array+=($!)
 
     install_z &
+    pid_array+=($!)
+
+    install_k9s &
     pid_array+=($!)
 
     for pid in "${pid_array[@]}"; do
