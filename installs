@@ -313,11 +313,10 @@ function install_stuff() {
     install_z &
     pid_array+=($!)
 
-    install_k9s &
-    pid_array+=($!)
-
     for pid in "${pid_array[@]}"; do
       wait "${pid}"
     done
+
+    install_k9s
 }
 
