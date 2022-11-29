@@ -169,7 +169,7 @@ function install_clusterctl() {
 
 function install_neovim() {
     if ! command -v nvim &> /dev/null; then
-        : "${NEOVIM_VERSION:="0.7.2"}"
+        : "${NEOVIM_VERSION:="0.8.1"}"
         pushd $(mktemp -d)
             wget -c https://github.com/neovim/neovim/releases/download/v${NEOVIM_VERSION}/nvim-linux64.tar.gz
             tar -xzvf nvim-linux64.tar.gz nvim-linux64
