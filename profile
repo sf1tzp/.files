@@ -66,8 +66,7 @@ if command -v nvim &> /dev/null; then
 fi
 
 if command -v bat &> /dev/null; then
-    alias cat='bat -p'
-    alias less='bat'
+    alias b='bat'
 fi
 
 if command -v exa &> /dev/null; then

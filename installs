@@ -114,7 +114,10 @@ function install_base() {
         wget \
         unzip \
         gnupg-agent \
-        build-essential
+        build-essential \
+        libevent-dev \
+        ncurses-dev
+
 }
 
 function install_brew() {
@@ -278,6 +281,27 @@ function install_fd-find() {
            tar -xzvf fd-v${FD_VERSION}-i686-unknown-linux-musl.tar.gz
            sudo mv fd-v${FD_VERSION}-i686-unknown-linux-musl/fd /usr/local/bin/
         popd
+    fi
+}
+
+function install_tmux() {
+    if [ ! $(command -v tmux | grep '/usr/local/bin') ] ; then
+        : ${TMUX_VERSION:="3.3a"}
+        pushd $(mktemp -d)
+            wget -c "https://github.com/tmux/tmux/releases/download/${TMUX_VERSION}/tmux-${TMUX_VERSION}.tar.gz"
+            tar -xzvf tmux-${TMUX_VERSION}.tar.gz
+            pushd tmux-${TMUX_VERSION}
+                ./configure && make
+                sudo make install
+            popd
+
+            # Get the tmux plugin manager
+            git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+        popd
+    fi
+
+    if [ ! -f "$HOME/.tmux.conf" ] ; then
+        ln -s $HOME/.files/tmux.conf $HOME/.tmux.conf
     fi
 }
 

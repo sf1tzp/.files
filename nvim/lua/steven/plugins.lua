@@ -46,6 +46,7 @@ return require('packer').startup(function(use)
   use 'ellisonleao/gruvbox.nvim'
   use 'rebelot/kanagawa.nvim'
   use 'EdenEast/nightfox.nvim'
+  use 'christoomey/vim-tmux-navigator'
   use {
     'nvim-telescope/telescope.nvim', tag = '0.1.0',
   -- or                            , branch = '0.1.x',
