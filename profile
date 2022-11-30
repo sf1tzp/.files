@@ -38,7 +38,6 @@ alias grc='git rebase --continue'
 alias watch="watch "
 
 alias pipes="pipes.sh"
-alias neofetch="neofetch --config ~/.files/neofetch.conf"
 
 alias azl='az login --use-device-code'
 
@@ -67,6 +66,7 @@ if command -v nvim &> /dev/null; then
 fi
 
 if command -v bat &> /dev/null; then
+    alias cat='bat -p'
     alias b='bat'
 fi
 

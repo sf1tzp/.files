@@ -305,6 +305,21 @@ function install_tmux() {
     fi
 }
 
+function install_neofetch() {
+    if ! command -v neofetch &> /dev/null; then
+        : ${NEOFETCH_VERSION="7.1.0"}
+        pushd $(mktemp -d)
+            wget -c "https://github.com/dylanaraps/neofetch/archive/refs/tags/${NEOFETCH_VERSION}.tar.gz"
+            tar -xzvf ${NEOFETCH_VERSION}.tar.gz
+            make -C neofetch-${NEOFETCH_VERSION} install
+        popd
+    fi
+
+    if [ ! -f ~/.config/neofetch/config.conf ]; then
+        mkdir -p ~/.config/neofetch/
+        ln -s ~/.files/neofetch.conf ~/.config/neofetch/config.conf
+    fi
+}
 
 function install_stuff() {
     mkdir -p "$HOME/.config"
