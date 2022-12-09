@@ -58,6 +58,7 @@ function describe_resources() {
   for resource in $resources; do
     mkdir -p "$log_dir/$namespace/$kind/$resource"
     kubectl describe -n "$namespace" "$kind" "$resource" > "$log_dir/$namespace/$kind/$resource/$resource.txt"
+    kubectl get -o yaml -n "$namespace" "$kind" "$resource" > "$log_dir/$namespace/$kind/$resource/$resource.yaml"
   done
 }
 
