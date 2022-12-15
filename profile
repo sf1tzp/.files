@@ -89,6 +89,7 @@ if [ -f /usr/local/bin/z.sh ]; then
 fi
 
 if [ ! -f ~/.config/alacritty.yml ]; then
+    mkdir -p ~/.config
     ln -s ~/.files/alacritty.yml ~/.config/alacritty.yml
 fi
 
