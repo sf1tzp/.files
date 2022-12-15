@@ -1,15 +1,35 @@
-vim.opt.nu = true
-vim.opt.relativenumber = true
+local opt = vim.opt
 
-vim.opt.tabstop = 4
-vim.opt.softtabstop = 4
-vim.opt.shiftwidth = 4
+-- line numbers
+opt.number = true
+opt.relativenumber = true
 
-vim.opt.expandtab = true
-vim.opt.hlsearch = false
-vim.opt.incsearch = false
+-- tabs & indentations
+opt.tabstop = 2
+opt.shiftwidth = 2
+opt.expandtab = true
+opt.autoindent = true
 
-vim.opt.smartindent = true
-vim.opt.wrap = false
+opt.wrap = false
 
-vim.g.mapleader = " "
+opt.ignorecase = true
+opt.smartcase = true
+
+opt.smartindent = true
+
+opt.termguicolors = true
+
+opt.background = "dark"
+
+opt.signcolumn = "yes"
+
+opt.backspace = "indent,eol,start"
+
+opt.clipboard:append("unnamedplus")
+
+opt.splitright = true
+opt.splitbelow = true
+
+opt.iskeyword:append("-")
+
+-- g.mapleader = " "

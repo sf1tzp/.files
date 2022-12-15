@@ -12,9 +12,6 @@ end
 
 local packer_bootstrap = ensure_packer()
 
--- Only required if you have packer configured as `opt`
-vim.cmd [[packadd packer.nvim]]
-
 -- Autocommand that reloads neovim whenever you save the plugins.lua file
 vim.cmd([[
   augroup packer_user_config
@@ -38,27 +35,48 @@ packer.init({
 	},
 })
 
+-- autocommand that reloads neovim and installs/updates/removes plugins
+-- when file is saved
+vim.cmd([[ 
+  augroup packer_user_config
+    autocmd!
+    autocmd BufWritePost plugins-setup.lua source <afile> | PackerSync
+  augroup end
+]])
+
+-- import packer safely
+local status, packer = pcall(require, "packer")
+if not status then
+  return
+end
 return require('packer').startup(function(use)
   -- Packer can manage itself
   use 'wbthomason/packer.nvim'
+
+  -- Themes
   use 'folke/tokyonight.nvim'
   use 'cocopon/iceberg.vim'
   use 'ellisonleao/gruvbox.nvim'
   use 'rebelot/kanagawa.nvim'
   use 'EdenEast/nightfox.nvim'
-  use 'christoomey/vim-tmux-navigator'
-  use {
-    'nvim-telescope/telescope.nvim', tag = '0.1.0',
-  -- or                            , branch = '0.1.x',
-    requires = { {'nvim-lua/plenary.nvim'} }
-  }
 
-  use { 'ibhagwan/fzf-lua',
-    -- optional for icon support
-     requires = { 'kyazdani42/nvim-web-devicons' }
-  }
-  use = { 'junegunn/fzf', run = './install --bin', }
+  -- Feature Plugins
+  use 'tpope/vim-surround' -- quote/unqote motions
+  use 'numToStr/Comment.nvim' -- comment motions
+  use 'nvim-lualine/lualine.nvim' -- status bar
+  use 'christoomey/vim-tmux-navigator' -- tmux integration
+  use 'inkarkat/vim-ReplaceWithRegister' -- paste over motion
 
+  -- File Tree and Fuzzy Finder
+  use 'nvim-tree/nvim-tree'
+  use 'nvim-tree/nvim-web-devicons'
+  use { 'nvim-telescope/telescope-fzf-native.nvim', run = "make" }
+  use { 'nvim-telescope/telescope.nvim', branch = '0.1.x' }
+
+  -- Language Server
+  use("williamboman/mason.nvim") -- in charge of managing lsp servers
+  use("williamboman/mason-lspconfig.nvim") -- integrates mason & lspconfig
+  use("neovim/nvim-lspconfig") -- configure language servers
 
   if packer_bootstrap then
     require('packer').sync()
