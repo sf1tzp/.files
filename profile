@@ -88,6 +88,10 @@ if [ -f /usr/local/bin/z.sh ]; then
     source /usr/local/bin/z.sh
 fi
 
+if [ ! -f ~/.config/alacritty.yml ]; then
+    ln -s ~/.files/alacritty.yml ~/.config/alacritty.yml
+fi
+
 source $HOME/.files/k8s
 source $HOME/.files/k8s-logs.sh
 source $HOME/.files/functions
