@@ -49,7 +49,7 @@ local status, packer = pcall(require, "packer")
 if not status then
   return
 end
-return require('packer').startup(function(use)
+return require('packer').startup(function()
   -- Packer can manage itself
   use 'wbthomason/packer.nvim'
 
@@ -73,10 +73,33 @@ return require('packer').startup(function(use)
   use { 'nvim-telescope/telescope-fzf-native.nvim', run = "make" }
   use { 'nvim-telescope/telescope.nvim', branch = '0.1.x' }
 
+  -- Treesitter (Syntax Tree Highlighting)
+  use { 'nvim-treesitter/nvim-treesitter',
+        run = function()
+            local ts_update = require('nvim-treesitter.install').update({ with_sync = true })
+            ts_update()
+        end,
+  }
+
   -- Language Server
-  use("williamboman/mason.nvim") -- in charge of managing lsp servers
-  use("williamboman/mason-lspconfig.nvim") -- integrates mason & lspconfig
-  use("neovim/nvim-lspconfig") -- configure language servers
+  use 'williamboman/mason.nvim' -- in charge of managing lsp servers
+  use 'williamboman/mason-lspconfig.nvim' -- integrates mason & lspconfig
+  use 'neovim/nvim-lspconfig' -- configure language servers
+  use 'simrat39/rust-tools.nvim' -- configures rust-analyzer lspconfig
+
+  -- Completion framework:
+  use 'hrsh7th/nvim-cmp'
+
+  -- LSP completion source:
+  use 'hrsh7th/cmp-nvim-lsp'
+
+  -- Useful completion sources:
+  use 'hrsh7th/cmp-nvim-lua'
+  use 'hrsh7th/cmp-nvim-lsp-signature-help'
+  use 'hrsh7th/cmp-vsnip'
+  use 'hrsh7th/cmp-path'
+  use 'hrsh7th/cmp-buffer'
+  use 'hrsh7th/vim-vsnip'
 
   if packer_bootstrap then
     require('packer').sync()
