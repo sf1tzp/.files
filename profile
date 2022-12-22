@@ -34,6 +34,7 @@ alias gfc='git-fetch-checkout'
 alias gfr='git-fetch-rebase'
 alias gl='git-log'
 alias grc='git rebase --continue'
+alias j='just'
 
 alias watch="watch "
 
