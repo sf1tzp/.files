@@ -6,9 +6,6 @@ alias k=kubectl
 alias kc=kubectl
 alias kx=kubectx
 
-alias bsc="get-bootstrap-config"
-alias ucc="get-undercloud-config"
-
 source <(kubectl completion bash)
 complete -F __start_kubectl k
 complete -F __start_kubectl kc
@@ -56,11 +53,6 @@ function aks-creds {
   az aks get-credentials --resource-group $RG --name $CLUSTER
 }
 
-function local-creds {
-  sudo cp -r /root/.kube /home/steven/
-  sudo chown -R steven:steven /home/steven/.kube
-}
-
 function merge-kubeconfig {
   if [[ ! -f ~/.kube/config.bak ]]; then
     cp ~/.kube/config ~/.kube/config.bak
@@ -84,18 +76,7 @@ function simulator-reset {
   reset-kubeconfig
 }
 
-function get-bootstrap-config {
-  rm ~/.kube/bootstrap-kubeconfig.yaml
-  ssh rack1-compute-node-01 -- sudo chmod 0644 /etc/kubernetes/admin.conf
-  ssh rack1-compute-node-01 -- sudo iptables -A INPUT -p tcp --dport 6443 -j ACCEPT
-  scp rack1-compute-node-01:/etc/kubernetes/admin.conf ~/.kube/bootstrap-kubeconfig.yaml
-  merge-kubeconfig ~/.kube/bootstrap-kubeconfig.yaml
-}
-
-function get-undercloud-config {
-  rm ~/.kube/undercloud-kubeconfig.yaml
-  ssh rack1-control-node-02 -- sudo chmod 0644 /etc/kubernetes/admin.conf
-  scp rack1-control-node-02:/etc/kubernetes/admin.conf ~/.kube/undercloud-kubeconfig.yaml
-  merge-kubeconfig ~/.kube/undercloud-kubeconfig.yaml
+function open-ephemeral {
+  ssh rack1compute01 -- sudo iptables -A INPUT -p tcp --dport 6443 -j ACCEPT
 }
 
