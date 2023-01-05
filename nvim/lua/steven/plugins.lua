@@ -66,6 +66,7 @@ return require('packer').startup(function()
   use 'nvim-lualine/lualine.nvim' -- status bar
   use 'christoomey/vim-tmux-navigator' -- tmux integration
   use 'inkarkat/vim-ReplaceWithRegister' -- paste over motion
+  use "lukas-reineke/indent-blankline.nvim" -- indent highlighting
 
   -- File Tree and Fuzzy Finder
   use 'nvim-tree/nvim-tree'

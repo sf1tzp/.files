@@ -2,9 +2,8 @@ require("steven.settings")
 require("steven.remap")
 require("steven.plugins")
 
+-- Mason & Rust Analyzer
 require("mason").setup()
-
-
 local rt = require("rust-tools")
 
 rt.setup({
@@ -33,17 +32,17 @@ sign({name = 'DiagnosticSignHint', text = ''})
 sign({name = 'DiagnosticSignInfo', text = ''})
 
 vim.diagnostic.config({
-    virtual_text = false,
-    signs = true,
-    update_in_insert = true,
-    underline = true,
-    severity_sort = false,
-    float = {
-        border = 'rounded',
-        source = 'always',
-        header = '',
-        prefix = '',
-    },
+  virtual_text = false,
+  signs = true,
+  update_in_insert = true,
+  underline = true,
+  severity_sort = false,
+  float = {
+    border = 'rounded',
+    source = 'always',
+    header = '',
+    prefix = '',
+  },
 })
 
 vim.cmd([[
@@ -57,7 +56,7 @@ cmp.setup({
   -- Enable LSP snippets
   snippet = {
     expand = function(args)
-        vim.fn["vsnip#anonymous"](args.body)
+      vim.fn["vsnip#anonymous"](args.body)
     end,
   },
   mapping = {
@@ -86,21 +85,21 @@ cmp.setup({
     { name = 'calc'},                               -- source for math calculation
   },
   window = {
-      completion = cmp.config.window.bordered(),
-      documentation = cmp.config.window.bordered(),
+    completion = cmp.config.window.bordered(),
+    documentation = cmp.config.window.bordered(),
   },
   formatting = {
-      fields = {'menu', 'abbr', 'kind'},
-      format = function(entry, item)
-          local menu_icon ={
-              nvim_lsp = 'λ',
-              vsnip = '⋗',
-              buffer = 'Ω',
-              path = '🖫',
-          }
-          item.menu = menu_icon[entry.source.name]
-          return item
-      end,
+    fields = {'menu', 'abbr', 'kind'},
+    format = function(entry, item)
+      local menu_icon ={
+        nvim_lsp = 'λ',
+        vsnip = '⋗',
+        buffer = 'Ω',
+        path = '🖫',
+      }
+      item.menu = menu_icon[entry.source.name]
+      return item
+    end,
   },
 })
 
@@ -119,5 +118,23 @@ require('nvim-treesitter.configs').setup {
     extended_mode = true,
     max_file_lines = nil,
   }
+}
+
+-- Indent Highlighting
+vim.opt.termguicolors = true
+vim.cmd [[highlight IndentBlanklineIndent1 guibg=#303030 gui=nocombine]]
+vim.cmd [[highlight IndentBlanklineIndent2 guibg=#3a3a3a gui=nocombine]]
+
+require("indent_blankline").setup {
+  char = "",
+  char_highlight_list = {
+    "IndentBlanklineIndent1",
+    "IndentBlanklineIndent2",
+  },
+  space_char_highlight_list = {
+    "IndentBlanklineIndent1",
+    "IndentBlanklineIndent2",
+  },
+  show_trailing_blankline_indent = false,
 }
 
