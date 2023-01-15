@@ -1,12 +1,11 @@
 if vim.g.vscode then
-  print("Hello")
-    -- VSCode extension
+  print("Using empty init.lua for VS Code Extension")
 else
-    -- ordinary Neovim
-    require("keymap")
-    require("plugins")
-    require("remap")
-    require("settings")
-    require("startup")
+  require("options")
+  require("plugins")
+  require("setup")
+
+  -- define keymaps after plugin setup
+  require("keymap")
 end
 

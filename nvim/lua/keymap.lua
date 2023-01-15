@@ -1,21 +1,12 @@
--- Kudos to the Primeagen
-local M = {}
+vim.g.mapleader = " "
 
-local function bind(op, outer_opts)
-    outer_opts = outer_opts or {noremap = true}
-    return function(lhs, rhs, opts)
-        opts = vim.tbl_extend("force",
-            outer_opts,
-            opts or {}
-        )
-        vim.keymap.set(op, lhs, rhs, opts)
-    end
-end
+-- nvim tree
+vim.keymap.set('n', "<leader>tt", ":NvimTreeToggle<cr>")
+vim.keymap.set('n', "<leader>td", ":NvimTreeFocus<cr>")
 
-M.nmap = bind("n", {noremap = false})
-M.nnoremap = bind("n")
-M.vnoremap = bind("v")
-M.xnoremap = bind("x")
-M.inoremap = bind("i")
+-- Telescope Keymaps
+local ts = require("telescope.builtin")
+vim.keymap.set("n", "<leader>ff", ts.find_files, {})
+vim.keymap.set("n", "<leader>fs", ts.live_grep, {})
+vim.keymap.set("n", "<leader>fg", ts.git_files, {})
 
-return M

@@ -1,6 +1,9 @@
--- require("steven.settings")
--- require("steven.remap")
--- require("steven.plugins")
+-- nvim-tree
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+require('nvim-tree').setup {
+--   auto_close = true
+}
 
 -- Mason & Rust Analyzer
 require("mason").setup()
@@ -109,9 +112,8 @@ require('telescope').setup {
     fzf = {
       fuzzy = true,
       override_generic_sorter = true,
-      override_file_sorter = true,     -- override the file sorter
-      case_mode = "smart_case",        -- or "ignore_case" or "respect_case"
-                                       -- the default case_mode is "smart_case"
+      override_file_sorter = true,
+      case_mode = "smart_case",
     }
   }
 }
