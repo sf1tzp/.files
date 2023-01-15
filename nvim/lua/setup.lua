@@ -1,9 +1,10 @@
+-- color scheme
+require("gruvbox").setup()
+
 -- nvim-tree
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
-require('nvim-tree').setup {
---   auto_close = true
-}
+require('nvim-tree').setup ()
 
 -- Mason & Rust Analyzer
 require("mason").setup()
@@ -153,4 +154,3 @@ require("indent_blankline").setup {
   show_trailing_blankline_indent = false,
 }
 
-require("gruvbox").setup()
