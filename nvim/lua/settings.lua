@@ -1,36 +1,38 @@
-local opt = vim.opt
--- theme
-opt.background = "dark"
+-- colors
+vim.opt.termguicolors = true
+vim.opt.background = "dark"
 vim.cmd([[colorscheme gruvbox]])
--- line numbers
-opt.number = true
-opt.relativenumber = true
+
+-- line options
+vim.opt.number = true
+vim.opt.relativenumber = true
+vim.opt.wrap = false
+vim.opt.signcolumn = "yes" -- display colunm number
+vim.opt.colorcolumn = "80" -- highlight column 80
 
 -- tabs & indentations
-opt.tabstop = 2
-opt.shiftwidth = 2
-opt.expandtab = true
-opt.autoindent = true
+vim.opt.tabstop = 2
+vim.opt.softtabstop = 2
+vim.opt.shiftwidth = 2
+vim.opt.expandtab = true -- indent using spaces
+vim.opt.autoindent = true
+vim.opt.smartindent = true
 
-opt.wrap = false
+-- search settings
+vim.opt.ignorecase = true
+vim.opt.smartcase = true -- use caps in a pattern for case sensitive search
+vim.opt.hlsearch = false -- don't highlight every result
+vim.opt.incsearch = true -- incremental search
 
-opt.ignorecase = true
-opt.smartcase = true
+-- backspace behavior
+vim.opt.backspace = "indent,eol,start"
 
-opt.smartindent = true
+-- use system clipboard
+vim.opt.clipboard:append("unnamedplus")
 
-opt.termguicolors = true
-
-opt.background = "dark"
-
-opt.signcolumn = "yes"
-
-opt.backspace = "indent,eol,start"
-
-opt.clipboard:append("unnamedplus")
-
-opt.splitright = true
-opt.splitbelow = true
+-- splits
+vim.opt.splitright = true -- :vsplit
+vim.opt.splitbelow = true -- :split
 
 --Set completeopt to have a better completion experience
 -- :help completeopt
@@ -48,13 +50,10 @@ vim.api.nvim_set_option('updatetime', 300)
 -- Goto previous / next diagnostic warning / error
 -- Show inlay_hints more frequently
 vim.cmd([[
-set signcolumn=yes
 autocmd CursorHold * lua vim.diagnostic.open_float(nil, { focusable = false })
 ]])
 
 
 -- Add '-' to word symbols
 -- opt.iskeyword:append("-")
-
--- g.mapleader = " "
 
