@@ -1,5 +1,7 @@
 local opt = vim.opt
-
+-- theme
+opt.background = "dark"
+vim.cmd([[colorscheme gruvbox]])
 -- line numbers
 opt.number = true
 opt.relativenumber = true

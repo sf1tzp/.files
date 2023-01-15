@@ -1,6 +1,6 @@
-require("steven.settings")
-require("steven.remap")
-require("steven.plugins")
+-- require("steven.settings")
+-- require("steven.remap")
+-- require("steven.plugins")
 
 -- Mason & Rust Analyzer
 require("mason").setup()
@@ -138,3 +138,4 @@ require("indent_blankline").setup {
   show_trailing_blankline_indent = false,
 }
 
+require("gruvbox").setup()

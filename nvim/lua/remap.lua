@@ -1,4 +1,4 @@
-local nnoremap = require("steven.keymap").nnoremap
+local nnoremap = require("keymap").nnoremap
 
 nnoremap("<leader>pv", "<cmd>Ex<CR>")
 nnoremap("<leader>tf", "<cmd>Telescope find_files<CR>")

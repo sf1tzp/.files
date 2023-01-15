@@ -69,7 +69,7 @@ return require('packer').startup(function()
   use "lukas-reineke/indent-blankline.nvim" -- indent highlighting
 
   -- File Tree and Fuzzy Finder
-  use 'nvim-tree/nvim-tree'
+  use 'nvim-tree/nvim-tree.lua'
   use 'nvim-tree/nvim-web-devicons'
   use { 'nvim-telescope/telescope-fzf-native.nvim', run = "make" }
   use { 'nvim-telescope/telescope.nvim', branch = '0.1.x' }
