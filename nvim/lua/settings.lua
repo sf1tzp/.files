@@ -9,6 +9,7 @@ vim.opt.relativenumber = true
 vim.opt.wrap = false
 vim.opt.signcolumn = "yes" -- display colunm number
 vim.opt.colorcolumn = "80" -- highlight column 80
+vim.opt.scrolloff = 8 -- keep n lines visible around cursor
 
 -- tabs & indentations
 vim.opt.tabstop = 2
@@ -33,6 +34,12 @@ vim.opt.clipboard:append("unnamedplus")
 -- splits
 vim.opt.splitright = true -- :vsplit
 vim.opt.splitbelow = true -- :split
+
+-- save & undo
+vim.opt.swapfile = false
+vim.opt.backup = false
+vim.opt.undodir = os.getenv("HOME") .. "/.vim/undodir"
+vim.opt.undofile = true
 
 --Set completeopt to have a better completion experience
 -- :help completeopt

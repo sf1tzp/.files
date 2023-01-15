@@ -69,6 +69,8 @@ return require('packer').startup(function()
   use 'inkarkat/vim-ReplaceWithRegister' -- paste over motion
   use "lukas-reineke/indent-blankline.nvim" -- indent highlighting
   use 'ntpeters/vim-better-whitespace' -- trailing whitespace
+  use 'mbbill/undotree' -- better undo history
+  use 'tpope/vim-fugitive' -- use git without leaving vim
 
   -- File Tree and Fuzzy Finder
   use 'nvim-tree/nvim-tree.lua'
