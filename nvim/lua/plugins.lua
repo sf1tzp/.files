@@ -37,7 +37,7 @@ packer.init({
 
 -- autocommand that reloads neovim and installs/updates/removes plugins
 -- when file is saved
-vim.cmd([[ 
+vim.cmd([[
   augroup packer_user_config
     autocmd!
     autocmd BufWritePost plugins-setup.lua source <afile> | PackerSync
@@ -61,12 +61,14 @@ return require('packer').startup(function()
   use 'EdenEast/nightfox.nvim'
 
   -- Feature Plugins
+  use 'nvim-lua/plenary.nvim' -- lua functions (used by other plugins)
   use 'tpope/vim-surround' -- quote/unqote motions
   use 'numToStr/Comment.nvim' -- comment motions
   use 'nvim-lualine/lualine.nvim' -- status bar
   use 'christoomey/vim-tmux-navigator' -- tmux integration
   use 'inkarkat/vim-ReplaceWithRegister' -- paste over motion
   use "lukas-reineke/indent-blankline.nvim" -- indent highlighting
+  use 'ntpeters/vim-better-whitespace' -- trailing whitespace
 
   -- File Tree and Fuzzy Finder
   use 'nvim-tree/nvim-tree.lua'
