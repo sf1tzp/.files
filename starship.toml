@@ -46,9 +46,9 @@ format = '[$state \($progress_current/$progress_total\)]($style) '
 
 [git_status]
 style = "green"
-untracked = "[$count U](red italic)[ / ](white)"
-modified = "[$count M](yellow italic)"
-staged = "[ / ](white)[$count S](green italic)"
+untracked = "[$count U](red)[ / ](white)"
+modified = "[$count M](yellow)"
+staged = "[ / ](white)[$count S](green)"
 diverged = '\[!!!\] '
 ahead = '\[$count ahead\] '
 behind = '\[$count behind\] '
@@ -56,7 +56,7 @@ format = '[$ahead_behind](purple)$untracked$modified$staged'
 
 [cmd_duration]
 format = '[\($duration\)]($style)'
-style = "bright-yellow italic"
+style = "bright-yellow"
 
 [time]
 disabled = false
