@@ -4,7 +4,17 @@ require("gruvbox").setup()
 -- nvim-tree
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
-require('nvim-tree').setup()
+require('nvim-tree').setup {
+  view = {
+    float = {
+      enable = true,
+      open_win_config = {
+        border = "single",
+        height = 100,
+      }
+    }
+  }
+}
 
 -- lsp-zero
 require("lsp")
