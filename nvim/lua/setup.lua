@@ -50,8 +50,9 @@ require('nvim-treesitter.configs').setup {
   }
 }
 
--- nvim-surround
+-- nvim comment and surround
 require("nvim-surround").setup()
+require("Comment").setup()
 
 -- Indent Highlighting
 vim.opt.termguicolors = true
