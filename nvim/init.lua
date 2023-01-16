@@ -3,6 +3,7 @@ if vim.g.vscode then
 else
   require("options")
   require("plugins")
+  require("lsp")
   require("setup")
 
   -- define keymaps after plugin setup

@@ -21,9 +21,6 @@ require('nvim-tree').setup {
   }
 }
 
--- lsp-zero
-require("lsp")
-
 -- Telescope
 require('telescope').setup {
   extensions = {
