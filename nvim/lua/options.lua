@@ -48,9 +48,9 @@ vim.opt.undofile = true
 -- noselect: Do not select, force to select one from the menu
 -- shortness: avoid showing extra messages when using completion
 -- updatetime: set updatetime for CursorHold
-vim.opt.completeopt = {'menuone', 'noselect', 'noinsert'}
-vim.opt.shortmess = vim.opt.shortmess + { c = true}
-vim.api.nvim_set_option('updatetime', 300)
+-- vim.opt.completeopt = {'menuone', 'noselect', 'noinsert'}
+-- vim.opt.shortmess = vim.opt.shortmess + { c = true}
+-- vim.api.nvim_set_option('updatetime', 300)
 
 -- Fixed column for diagnostics to appear
 -- Show autodiagnostic popup on cursor hover_range
@@ -59,7 +59,6 @@ vim.api.nvim_set_option('updatetime', 300)
 vim.cmd([[
 autocmd CursorHold * lua vim.diagnostic.open_float(nil, { focusable = false })
 ]])
-
 
 -- Add '-' to word symbols
 -- opt.iskeyword:append("-")
