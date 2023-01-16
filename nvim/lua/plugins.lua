@@ -79,12 +79,7 @@ return require('packer').startup(function()
   use { 'nvim-telescope/telescope.nvim', branch = '0.1.x' }
 
   -- Treesitter (Syntax Tree Highlighting)
-  use { 'nvim-treesitter/nvim-treesitter',
-        run = function()
-            local ts_update = require('nvim-treesitter.install').update({ with_sync = true })
-            ts_update()
-        end,
-  }
+  use { 'nvim-treesitter/nvim-treesitter', run = ":TSUpdate" }
 
   -- Language Server
   use 'williamboman/mason.nvim' -- in charge of managing lsp servers
