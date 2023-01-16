@@ -71,7 +71,8 @@ return require('packer').startup(function()
   use 'ntpeters/vim-better-whitespace' -- trailing whitespace
   use 'mbbill/undotree' -- better undo history
   use 'tpope/vim-fugitive' -- use git without leaving vim
-  use { 'wfxr/minimap.vim', run = ":!cargo install --locked code-minimap" } -- minimap
+  -- use { 'wfxr/minimap.vim', run = ":!cargo install --locked code-minimap" } -- minimap
+  use 'gorbit99/codewindow.nvim'
 
   -- File Tree and Fuzzy Finder
   use 'nvim-tree/nvim-tree.lua'
