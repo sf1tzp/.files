@@ -82,24 +82,30 @@ return require('packer').startup(function()
   use { 'nvim-treesitter/nvim-treesitter', run = ":TSUpdate" }
 
   -- Language Server
-  use 'williamboman/mason.nvim' -- in charge of managing lsp servers
-  use 'williamboman/mason-lspconfig.nvim' -- integrates mason & lspconfig
-  use 'neovim/nvim-lspconfig' -- configure language servers
   use 'simrat39/rust-tools.nvim' -- configures rust-analyzer lspconfig
 
-  -- Completion framework:
-  use 'hrsh7th/nvim-cmp'
+  use {
+    'VonHeikemen/lsp-zero.nvim',
+    requires = {
+      -- LSP Support
+      {'neovim/nvim-lspconfig'},
+      {'williamboman/mason.nvim'},
+      {'williamboman/mason-lspconfig.nvim'},
 
-  -- LSP completion source:
-  use 'hrsh7th/cmp-nvim-lsp'
+      -- Autocompletion
+      {'hrsh7th/nvim-cmp'},
+      {'hrsh7th/cmp-buffer'},
+      {'hrsh7th/cmp-path'},
+      {'saadparwaiz1/cmp_luasnip'},
+      {'hrsh7th/cmp-nvim-lsp'},
+      {'hrsh7th/cmp-nvim-lua'},
 
-  -- Useful completion sources:
-  use 'hrsh7th/cmp-nvim-lua'
-  use 'hrsh7th/cmp-nvim-lsp-signature-help'
-  use 'hrsh7th/cmp-vsnip'
-  use 'hrsh7th/cmp-path'
-  use 'hrsh7th/cmp-buffer'
-  use 'hrsh7th/vim-vsnip'
+      -- Snippets
+      {'L3MON4D3/LuaSnip'},
+      -- Snippet Collection (Optional)
+      {'rafamadriz/friendly-snippets'},
+    }
+  }
 
   if packer_bootstrap then
     require('packer').sync()
