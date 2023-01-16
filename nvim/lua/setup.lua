@@ -68,3 +68,8 @@ require("indent_blankline").setup {
   show_trailing_blankline_indent = false,
 }
 
+-- minimap
+vim.g.minimap_width = 10
+vim.g.minimap_auto_start = 1
+vim.g.minimap_auto_start_win_enter = 1
+

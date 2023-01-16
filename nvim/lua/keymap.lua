@@ -11,6 +11,7 @@ vim.keymap.set("n", "q", "<nop>") -- disable 'q' (default start recording)
 vim.keymap.set("n", "Q", "<nop>") -- disable 'Q' (play last macro)
 vim.keymap.set("n", "<C-c>", "<Esc>") -- make ctrl-c quiet
 vim.keymap.set("i", "<C-c>", "<Esc>")
+vim.keymap.set("n", "<leader>l", ":set number! norelativenumber<cr>")
 -- Open file right split
 -- highlight via telescope or tree and hit ctrl+V
 -- Open file down split
@@ -61,4 +62,7 @@ vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle)
 
 -- fugitive
 vim.keymap.set("n", "<leader>gs", vim.cmd.Git)
+
+-- minimap
+vim.keymap.set("n", "<leader>n", vim.cmd.MinimapToggle)
 
