@@ -62,7 +62,7 @@ return require('packer').startup(function()
 
   -- Feature Plugins
   use 'nvim-lua/plenary.nvim' -- lua functions (used by other plugins)
-  use 'tpope/vim-surround' -- quote/unqote motions
+  use 'kylechui/nvim-surround' -- quote/unqote motions
   use 'numToStr/Comment.nvim' -- comment motions
   use 'nvim-lualine/lualine.nvim' -- status bar
   use 'christoomey/vim-tmux-navigator' -- tmux integration

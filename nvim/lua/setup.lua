@@ -50,6 +50,9 @@ require('nvim-treesitter.configs').setup {
   }
 }
 
+-- nvim-surround
+require("nvim-surround").setup()
+
 -- Indent Highlighting
 vim.opt.termguicolors = true
 vim.cmd [[highlight IndentBlanklineIndent1 guibg=#303030 gui=nocombine]]
