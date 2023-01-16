@@ -13,8 +13,8 @@ vim.keymap.set("n", "Q", "<nop>") -- disable 'Q' (play last macro)
 vim.keymap.set("n", "<C-c>", "<Esc>") -- make ctrl-c quiet
 vim.keymap.set("i", "<C-c>", "<Esc>")
 
--- Open a new session
-vim.keymap.set("n", "<C-f>", "<cmd>silent !tmux neww tmux-sessionizer<CR>")
+-- Open a folder as a new session
+vim.keymap.set("n", "<C-f>", "<cmd>silent !tms<CR>")
 
 -- Keep cursor centered when jumping
 vim.keymap.set("n", "n", "nzzzv") -- slash searching
@@ -46,9 +46,9 @@ vim.keymap.set('n', "<leader>tf", vim.cmd.NvimTreeFocus)
 
 -- Telescope Keymaps
 local ts = require("telescope.builtin")
-vim.keymap.set("n", "<leader>ff", ts.find_files, {})
-vim.keymap.set("n", "<leader>fs", ts.live_grep, {})
-vim.keymap.set("n", "<leader>fg", ts.git_files, {})
+vim.keymap.set("n", "<leader>o", ts.find_files, {})
+vim.keymap.set("n", "<leader>g", ts.live_grep, {})
+vim.keymap.set("n", "<leader>og", ts.git_files, {})
 
 -- undotree
 vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle)
