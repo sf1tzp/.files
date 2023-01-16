@@ -29,7 +29,8 @@ vim.opt.incsearch = true -- incremental search
 vim.opt.backspace = "indent,eol,start"
 
 -- use system clipboard
-vim.opt.clipboard:append("unnamedplus")
+-- Note: use leader{y, p} for system clipboard
+-- vim.opt.clipboard:append("unnamedplus")
 
 -- splits
 vim.opt.splitright = true -- :vsplit
