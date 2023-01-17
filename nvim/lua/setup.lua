@@ -1,6 +1,11 @@
 -- color scheme
 require("gruvbox").setup()
 
+-- status bar
+require('lualine').setup({
+  options = { theme = 'everforest' }
+})
+
 -- nvim-tree
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
@@ -21,6 +26,9 @@ require('nvim-tree').setup {
   }
 }
 
+-- harpoon
+require('harpoon').setup()
+
 -- Telescope
 require('telescope').setup {
   extensions = {
@@ -36,7 +44,7 @@ require('telescope').load_extension("fzf")
 
 -- Treesitter Plugin Setup
 require('nvim-treesitter.configs').setup {
-  ensure_installed = { "lua", "rust", "toml" },
+  ensure_installed = { "lua", "vim", "help", "markdown", "go",  "rust", "json", "yaml", "toml" },
   auto_install = true,
   highlight = {
     enable = true,
@@ -73,11 +81,10 @@ require("indent_blankline").setup {
 }
 
 -- minimap
-vim.g.minimap_width = 10
-vim.g.minimap_auto_start = 1
-vim.g.minimap_auto_start_win_enter = 1
-require("codewindow").setup()
 local codewindow = require('codewindow')
-codewindow.setup()
+codewindow.setup({
+  minimap_width = 5,
+  width_multuplier = 12,
+})
 codewindow.apply_default_keybinds()
 

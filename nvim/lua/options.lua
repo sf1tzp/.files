@@ -32,6 +32,9 @@ vim.opt.backspace = "indent,eol,start"
 -- Note: use leader{y, p} for system clipboard
 -- vim.opt.clipboard:append("unnamedplus")
 
+-- Hide builtin command line (using lualine instead)
+vim.opt.cmdheight=0
+
 -- splits
 vim.opt.splitright = true -- :vsplit
 vim.opt.splitbelow = true -- :split

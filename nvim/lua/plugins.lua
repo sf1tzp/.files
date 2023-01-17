@@ -49,7 +49,7 @@ local status, packer = pcall(require, "packer")
 if not status then
   return
 end
-return require('packer').startup(function()
+return require('packer').startup(function(use)
   -- Packer can manage itself
   use 'wbthomason/packer.nvim'
 
@@ -64,19 +64,22 @@ return require('packer').startup(function()
   use 'nvim-lua/plenary.nvim' -- lua functions (used by other plugins)
   use 'kylechui/nvim-surround' -- quote/unqote motions
   use 'numToStr/Comment.nvim' -- comment motions
-  use 'nvim-lualine/lualine.nvim' -- status bar
+  use {                        -- status bar
+    'nvim-lualine/lualine.nvim',
+    requires = { 'kyazdani42/nvim-web-devicons', opt = true },
+  }
   use 'christoomey/vim-tmux-navigator' -- tmux integration
   use 'inkarkat/vim-ReplaceWithRegister' -- paste over motion
-  use "lukas-reineke/indent-blankline.nvim" -- indent highlighting
+  use 'lukas-reineke/indent-blankline.nvim' -- indent highlighting
   use 'ntpeters/vim-better-whitespace' -- trailing whitespace
   use 'mbbill/undotree' -- better undo history
   use 'tpope/vim-fugitive' -- use git without leaving vim
-  -- use { 'wfxr/minimap.vim', run = ":!cargo install --locked code-minimap" } -- minimap
-  use 'gorbit99/codewindow.nvim'
+  use 'gorbit99/codewindow.nvim' -- minimap
 
-  -- File Tree and Fuzzy Finder
+  -- File Tree and Navigation
   use 'nvim-tree/nvim-tree.lua'
   use 'nvim-tree/nvim-web-devicons'
+  use 'ThePrimeagen/harpoon' -- mark files and hop between them
   use { 'nvim-telescope/telescope-fzf-native.nvim', run = "make" }
   use { 'nvim-telescope/telescope.nvim', branch = '0.1.x' }
 
