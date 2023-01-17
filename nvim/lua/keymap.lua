@@ -94,5 +94,7 @@ vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle)
 vim.keymap.set("n", "<leader>gs", vim.cmd.Git)
 
 -- minimap
-vim.keymap.set("n", "<leader>n", vim.cmd.MinimapToggle)
+local mm = require('codewindow')
+vim.keymap.set("n", "<leader>n", mm.toggle_minimap, {})
+vim.keymap.set("n", "<leader>nf", mm.toggle_focus, {})
 
