@@ -86,6 +86,7 @@ return require('packer').startup(function(use)
 
   -- Treesitter (Syntax Tree Highlighting)
   use { 'nvim-treesitter/nvim-treesitter', run = ":TSUpdate" }
+  use 'eckon/treesitter-current-functions' -- jump around between functions
 
   -- Language Server
   use 'simrat39/rust-tools.nvim' -- configures rust-analyzer lspconfig

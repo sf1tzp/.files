@@ -64,6 +64,9 @@ vim.keymap.set("n", "<leader>oo", ts.find_files, {})
 vim.keymap.set("n", "<leader>gg", ts.live_grep, {})
 vim.keymap.set("n", "<leader>og", ts.git_files, {})
 
+-- treesitter
+vim.keymap.set("n", "<leader>@", ":GetCurrentFunctions<cr>")
+
 -- undotree
 vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle)
 
