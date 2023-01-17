@@ -11,7 +11,7 @@ vim.keymap.set("n", "q", "<nop>") -- disable 'q' (default start recording)
 vim.keymap.set("n", "Q", "<nop>") -- disable 'Q' (play last macro)
 vim.keymap.set("n", "<C-c>", "<Esc>") -- make ctrl-c quiet
 vim.keymap.set("i", "<C-c>", "<Esc>")
-vim.keymap.set("n", "<leader>l", ":set number! norelativenumber<cr>") -- toggle relativenumber
+vim.keymap.set("n", "<leader>l", ":set relativenumber!<cr>") -- toggle relativenumber
 
 -- Open file right split
 -- highlight via telescope or tree and hit ctrl+V
