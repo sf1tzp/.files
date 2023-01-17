@@ -60,8 +60,8 @@ vim.keymap.set('n', "<leader>tf", vim.cmd.NvimTreeFocus)
 
 -- Telescope Keymaps
 local ts = require("telescope.builtin")
-vim.keymap.set("n", "<leader>o", ts.find_files, {})
-vim.keymap.set("n", "<leader>g", ts.live_grep, {})
+vim.keymap.set("n", "<leader>oo", ts.find_files, {})
+vim.keymap.set("n", "<leader>gg", ts.live_grep, {})
 vim.keymap.set("n", "<leader>og", ts.git_files, {})
 
 -- undotree
