@@ -19,6 +19,12 @@ vim.opt.expandtab = true -- indent using spaces
 vim.opt.autoindent = true
 vim.opt.smartindent = true
 
+-- use tabs and 4 width in go files
+vim.api.nvim_create_autocmd({"BufEnter", "BufWinEnter"}, {
+  pattern = {"*.go"},
+  command = "setlocal tabstop=4 shiftwidth=4 softtabstop=4",
+})
+
 -- search settings
 vim.opt.ignorecase = true
 vim.opt.smartcase = true -- use caps in a pattern for case sensitive search
