@@ -49,7 +49,7 @@ function install_helm() {
 function install_go() {
     : "${FORCE_GO_INSTALL:=false}"
     if ! command -v go &> /dev/null || $FORCE_GO_INSTALL; then
-        : "${GO_VERSION:="1.18.6"}"
+        : "${GO_VERSION:="1.19.4"}"
         sudo rm -rf /usr/local/go
         wget -c https://golang.org/dl/go$GO_VERSION.linux-amd64.tar.gz -O - | sudo tar -xz -C /usr/local
     fi
@@ -369,7 +369,7 @@ function install_stuff() {
     install_shellcheck &
     pid_array+=($!)
 
-    FORCE_GO_INSTALL=true GO_VERSION=1.18.5 install_go &
+    FORCE_GO_INSTALL=true install_go &
     pid_array+=($!)
 
     HELM_VERSION=v3.6.3 install_helm &
