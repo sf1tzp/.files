@@ -75,6 +75,7 @@ return require('packer').startup(function(use)
   use 'mbbill/undotree' -- better undo history
   use 'tpope/vim-fugitive' -- use git without leaving vim
   use 'gorbit99/codewindow.nvim' -- minimap
+  use "windwp/nvim-autopairs" -- add closing brackets and quotes
 
   -- File Tree and Navigation
   use 'nvim-tree/nvim-tree.lua'

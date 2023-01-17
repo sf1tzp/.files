@@ -10,6 +10,7 @@ require('lualine').setup({
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 require('nvim-tree').setup {
+  disable_netrw = true,
   -- see :help nvim-tree-setup
   view = {
     -- use float for quit_on_focus_loss
@@ -61,6 +62,25 @@ require('nvim-treesitter.configs').setup {
 -- nvim comment and surround
 require("nvim-surround").setup()
 require("Comment").setup()
+
+-- nvim auto pair w/ treesitter
+local npairs = require("nvim-autopairs")
+local Rule = require('nvim-autopairs.rule')
+npairs.setup({
+    check_ts = true,
+    ts_config = {
+        lua = {'string'},-- it will not add a pair on that treesitter node
+    }
+})
+local ts_conds = require('nvim-autopairs.ts-conds')
+
+-- press % => %% only while inside a comment or string
+npairs.add_rules({
+  Rule("%", "%", "lua")
+    :with_pair(ts_conds.is_ts_node({'string','comment'})),
+  Rule("$", "$", "lua")
+    :with_pair(ts_conds.is_not_ts_node({'function'}))
+})
 
 -- Indent Highlighting
 vim.opt.termguicolors = true
