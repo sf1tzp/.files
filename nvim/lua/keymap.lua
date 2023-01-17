@@ -11,7 +11,8 @@ vim.keymap.set("n", "q", "<nop>") -- disable 'q' (default start recording)
 vim.keymap.set("n", "Q", "<nop>") -- disable 'Q' (play last macro)
 vim.keymap.set("n", "<C-c>", "<Esc>") -- make ctrl-c quiet
 vim.keymap.set("i", "<C-c>", "<Esc>")
-vim.keymap.set("n", "<leader>l", ":set number! norelativenumber<cr>")
+vim.keymap.set("n", "<leader>l", ":set number! norelativenumber<cr>") -- toggle relativenumber
+
 -- Open file right split
 -- highlight via telescope or tree and hit ctrl+V
 -- Open file down split
@@ -19,39 +20,15 @@ vim.keymap.set("n", "<leader>l", ":set number! norelativenumber<cr>")
 -- Move between splits
 -- ctrl+w, hjkl
 
--- nvim-surround
--- The three "core" operations of add/delete/change can be done with the keymaps ys{motion}{char}, ds{char}, and cs{target}{replacement}, respectively. For the following examples, * will denote the cursor position:
---
---     Old text                    Command         New text
--- --------------------------------------------------------------------------------
---     surr*ound_words             ysiw)           (surround_words)
---     *make strings               ys$"            "make strings"
---     [delete ar*ound me!]        ds]             delete around me!
---     remove <b>HTML t*ags</b>    dst             remove HTML tags
---     'change quot*es'            cs'"            "change quotes"
---     <b>or tag* types</b>        csth1<CR>       <h1>or tag types</h1>
---     delete(functi*on calls)     dsf             function calls
---
--- Detailed information on how to use this plugin can be found in :h nvim-surround.usage.
+-- nvim-surround :help nvim-surround.usage
 
 -- nvim comment
 --     NORMAL mode
 -- `gcc` - Toggles the current line using linewise comment
 -- `gbc` - Toggles the current line using blockwise comment
--- `[count]gcc` - Toggles the number of line given as a prefix-count using linewise
--- `[count]gbc` - Toggles the number of line given as a prefix-count using blockwise
--- `gc[count]{motion}` - (Op-pending) Toggles the region using linewise comment
--- `gb[count]{motion}` - (Op-pending) Toggles the region using blockwise comment
--- `gco` - Insert comment to the next line and enters INSERT mode
--- `gcO` - Insert comment to the previous line and enters INSERT mode
--- `gcA` - Insert comment to end of the current line and enters INSERT mode
 --     VISUAL mode
 -- `gc` - Toggles the region using linewise comment
 -- `gb` - Toggles the region using blockwise comment
--- for more, see readme
-
--- Open a folder as a new session
-vim.keymap.set("n", "<C-f>", "<cmd>silent !tms<CR>")
 
 -- Keep cursor centered when jumping
 vim.keymap.set("n", "n", "nzzzv") -- slash searching
