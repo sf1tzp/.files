@@ -146,7 +146,6 @@ function describe_afo_resources() {
   describe_resources virtualmachineactionrestarts
   describe_resources virtualmachineactionstarts
   describe_resources virtualmachines
-  describe_resources workloadnetworks
 }
 
 function describe_crs() {
