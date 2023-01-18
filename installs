@@ -63,6 +63,7 @@ function install_rust() {
     fi
     if $COOL_CARGO; then
       cargo install code-minimap tmux-sessionizer
+      tms config --paths $HOME
     fi
 }
 
