@@ -72,6 +72,13 @@ vim.keymap.set("n", "<leader>gs", vim.cmd.Git)
 -- code coverage
 vim.keymap.set("n", "<leader>cc", ":Coverage<cr>")
 vim.keymap.set("n", "<leader>cr", ":CoverageSummary<cr>")
+vim.api.nvim_create_autocmd({"BufEnter", "BufWinEnter"}, {
+  pattern = {"*.go"},
+  command = ":Coverage",
+})
+
+-- git blame
+vim.keymap.set("n", "<leader>??", ":GitBlameToggle<cr>")
 -- base64
 -- <leader>atob to encode
 -- <leader>btoa to decode

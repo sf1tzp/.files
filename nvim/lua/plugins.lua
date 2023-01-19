@@ -79,6 +79,7 @@ return require('packer').startup(function(use)
   use 'dstein64/vim-startuptime' -- measure startup time with :StartupTime
   use 'christianrondeau/vim-base64' -- base 64 extension
   use 'andythigpen/nvim-coverage' -- coverage report visualiztion
+  use 'f-person/git-blame.nvim' -- git blame inline
 
   -- File Navigation
   use 'ThePrimeagen/harpoon' -- mark files and hop between them

@@ -96,3 +96,8 @@ require("coverage").setup({
   }
 })
 
+-- git blame
+vim.g.gitblame_enabled = 0 -- don't render by default
+vim.g.gitblame_date_format = '%r'
+vim.g.gitblame_message_template = '\t\t\t\t\t<author>, <date> <sha> <summary>'
+
