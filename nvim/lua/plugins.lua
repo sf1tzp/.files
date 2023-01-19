@@ -76,10 +76,9 @@ return require('packer').startup(function(use)
   use 'tpope/vim-fugitive' -- use git without leaving vim
   use 'gorbit99/codewindow.nvim' -- minimap
   use "windwp/nvim-autopairs" -- add closing brackets and quotes
+  use 'dstein64/vim-startuptime' -- measure startup time with :StartupTime
 
-  -- File Tree and Navigation
-  use 'nvim-tree/nvim-tree.lua'
-  use 'nvim-tree/nvim-web-devicons'
+  -- File Navigation
   use 'ThePrimeagen/harpoon' -- mark files and hop between them
   use { 'nvim-telescope/telescope-fzf-native.nvim', run = "make" }
   use { 'nvim-telescope/telescope.nvim', branch = '0.1.x' }

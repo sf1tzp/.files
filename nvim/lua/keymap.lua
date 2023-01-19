@@ -54,10 +54,6 @@ vim.keymap.set("n", "<leader>Y", [["+Y]])
 vim.keymap.set("n", "<leader>d", [["_d]])
 vim.keymap.set("v", "<leader>d", [["_d]])
 
--- nvim tree
-vim.keymap.set('n', "<leader>tt", vim.cmd.NvimTreeToggle)
-vim.keymap.set('n', "<leader>tf", vim.cmd.NvimTreeFocus)
-
 -- Telescope Keymaps
 local ts = require("telescope.builtin")
 vim.keymap.set("n", "<leader>oo", ts.find_files, {})

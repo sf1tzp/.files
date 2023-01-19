@@ -6,27 +6,6 @@ require('lualine').setup({
   options = { theme = 'everforest' }
 })
 
--- nvim-tree
-vim.g.loaded_netrw = 1
-vim.g.loaded_netrwPlugin = 1
-require('nvim-tree').setup {
-  disable_netrw = true,
-  -- see :help nvim-tree-setup
-  view = {
-    -- use float for quit_on_focus_loss
-    -- Otherwise, nvim-tree will get in the way when quitting vim when docked
-    -- see : https://github.com/nvim-tree/nvim-tree.lua/wiki/Auto-Close
-    float = {
-      enable = true,
-      quit_on_focus_loss = true,
-      open_win_config = {
-        border = "single",
-        height = 100,
-      }
-    }
-  }
-}
-
 -- harpoon
 require('harpoon').setup()
 
