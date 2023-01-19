@@ -69,6 +69,9 @@ vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle)
 -- fugitive
 vim.keymap.set("n", "<leader>gs", vim.cmd.Git)
 
+-- code coverage
+vim.keymap.set("n", "<leader>cc", ":Coverage<cr>")
+vim.keymap.set("n", "<leader>cr", ":CoverageSummary<cr>")
 -- base64
 -- <leader>atob to encode
 -- <leader>btoa to decode

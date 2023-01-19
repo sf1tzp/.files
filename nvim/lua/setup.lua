@@ -87,3 +87,12 @@ codewindow.setup({
 })
 codewindow.apply_default_keybinds()
 
+-- code coverage
+require("coverage").setup({
+  lang = {
+    go = {
+      coverage_file = "./out/tests/unit/full_coverage.out"
+    }
+  }
+})
+
