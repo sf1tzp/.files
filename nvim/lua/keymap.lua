@@ -69,6 +69,13 @@ vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle)
 -- fugitive
 vim.keymap.set("n", "<leader>gs", vim.cmd.Git)
 
+-- base64
+-- <leader>atob to encode
+-- <leader>btoa to decode
+-- vim.g.vim_base64_disable_default_key_mappings = 0 -- 1 to disable
+-- vim.keymap.set("v", "<leader>bd", ":base64#v_btoa()<cr>") -- fixme
+-- vim.keymap.set("v", "<leader>be", ":base64#v_atob()<cr>") --fixme
+
 -- minimap
 local mm = require('codewindow')
 vim.keymap.set("n", "<leader>n", mm.toggle_minimap, {})
