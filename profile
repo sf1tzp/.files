@@ -78,6 +78,11 @@ if command -v exa &> /dev/null; then
     alias tree='exa -T'
 fi
 
+if command -v pacman &> /dev/null; then
+    alias p='pacman'
+    alias packman='pacman'
+fi
+
 if command -v rg &> /dev/null; then
     alias grep='rg'
 fi
