@@ -72,6 +72,7 @@ vim.keymap.set("n", "<leader>gs", vim.cmd.Git)
 -- code coverage
 vim.keymap.set("n", "<leader>cc", ":Coverage<cr>")
 vim.keymap.set("n", "<leader>cr", ":CoverageSummary<cr>")
+vim.keymap.set("n", "<leader>ct", ":CoverageToggle<cr>")
 vim.api.nvim_create_autocmd({"BufEnter", "BufWinEnter"}, {
   pattern = {"*.go"},
   command = ":Coverage",
