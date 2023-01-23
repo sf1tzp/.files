@@ -101,3 +101,14 @@ vim.g.gitblame_enabled = 0 -- don't render by default
 vim.g.gitblame_date_format = '%r'
 vim.g.gitblame_message_template = '\t\t\t\t\t<author>, <date> <sha> <summary>'
 
+-- git diffview
+require("diffview").setup()
+
+-- obsidian
+require("obsidian").setup({
+  dir = "~/mine/notes",
+  completion = {
+    nvim_cmp = true, -- if using nvim-cmp, otherwise set to false
+  }
+})
+

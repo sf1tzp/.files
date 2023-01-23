@@ -60,14 +60,16 @@ return require('packer').startup(function(use)
   use 'rebelot/kanagawa.nvim'
   use 'EdenEast/nightfox.nvim'
 
+  -- Status Bar
+  use {
+    'nvim-lualine/lualine.nvim',
+    requires = { 'kyazdani42/nvim-web-devicons', opt = true },
+  }
+
   -- Feature Plugins
   use 'nvim-lua/plenary.nvim' -- lua functions (used by other plugins)
   use 'kylechui/nvim-surround' -- quote/unqote motions
   use 'numToStr/Comment.nvim' -- comment motions
-  use {                        -- status bar
-    'nvim-lualine/lualine.nvim',
-    requires = { 'kyazdani42/nvim-web-devicons', opt = true },
-  }
   use 'christoomey/vim-tmux-navigator' -- tmux integration
   use 'inkarkat/vim-ReplaceWithRegister' -- paste over motion
   use 'lukas-reineke/indent-blankline.nvim' -- indent highlighting
@@ -80,6 +82,8 @@ return require('packer').startup(function(use)
   use 'christianrondeau/vim-base64' -- base 64 extension
   use 'andythigpen/nvim-coverage' -- coverage report visualiztion
   use 'f-person/git-blame.nvim' -- git blame inline
+  use 'sindrets/diffview.nvim' -- git diff viewer
+  use 'epwalsh/obsidian.nvim' -- obsidian integration
 
   -- File Navigation
   use 'ThePrimeagen/harpoon' -- mark files and hop between them
