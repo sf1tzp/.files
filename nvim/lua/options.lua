@@ -22,7 +22,7 @@ vim.opt.smartindent = true
 -- use tabs and 4 width in go files
 vim.api.nvim_create_autocmd({"BufEnter", "BufWinEnter"}, {
   pattern = {"*.go"},
-  command = "setlocal tabstop=4 shiftwidth=4 softtabstop=4",
+  command = "setlocal tabstop=4 shiftwidth=4 softtabstop=0 noexpandtab",
 })
 
 -- search settings
