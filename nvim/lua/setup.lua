@@ -7,7 +7,11 @@ require("gruvbox").setup({
 
 -- status bar
 require('lualine').setup({
-  options = { theme = 'everforest' }
+  options = { theme = 'everforest' },
+  sections = {
+    lualine_c = {{'filename', path = 1}}
+  }
+
 })
 
 -- harpoon
