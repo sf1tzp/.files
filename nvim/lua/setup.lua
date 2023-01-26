@@ -1,5 +1,9 @@
 -- color scheme
-require("gruvbox").setup()
+require("gruvbox").setup({
+    overrides = {
+        SignColumn = {bg = "#282828"}
+    }
+})
 
 -- status bar
 require('lualine').setup({
