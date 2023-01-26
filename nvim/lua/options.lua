@@ -8,7 +8,7 @@ vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.wrap = false
 vim.opt.signcolumn = "yes" -- display colunm number
-vim.opt.colorcolumn = "80" -- highlight column 80
+vim.opt.colorcolumn = { "80", "120" } -- code rulers 80
 vim.opt.scrolloff = 8 -- keep n lines visible around cursor
 
 -- tabs & indentations

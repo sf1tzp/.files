@@ -1,7 +1,8 @@
 -- color scheme
 require("gruvbox").setup({
     overrides = {
-        SignColumn = {bg = "#282828"}
+        SignColumn = {bg = "#282828"}, -- left-most bar where lsp signs show
+        ColorColumn = {bg = "#32302f"}, -- code rulers
     }
 })
 
@@ -11,7 +12,6 @@ require('lualine').setup({
   sections = {
     lualine_c = {{'filename', path = 1}}
   }
-
 })
 
 -- harpoon
@@ -71,8 +71,8 @@ npairs.add_rules({
 
 -- Indent Highlighting
 vim.opt.termguicolors = true
-vim.cmd [[highlight IndentBlanklineIndent1 guibg=#303030 gui=nocombine]]
-vim.cmd [[highlight IndentBlanklineIndent2 guibg=#3a3a3a gui=nocombine]]
+vim.cmd [[highlight IndentBlanklineIndent1 guibg=#32302f gui=nocombine]]
+vim.cmd [[highlight IndentBlanklineIndent2 guibg=#3c3836 gui=nocombine]]
 
 require("indent_blankline").setup {
   char = "",
