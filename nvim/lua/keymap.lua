@@ -3,25 +3,6 @@
 -- Leader key (Start a key sequence)
 vim.g.mapleader = " "
 
--- colemak swaps
-vim.keymap.set("n", "m", "h")
-vim.keymap.set("n", "n", "j")
-vim.keymap.set("n", "e", "k")
-vim.keymap.set("n", "i", "l")
-vim.keymap.set("n", "f", "e")
-vim.keymap.set("n", "l", "i")
-
-vim.g.tmux_navigator_no_mappings = 1
-
--- noremap <silent> {Left-Mapping} :<C-U>TmuxNavigateLeft<cr>
-vim.keymap.set("n", "<c-m>", ":<C-U>TmuxNavigateLeft<cr>", { noremap = true })
--- noremap <silent> {Down-Mapping} :<C-U>TmuxNavigateDown<cr>
-vim.keymap.set("n", "<c-n>", ":<C-U>TmuxNavigateDown<cr>", { noremap = true })
--- noremap <silent> {Up-Mapping} :<C-U>TmuxNavigateUp<cr>
-vim.keymap.set("n", "<c-e>", ":<C-U>TmuxNavigateUp<cr>", { noremap = true })
--- noremap <silent> {Right-Mapping} :<C-U>TmuxNavigateRight<cr>
-vim.keymap.set("n", "<c-i>", ":<C-U>TmuxNavigateRight<cr>", { noremap = true })
-
 -- change default mappings
 vim.keymap.set("n", "J", "<nop>") -- disable 'J' (concatenate line down)
 vim.keymap.set("n", "<leader>q", "q") -- Use leader key to start recording
@@ -50,16 +31,16 @@ vim.keymap.set("n", "<leader>l", ":set relativenumber!<cr>") -- toggle relativen
 -- `gb` - Toggles the region using blockwise comment
 
 -- Keep cursor centered when jumping
-vim.keymap.set("n", "k", "nzzzv") -- slash searching
-vim.keymap.set("n", "K", "Nzzzv")
+vim.keymap.set("n", "n", "nzzzv") -- slash searching
+vim.keymap.set("n", "N", "Nzzzv")
 vim.keymap.set("n", "<C-d>", "<C-d>zz") -- half-page jumping
 vim.keymap.set("n", "<C-u>", "<C-u>zz")
 vim.keymap.set("n", "<PageUp>", "<PageUp>zz") -- full-page jumping
 vim.keymap.set("n", "<PageDown>", "<PageDown>zz")
 
 -- Move selection up and down when in visual mode
-vim.keymap.set("v", "E", ":m '<-2<CR>gv=gv")
-vim.keymap.set("v", "N", ":m '>+1<CR>gv=gv")
+vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
+vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 
 -- paste without overwriting clipboard
 vim.keymap.set("x", "<leader>p", [["_dP]])
