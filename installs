@@ -1,114 +1,6 @@
 #!/bin/bash
 
-function install_docker() {
-    if ! command -v docker &> /dev/null; then
-        echo "Installing Docker ..."
-        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-        sudo add-apt-repository \
-        "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-        $(lsb_release -cs) \
-        stable"
-        sudo apt-get update
-        sudo apt-get install -y docker-ce bridge-utils docker-ce-cli containerd.io
-    fi
-    sudo usermod -aG docker $USER
-    echo "'$USER' was added to the docker group. Please log out and back in for change to take effect"
-}
-
-function install_kubectl() {
-    if ! command -v kubectl &> /dev/null; then
-        echo "Installing Kubernetes ..."
-        : "${KUBERNETES_VERSION:=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)}"
-        sudo curl -L "https://storage.googleapis.com/kubernetes-release/release/$KUBERNETES_VERSION/bin/linux/amd64/kubectl" -o /usr/local/bin/kubectl
-        sudo chmod +x /usr/local/bin/kubectl
-        kubectl version --short --client
-    fi
-}
-
-function install_kind() {
-    if ! command -v kind &> /dev/null; then
-        echo "Installing Kind ..."
-        curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.11.1/kind-linux-amd64
-        chmod +x ./kind
-        sudo mv ./kind /usr/local/bin/kind
-    fi
-}
-
-function install_helm() {
-    echo "Installing Helm ..."
-    curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
-    chmod 700 get_helm.sh
-    if [ "x$HELM_VERSION" == "x" ]; then
-        ./get_helm.sh
-    else
-        ./get_helm.sh --version $HELM_VERSION
-    fi
-    rm get_helm.sh
-}
-
-function install_go() {
-    : "${FORCE_GO_INSTALL:=false}"
-    if ! command -v go &> /dev/null || $FORCE_GO_INSTALL; then
-        : "${GO_VERSION:="1.19.4"}"
-        sudo rm -rf /usr/local/go
-        wget -c https://golang.org/dl/go$GO_VERSION.linux-amd64.tar.gz -O - | sudo tar -xz -C /usr/local
-    fi
-}
-
-function install_rust() {
-    : "${COOL_CARGO:=false}"
-    if ! command -v rustup &> /dev/null; then
-        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y -q
-        source "$HOME/.cargo/env"
-    fi
-    if $COOL_CARGO; then
-      cargo install code-minimap tmux-sessionizer
-      tms config --paths $HOME
-    fi
-}
-
-function install_jq() {
-    if ! command -v jq &> /dev/null; then
-        sudo wget -qO /usr/local/bin/jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
-        sudo chmod +x /usr/local/bin/jq
-    fi
-}
-
-function install_yq() {
-    if ! command -v yq &> /dev/null; then
-        echo "Installing yq ..."
-        sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
-        sudo chmod a+x /usr/local/bin/yq
-    fi
-}
-
-function install_az() {
-    if ! command -v az &> /dev/null; then
-        echo "Installing Azure CLI ..."
-        curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-    fi
-}
-
-function install_kustomize() {
-    if ! command -v kustomize &> /dev/null; then
-        curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
-        sudo mv ./kustomize /usr/local/bin/kustomize
-    fi
-}
-
-function install_kubectx() {
-    : "${VERSION:="v0.9.4"}"
-    if ! command -v kubectx &> /dev/null; then
-        wget -c https://github.com/ahmetb/kubectx/releases/download/${VERSION}/kubectx_${VERSION}_linux_x86_64.tar.gz -O - | sudo tar -xz -C /usr/local/bin
-    fi
-
-    if ! command -v kubens &> /dev/null; then
-        wget -c https://github.com/ahmetb/kubectx/releases/download/${VERSION}/kubens_${VERSION}_linux_x86_64.tar.gz -O - | sudo tar -xz -C /usr/local/bin
-    fi
-}
-
-function install_base() {
-    # Install base packages
+install_base() {
     sudo apt-get update
     sudo apt-get install -y \
         apt-transport-https \
@@ -124,26 +16,275 @@ function install_base() {
         ncurses-dev \
         libssl-dev \
         pkg-config
-
 }
 
-function install_brew() {
+install_stuff() {
+    mkdir -p ~/.config
+
+    install_base
+
+    parallelize '
+        install_z
+        install_jq
+        install_yq
+        install_bat
+        install_exa
+        install_fzf
+        install_fd-find
+    '
+    parallelize '
+        install_az
+        install_go
+        install_rust
+    '
+    parallelize '
+        install_pipes
+        install_neofetch
+    '
+    parallelize '
+        install_tmux
+        install_neovim
+        install_shellcheck
+    '
+    parallelize '
+        install_k9s
+        install_kind
+        install_helm
+        install_kubectl
+        install_kubectx
+        install_clusterctl
+        install_kubebuilder
+    '
+}
+
+parallelize() {
+    tasks=$1
+    pid_array=() # Track backgrounded pids
+    for task in $tasks; do
+        printf "running %s " "$task"
+        eval "$task" &
+        pid_array+=($!)
+    done
+    # Wait for pid completion
+    for pid in "${pid_array[@]}"; do
+        wait "${pid}" &> /dev/null
+    done
+}
+
+#------------------------------------------------------------------------------#
+
+install_az() {
+    if ! command -v az &> /dev/null; then
+        curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+    fi
+}
+
+install_bat() {
+    : "${BAT_VERSION:="0.22.1"}"
+    if ! command -v bat &> /dev/null; then
+        pushd $(mktemp -d)
+            wget -qc "https://github.com/sharkdp/bat/releases/download/v${BAT_VERSION}/bat-v${BAT_VERSION}-x86_64-unknown-linux-gnu.tar.gz"
+            tar -xzvf bat-v${BAT_VERSION}-x86_64-unknown-linux-gnu.tar.gz
+            sudo mv bat-v${BAT_VERSION}-x86_64-unknown-linux-gnu /usr/local/bat
+        popd
+    fi
+}
+
+install_brew() {
     if ! command -v brew &> /dev/null; then
         CI=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     fi
 }
 
-function install_pyenv() {
+install_clusterctl() {
+    : "${CLUSTERCTL_VERSION:="1.3.3"}"
+    if ! command -v clusterctl &> /dev/null; then
+        pushd $(mktemp -d)
+            wget -c https://github.com/kubernetes-sigs/cluster-api/releases/download/v${CLUSTERCTL_VERSION}/clusterctl-linux-amd64
+            chmod +x clusterctl-linux-amd64
+            sudo mv clusterctl-linux-amd64 /usr/local/bin/clusterctl
+        popd
+    fi
+}
+
+install_docker() {
+    if ! command -v docker &> /dev/null; then
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+        sudo apt-get install -y docker-ce bridge-utils docker-ce-cli containerd.io
+    fi
+    sudo usermod -aG docker "$USER"
+    echo "'$USER' was added to the docker group. Please log out and back in for change to take effect"
+}
+
+install_exa() {
+    : "${EXA_VERSION:="0.10.1"}"
+    if ! command -v exa &> /dev/null; then
+        pushd $(mktemp -d)
+            wget -qc "https://github.com/ogham/exa/releases/download/v${EXA_VERSION}/exa-linux-x86_64-v${EXA_VERSION}.zip"
+            sudo unzip exa-linux-x86_64-v${EXA_VERSION}.zip -d /usr/local/exa
+        popd
+    fi
+}
+
+install_fd-find() {
+    : "${FD_VERSION:="8.5.3"}"
+    if ! command -v fd &> /dev/null; then
+        pushd $(mktemp -d)
+           wget -qc "https://github.com/sharkdp/fd/releases/download/v${FD_VERSION}/fd-v${FD_VERSION}-i686-unknown-linux-musl.tar.gz"
+           tar -xzvf fd-v${FD_VERSION}-i686-unknown-linux-musl.tar.gz
+           sudo mv fd-v${FD_VERSION}-i686-unknown-linux-musl/fd /usr/local/bin/
+        popd
+    fi
+}
+
+install_fzf() {
+    if ! command -v fzf &> /dev/null; then
+        git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+        ~/.fzf/install --all
+    fi
+}
+
+install_go() {
+    : "${GO_VERSION:="1.19.4"}"
+    : "${FORCE_GO_INSTALL:=false}"
+    if ! command -v go &> /dev/null || $FORCE_GO_INSTALL; then
+        sudo rm -rf /usr/local/go
+        wget -qc https://golang.org/dl/go$GO_VERSION.linux-amd64.tar.gz -O - | sudo tar -xz -C /usr/local
+    fi
+}
+
+install_helm() {
+    : "${HELM_VERSION:="3.10.3"}"
+    curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+    chmod 700 get_helm.sh
+    if [ "$HELM_VERSION" == "" ]; then
+        ./get_helm.sh
+    else
+        ./get_helm.sh --version v$HELM_VERSION
+    fi
+    rm get_helm.sh
+}
+
+install_jq() {
+    if ! command -v jq &> /dev/null; then
+        sudo wget -qcO /usr/local/bin/jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
+        sudo chmod +x /usr/local/bin/jq
+    fi
+}
+
+install_k9s() {
+    : "${K9S_VERSION:="0.27.3"}"
+    if ! command -v k9s &> /dev/null; then
+        pushd $(mktemp -d)
+            mkdir -p ~/.config/k9s/
+            wget -qc https://github.com/derailed/k9s/releases/download/v${K9S_VERSION}/k9s_Linux_amd64.tar.gz -O - | sudo tar -xz -C /usr/local/bin
+            wget -qO ~/.config/k9s/skin.yml https://raw.githubusercontent.com/derailed/k9s/v${K9S_VERSION}/skins/gruvbox-dark.yml
+            if [ -f ~/.config/k9s/config.yml ] ; then
+                yq -i '.k9s.headless = true' ~/.config/k9s/config.yml
+                yq -i '.k9s.noExitOnCtrlC = true' ~/.config/k9s/config.yml
+            fi
+        popd
+    fi
+}
+
+install_kind() {
+    : "${KIND_VERSION:="0.17.0"}"
+    if ! command -v kind &> /dev/null; then
+        wget -qcO ./kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
+        chmod +x ./kind
+        sudo mv ./kind /usr/local/bin/kind
+    fi
+}
+
+install_kubebuilder() {
+    : "${KUBEBUILDER_VERSION:=$(go env GOOS)}"
+    if ! command -v kubebuilder &> /dev/null; then
+        wget -qcO kubebuilder https://go.kubebuilder.io/dl/latest/${KUBEBUILDER_VERSION}/$(go env GOARCH)
+        chmod +x kubebuilder && sudo mv kubebuilder /usr/local/bin/
+    fi
+}
+
+install_kubectl() {
+    : "${KUBERNETES_VERSION:=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)}"
+    if ! command -v kubectl &> /dev/null; then
+        sudo curl -L "https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_VERSION}/bin/linux/amd64/kubectl" -o /usr/local/bin/kubectl
+        sudo chmod +x /usr/local/bin/kubectl
+        kubectl version --short --client
+    fi
+}
+
+install_kubectx() {
+    : "${KUBECTX_VERSION:="v0.9.4"}"
+    if ! command -v kubectx &> /dev/null; then
+        wget -qc https://github.com/ahmetb/kubectx/releases/download/${KUBECTX_VERSION}/kubectx_${KUBECTX_VERSION}_linux_x86_64.tar.gz -O - | sudo tar -xz -C /usr/local/bin
+    fi
+
+    if ! command -v kubens &> /dev/null; then
+        wget -qc https://github.com/ahmetb/kubectx/releases/download/${KUBECTX_VERSION}/kubens_${KUBECTX_VERSION}_linux_x86_64.tar.gz -O - | sudo tar -xz -C /usr/local/bin
+    fi
+}
+
+install_kustomize() {
+    if ! command -v kustomize &> /dev/null; then
+        curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
+        sudo mv ./kustomize /usr/local/bin/kustomize
+    fi
+}
+
+install_neofetch() {
+    : "${NEOFETCH_VERSION="7.1.0"}"
+    if ! command -v neofetch &> /dev/null; then
+        pushd $(mktemp -d)
+            wget -qc "https://github.com/dylanaraps/neofetch/archive/refs/tags/${NEOFETCH_VERSION}.tar.gz"
+            tar -xzvf ${NEOFETCH_VERSION}.tar.gz
+            sudo make -C neofetch-${NEOFETCH_VERSION} install
+        popd
+    fi
+
+    if [ ! -f ~/.config/neofetch/config.conf ]; then
+        mkdir -p ~/.config/neofetch/
+        ln -s ~/.files/neofetch.conf ~/.config/neofetch/config.conf
+    fi
+}
+
+install_neovim() {
+    : "${NEOVIM_VERSION:="0.8.1"}"
+    if ! command -v nvim &> /dev/null; then
+        pushd $(mktemp -d)
+            wget -qc https://github.com/neovim/neovim/releases/download/v${NEOVIM_VERSION}/nvim-linux64.tar.gz
+            tar -xzvf nvim-linux64.tar.gz nvim-linux64
+            sudo mv nvim-linux64 /usr/local/nvim
+        popd
+        if [ ! -f ~/.config/nvim ] ; then
+            ln -s ~/.files/nvim ~/.config/nvim
+        fi
+    fi
+}
+
+install_pipes() {
+    if ! command -v pipes.sh &> /dev/null; then
+      pushd $(mktemp -d)
+          git clone https://github.com/pipeseroni/pipes.sh.git
+          pushd pipes.sh
+            sudo make install
+          popd
+      popd
+    fi
+}
+
+install_pyenv() {
+    install_brew
     if ! command -v pyenv &> /dev/null; then
         brew install pyenv pyenv-virtualenv
     fi
 }
 
-function install_python() {
+install_python() {
     install_brew
     install_pyenv
 
-    export PYENV_ROOT="$HOME/.pyenv"
+    export PYENV_ROOT=~/.pyenv
     export PATH="$PYENV_ROOT/bin:$PATH"
     eval "$(pyenv init --path)"
     eval "$(pyenv init -)"
@@ -153,153 +294,58 @@ function install_python() {
     pyenv global $PYTHON_VERSION
 }
 
-function install_pipes() {
-    if ! command -v pipes.sh &> /dev/null; then
-        pushd /tmp
-        git clone https://github.com/pipeseroni/pipes.sh.git
-        cd pipes.sh
-        sudo make install
-        popd
-    fi
-}
-
-function install_clusterctl() {
-    if ! command -v clusterctl &> /dev/null; then
-        : "${CLUSTERCTL_VERSION:="v1.4.4"}"
-        sudo wget https://github.com/kubernetes-sigs/cluster-api/releases/download/${CLUSTERCTL_VERSION}/clusterctl-linux-amd64
-        sudo chmod +x clusterctl-linux-amd64
-        sudo mv clusterctl-linux-amd64 /usr/local/bin/clusterctl
-    fi
-}
-
-function install_neovim() {
-    if ! command -v nvim &> /dev/null; then
-        : "${NEOVIM_VERSION:="0.8.1"}"
-        pushd $(mktemp -d)
-            wget -c https://github.com/neovim/neovim/releases/download/v${NEOVIM_VERSION}/nvim-linux64.tar.gz
-            tar -xzvf nvim-linux64.tar.gz nvim-linux64
-            sudo mv nvim-linux64 /usr/local/nvim
-        popd
-        if [ ! -f $HOME/.config/nvim ] ; then
-            ln -s $HOME/.files/nvim $HOME/.config/nvim
-        fi
-    fi
-}
-
-function install_kubebuilder() {
-    if ! command -v kubebuilder &> /dev/null; then
-        # download kubebuilder and install locally.
-        curl -L -o kubebuilder https://go.kubebuilder.io/dl/latest/$(go env GOOS)/$(go env GOARCH)
-        chmod +x kubebuilder && sudo mv kubebuilder /usr/local/bin/
-    fi
-}
-
-function install_fzf() {
-    if ! command -v fzf &> /dev/null; then
-        git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-        ~/.fzf/install --all
-    fi
-}
-
-function install_starship() {
-    if ! command -v starship &> /dev/null; then
-        pushd $(mktemp -d)
-            curl -sSO https://starship.rs/install.sh
-            sudo chmod +x install.sh
-            # 🕊
-            sudo ./install.sh -y
-            if [ ! -f "$HOME/.config/starship.toml" ] ; then
-                ln -s $HOME/.files/starship.toml $HOME/.config/starship.toml
-            fi
-        popd
-    fi
-}
-
-function install_bat() {
-    if ! command -v bat &> /dev/null; then
-        : "${BAT_VERSION:="0.22.1"}"
-        pushd $(mktemp -d)
-            wget -c "https://github.com/sharkdp/bat/releases/download/v${BAT_VERSION}/bat-v${BAT_VERSION}-x86_64-unknown-linux-gnu.tar.gz"
-            tar -xzvf bat-v${BAT_VERSION}-x86_64-unknown-linux-gnu.tar.gz
-            sudo mv bat-v${BAT_VERSION}-x86_64-unknown-linux-gnu /usr/local/bat
-        popd
-    fi
-}
-
-function install_exa() {
-    if ! command -v exa &> /dev/null; then
-        : "${EXA_VERSION:="0.10.1"}"
-        pushd $(mktemp -d)
-            wget -c "https://github.com/ogham/exa/releases/download/v${EXA_VERSION}/exa-linux-x86_64-v${EXA_VERSION}.zip"
-            sudo unzip exa-linux-x86_64-v${EXA_VERSION}.zip -d /usr/local/exa
-        popd
-    fi
-}
-
-function install_shellcheck() {
-    if ! command -v shellcheck &> /dev/null; then
-        : "${SHELLCHECK_VERSION:="0.8.0"}"
-        pushd $(mktemp -d)
-            wget -c "https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VERSION}/shellcheck-v${SHELLCHECK_VERSION}.linux.x86_64.tar.xz"
-            tar -xvf shellcheck-v${SHELLCHECK_VERSION}.linux.x86_64.tar.xz
-            sudo mv shellcheck-v${SHELLCHECK_VERSION}/shellcheck /usr/local/bin/
-        popd
-    fi
-}
-
-function install_z() {
-    if ! command -v z &> /dev/null; then
-        pushd $(mktemp -d)
-            git clone https://github.com/rupa/z
-            sudo chmod +x z/z.sh
-            sudo cp z/z.sh /usr/local/bin
-        popd
-    fi
-}
-
-function install_k9s() {
-    if ! command -v k9s &> /dev/null; then
-        pushd $(mktemp -d)
-            git clone https://github.com/derailed/k9s.git
-            make -C k9s build
-            sudo mv k9s/execs/k9s /usr/local/bin
-            mkdir -p ~/.config/k9s/
-            mv k9s/skins/gruvbox-dark.yml ~/.config/k9s/skin.yml
-            if [ -f "$HOME/.config/k9s/config.yml" ] ; then
-                yq -i '.k9s.headless = true' ~/.config/k9s/config.yml
-                yq -i '.k9s.noExitOnCtrlC = true' ~/.config/k9s/config.yml
-            fi
-        popd
-    fi
-}
-
-function install_ripgrep() {
+install_ripgrep() {
+    : "${RIPGREP_VERSION:="13.0.0"}"
     if ! command -v rg &> /dev/null; then
-        : ${RIPGREP_VERSION:="13.0.0"}
         pushd $(mktemp -d)
-           wget -c "https://github.com/BurntSushi/ripgrep/releases/download/${RIPGREP_VERSION}/ripgrep-${RIPGREP_VERSION}-x86_64-unknown-linux-musl.tar.gz"
+           wget -qc "https://github.com/BurntSushi/ripgrep/releases/download/${RIPGREP_VERSION}/ripgrep-${RIPGREP_VERSION}-x86_64-unknown-linux-musl.tar.gz"
            tar -xzvf ripgrep-${RIPGREP_VERSION}-x86_64-unknown-linux-musl.tar.gz
            sudo mv ripgrep-${RIPGREP_VERSION}-x86_64-unknown-linux-musl/rg /usr/local/bin/
         popd
     fi
 }
 
-function install_fd-find() {
-    if ! command -v fd &> /dev/null; then
-        : ${FD_VERSION:="8.5.3"}
+install_rust() {
+    : "${COOL_CARGO:=false}"
+    if ! command -v rustup &> /dev/null; then
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y -q
+        source ~/.cargo/env
+    fi
+    if $COOL_CARGO; then
+        cargo install code-minimap tmux-sessionizer
+        tms config --paths "$HOME"
+    fi
+}
+
+install_shellcheck() {
+    : "${SHELLCHECK_VERSION:="0.8.0"}"
+    if ! command -v shellcheck &> /dev/null; then
         pushd $(mktemp -d)
-           wget -c "https://github.com/sharkdp/fd/releases/download/v${FD_VERSION}/fd-v${FD_VERSION}-i686-unknown-linux-musl.tar.gz"
-           tar -xzvf fd-v${FD_VERSION}-i686-unknown-linux-musl.tar.gz
-           sudo mv fd-v${FD_VERSION}-i686-unknown-linux-musl/fd /usr/local/bin/
+            wget -qc "https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VERSION}/shellcheck-v${SHELLCHECK_VERSION}.linux.x86_64.tar.xz"
+            tar -xvf shellcheck-v${SHELLCHECK_VERSION}.linux.x86_64.tar.xz
+            sudo mv shellcheck-v${SHELLCHECK_VERSION}/shellcheck /usr/local/bin/
         popd
     fi
 }
 
-function install_tmux() {
-    if [ ! $(command -v tmux | grep '/usr/local/bin') ] ; then
-        : ${TMUX_VERSION:="3.3a"}
+install_starship() {
+    if ! command -v starship &> /dev/null; then
         pushd $(mktemp -d)
-            wget -c "https://github.com/tmux/tmux/releases/download/${TMUX_VERSION}/tmux-${TMUX_VERSION}.tar.gz"
+            curl -sSO https://starship.rs/install.sh
+            sudo chmod +x install.sh
+            sudo ./install.sh -y
+            if [ ! -f ~/.config/starship.toml ] ; then
+                ln -s ~/.files/starship.toml ~/.config/starship.toml
+            fi
+        popd
+    fi
+}
+
+install_tmux() {
+    : "${TMUX_VERSION:="3.3a"}"
+    if [ ! "$(command -v tmux | grep '/usr/local/bin')" ] ; then
+        pushd $(mktemp -d)
+            wget -qc "https://github.com/tmux/tmux/releases/download/${TMUX_VERSION}/tmux-${TMUX_VERSION}.tar.gz"
             tar -xzvf tmux-${TMUX_VERSION}.tar.gz
             pushd tmux-${TMUX_VERSION}
                 ./configure && make
@@ -311,89 +357,36 @@ function install_tmux() {
         popd
     fi
 
-    if [ ! -f "$HOME/.tmux.conf" ] ; then
-        ln -s $HOME/.files/tmux.conf $HOME/.tmux.conf
+    if [ ! -f ~/.tmux.conf ] ; then
+        ln -s ~/.files/tmux.conf ~/.tmux.conf
     fi
 }
 
-function install_neofetch() {
-    if ! command -v neofetch &> /dev/null; then
-        : ${NEOFETCH_VERSION="7.1.0"}
+install_vivid() {
+    : "${VIVID_VERSION:="0.8.0"}"
+    if ! command -v vivid ; then
         pushd $(mktemp -d)
-            wget -c "https://github.com/dylanaraps/neofetch/archive/refs/tags/${NEOFETCH_VERSION}.tar.gz"
-            tar -xzvf ${NEOFETCH_VERSION}.tar.gz
-            make -C neofetch-${NEOFETCH_VERSION} install
+            wget -qc https://github.com/sharkdp/vivid/releases/download/v${VIVID_VERSION}/vivid-v${VIVID_VERSION}-x86_64-unknown-linux-musl.tar.gz
+            tar -xzvf vivid-v${VIVID_VERSION}-x86_64-unknown-linux-musl.tar.gz
+            sudo mv vivid-v${VIVID_VERSION}-x86_64-unknown-linux-musl/vivid /usr/local/bin/
         popd
     fi
+}
 
-    if [ ! -f ~/.config/neofetch/config.conf ]; then
-        mkdir -p ~/.config/neofetch/
-        ln -s ~/.files/neofetch.conf ~/.config/neofetch/config.conf
+install_yq() {
+    if ! command -v yq &> /dev/null; then
+        sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+        sudo chmod a+x /usr/local/bin/yq
     fi
 }
 
-function install_stuff() {
-    mkdir -p "$HOME/.config"
-
-    pid_array=()
-
-    install_base
-
-    install_yq &
-    pid_array+=($!)
-
-    install_jq &
-    pid_array+=($!)
-
-    install_bat &
-    pid_array+=($!)
-
-    install_exa &
-    pid_array+=($!)
-
-    install_ripgrep &
-    pid_array+=($!)
-
-    install_fd-find &
-    pid_array+=($!)
-
-    install_fzf &
-    pid_array+=($!)
-    
-    install_pipes &
-    pid_array+=($!)
-
-    install_neovim &
-    pid_array+=($!)
-
-    install_starship &
-    pid_array+=($!)
-
-    install_shellcheck &
-    pid_array+=($!)
-
-    FORCE_GO_INSTALL=true install_go &
-    pid_array+=($!)
-
-    HELM_VERSION=v3.6.3 install_helm &
-    pid_array+=($!)
-
-    install_kubebuilder &
-    pid_array+=($!)
-
-    install_kubectx &
-    pid_array+=($!)
-
-    install_z &
-    pid_array+=($!)
-
-    install_tmux &
-    pid_array+=($!)
-
-    for pid in "${pid_array[@]}"; do
-      wait "${pid}"
-    done
-
-    install_k9s
+install_z() {
+    if ! command -v z &> /dev/null; then
+        pushd $(mktemp -d)
+            git clone https://github.com/rupa/z
+            sudo chmod +x z/z.sh
+            sudo cp z/z.sh /usr/local/bin
+        popd
+    fi
 }
 
