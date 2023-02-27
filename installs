@@ -23,6 +23,7 @@ install_stuff() {
 
     install_base
 
+    # Shell Utilties
     parallelize '
         install_z
         install_jq
@@ -32,20 +33,22 @@ install_stuff() {
         install_fzf
         install_fd-find
     '
+    # Programming Languages
     parallelize '
         install_az
         install_go
         install_rust
     '
-    parallelize '
-        install_pipes
-        install_neofetch
-    '
+    # Shell Experience
     parallelize '
         install_tmux
+        install_pipes
         install_neovim
+        install_neofetch
+        install_starship
         install_shellcheck
     '
+    # Kubernetes Tools
     parallelize '
         install_k9s
         install_kind
