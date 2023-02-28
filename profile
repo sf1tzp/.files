@@ -91,6 +91,10 @@ if command -v fzf &> /dev/null; then
     [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 fi
 
+if command -v glow &> /dev/null; then
+    alias glow='PAGER=bat glow -p'
+fi
+
 if [ -f /usr/local/bin/z.sh ]; then
     source /usr/local/bin/z.sh
 fi
