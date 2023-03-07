@@ -89,6 +89,7 @@ fi
 
 if command -v fzf &> /dev/null; then
     [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+    alias branches='git checkout $(git branch -a | fzf)'
 fi
 
 if command -v glow &> /dev/null; then
