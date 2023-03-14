@@ -31,6 +31,7 @@ install_stuff() {
         install_bat
         install_exa
         install_fzf
+        install_ripgrep
         install_fd-find
     '
     # Programming Languages
