@@ -92,6 +92,7 @@ return require('packer').startup(function(use)
 
   -- Treesitter (Syntax Tree Highlighting)
   use { 'nvim-treesitter/nvim-treesitter', run = ":TSUpdate" }
+  use { 'nvim-treesitter/playground'}
   use 'eckon/treesitter-current-functions' -- jump around between functions
 
   -- Language Server
