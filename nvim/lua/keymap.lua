@@ -87,11 +87,6 @@ vim.keymap.set("n", "<leader>??", ":GitBlameToggle<cr>")
 -- vim.keymap.set("v", "<leader>bd", ":base64#v_btoa()<cr>") -- fixme
 -- vim.keymap.set("v", "<leader>be", ":base64#v_atob()<cr>") --fixme
 
--- minimap
-local mm = require('codewindow')
-vim.keymap.set("n", "<leader>n", mm.toggle_minimap, {})
-vim.keymap.set("n", "<leader>nf", mm.toggle_focus, {})
-
 -- harpoon
 local mark = require("harpoon.mark")
 local ui = require("harpoon.ui")

@@ -76,7 +76,6 @@ return require('packer').startup(function(use)
   use 'ntpeters/vim-better-whitespace' -- trailing whitespace
   use 'mbbill/undotree' -- better undo history
   use 'tpope/vim-fugitive' -- use git without leaving vim
-  use 'gorbit99/codewindow.nvim' -- minimap
   use 'windwp/nvim-autopairs' -- add closing brackets and quotes
   use 'dstein64/vim-startuptime' -- measure startup time with :StartupTime
   use 'christianrondeau/vim-base64' -- base 64 extension

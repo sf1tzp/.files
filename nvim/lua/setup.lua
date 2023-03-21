@@ -87,14 +87,6 @@ require("indent_blankline").setup {
   show_trailing_blankline_indent = false,
 }
 
--- minimap
-local codewindow = require('codewindow')
-codewindow.setup({
-  minimap_width = 5,
-  width_multuplier = 12,
-})
-codewindow.apply_default_keybinds()
-
 -- code coverage
 require("coverage").setup({
   lang = {
