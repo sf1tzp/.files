@@ -2,7 +2,7 @@
 return {
   {
     "akinsho/bufferline.nvim",
-    enabled = true,
+    enabled = false,
     opts = {
       options = {
         separator_style = "padded_slant",
