@@ -39,6 +39,7 @@ install_stuff() {
         install_az
         install_go
         install_rust
+        install_nodejs
     '
 	# Shell Experience
 	parallelize '
@@ -275,6 +276,16 @@ install_neovim() {
 		if [ ! -f ~/.config/nvim ]; then
 			ln -s ~/.files/nvim ~/.config/nvim
 		fi
+	fi
+}
+
+install_nodejs() {
+	: "${NODE_JS_VERSION="18.15.0"}"
+	if ! command -v node &>/dev/null; then
+		pushd $(mktemp -d)
+		wget -qc "https://nodejs.org/dist/v${NODE_JS_VERSION}/node-v${NODE_JS_VERSION}-linux-x64.tar.xz"
+		tar -xzvf node-v${NODE_JS_VERSION}-linux-x64.tar.xz
+		popd
 	fi
 }
 
