@@ -25,6 +25,7 @@ return {
     config = function(_, opts)
       local marginTopPercent = 0.1
       local headerPadding = vim.fn.max({ 2, vim.fn.floor(vim.fn.winheight(0) * marginTopPercent) })
+      vim.cmd([[highlight AzureBlue guifg=#0080FF gui=nocombine]])
       local heading = [[
  _____                                   
 |  _  |___ _ _ ___ ___                   
@@ -47,7 +48,7 @@ return {
       local dashboard = require("alpha.themes.dashboard")
       dashboard.opts = opts
       dashboard.section.header.val = vim.split(heading, "\n")
-      dashboard.section.header.opts.hl = "Conceal" -- Blue in gruvbox
+      dashboard.section.header.opts.hl = "AzureBlue"
       dashboard.config.layout = {
         { type = "padding", val = headerPadding },
         dashboard.section.header,
