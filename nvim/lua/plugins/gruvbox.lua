@@ -5,7 +5,9 @@ return {
     priority = 1000,
     config = function()
       local config = {
-        overrides = {},
+        overrides = {
+          SignColumn = { bg = "#282828" },
+        },
       }
       require("gruvbox").setup(config)
     end,
