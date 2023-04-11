@@ -35,6 +35,12 @@ return {
     },
   },
   {
+    "SmiteshP/nvim-navic",
+    opts = function(_, opts)
+      opts.highlight = false
+    end,
+  },
+  {
     "goolord/alpha-nvim",
     keys = {
       { "<leader>ua", "<cmd>Alpha<cr>", desc = "Show Alpha Dashboard" },
