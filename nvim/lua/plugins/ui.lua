@@ -1,6 +1,23 @@
 -- Configuration overrides for the builtin LazyVim `ui` plugins
 return {
   {
+    "rcarriga/nvim-notify",
+    keys = {
+      { "<leader>un", "<cmd>Telescope notify<cr>", desc = "Show Notification History" },
+      {
+        "<leader>und",
+        function()
+          require("notify").dismiss({ silent = true, pending = true })
+        end,
+        desc = "Delete all Notifications",
+      },
+    },
+
+    config = function()
+      require("telescope").load_extension("notify")
+    end,
+  },
+  {
     "akinsho/bufferline.nvim",
     enabled = false,
     opts = {
