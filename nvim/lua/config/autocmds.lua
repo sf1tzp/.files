@@ -10,3 +10,13 @@ vim.api.nvim_create_autocmd({ "BufLeave", "FocusLost" }, {
     end
   end,
 })
+
+-- Load Coverage Plugin when opening Go Files
+vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
+  pattern = { "*.go" },
+  callback = function()
+    require("coverage")
+    vim.cmd("Coverage")
+    vim.cmd("CoverageHide")
+  end,
+})
