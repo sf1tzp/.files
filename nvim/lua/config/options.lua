@@ -3,3 +3,5 @@
 -- Add any additional options here
 
 vim.opt.colorcolumn = { "80", "120" }
+vim.opt.list = false
+vim.g.strip_whitespace_on_save = 1
