@@ -6,10 +6,6 @@ return {
     "folke/which-key.nvim",
   },
 
-  -- config = function()
-  --   require("harpoon").setup()
-  -- end,
-
   keys = function()
     local ui = require("harpoon.ui")
     local mark = require("harpoon.mark")
@@ -88,6 +84,70 @@ return {
           require("harpoon.ui").nav_file(9)
         end,
         desc = "Open File 9",
+      },
+      -- Silent Keybindings of the same
+      {
+        "<leader>1",
+        function()
+          require("harpoon.ui").nav_file(1)
+        end,
+        desc = "which_key_ignore",
+      },
+      {
+        "<leader>2",
+        function()
+          require("harpoon.ui").nav_file(2)
+        end,
+        desc = "which_key_ignore",
+      },
+      {
+        "<leader>3",
+        function()
+          require("harpoon.ui").nav_file(3)
+        end,
+        desc = "which_key_ignore",
+      },
+      {
+        "<leader>4",
+        function()
+          require("harpoon.ui").nav_file(4)
+        end,
+        desc = "which_key_ignore",
+      },
+      {
+        "<leader>5",
+        function()
+          require("harpoon.ui").nav_file(5)
+        end,
+        desc = "which_key_ignore",
+      },
+      {
+        "<leader>6",
+        function()
+          require("harpoon.ui").nav_file(6)
+        end,
+        desc = "which_key_ignore",
+      },
+      {
+        "<leader>7",
+        function()
+          require("harpoon.ui").nav_file(7)
+        end,
+        desc = "which_key_ignore",
+      },
+      {
+        "<leader>8",
+        function()
+          require("harpoon.ui").nav_file(8)
+        end,
+        desc = "which_key_ignore",
+      },
+      {
+        "<leader>9",
+        function()
+          require("harpoon.ui").nav_file(9)
+        end,
+        desc = "which_key_ignore",
       },
     }
   end,
