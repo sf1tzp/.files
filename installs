@@ -284,7 +284,8 @@ install_nodejs() {
 	if ! command -v node &>/dev/null; then
 		pushd $(mktemp -d)
 		wget -qc "https://nodejs.org/dist/v${NODE_JS_VERSION}/node-v${NODE_JS_VERSION}-linux-x64.tar.xz"
-		tar -xzvf node-v${NODE_JS_VERSION}-linux-x64.tar.xz
+		tar -xvf node-v${NODE_JS_VERSION}-linux-x64.tar.xz
+		sudo mv node-v${NODE_JS_VERSION}-linux-x64 /usr/local/nodejs
 		popd
 	fi
 }
