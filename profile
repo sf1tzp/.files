@@ -20,7 +20,7 @@ export PATH="${PATH:+${PATH}:}/usr/local/go/bin"
 export PATH="${PATH:+${PATH}:}/usr/local/bat"
 export PATH="${PATH:+${PATH}:}/usr/local/exa/bin"
 export PATH="${PATH:+${PATH}:}/usr/local/nvim/bin"
-export PATH="${PATH:+${PATH}:}/usr/local/node/bin"
+export PATH="${PATH:+${PATH}:}/usr/local/nodejs/bin"
 
 alias get='git'
 alias git-log='git log --date=short --pretty="%h  %cd  %s"'
