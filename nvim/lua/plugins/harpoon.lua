@@ -24,7 +24,7 @@ return {
     -- Keybindings to jump between files 1-9
     { "<leader>h1", "<cmd>lua require('harpoon.ui').nav_file(1)<cr>", desc = "Open File 1" },
     { "<leader>h2", "<cmd>lua require('harpoon.ui').nav_file(2)<cr>", desc = "Open File 2" },
-    { "<leader>h3", "<cmd>lua require('harpoon.ui;).nav_file(3)<cr>", desc = "Open File 3" },
+    { "<leader>h3", "<cmd>lua require('harpoon.ui').nav_file(3)<cr>", desc = "Open File 3" },
     { "<leader>h4", "<cmd>lua require('harpoon.ui').nav_file(4)<cr>", desc = "Open File 4" },
     { "<leader>h5", "<cmd>lua require('harpoon.ui').nav_file(5)<cr>", desc = "Open File 5" },
     { "<leader>h6", "<cmd>lua require('harpoon.ui').nav_file(6)<cr>", desc = "Open File 6" },
@@ -34,7 +34,7 @@ return {
     -- Silent Keybindings of the same
     { "<leader>1", "<cmd>lua require('harpoon.ui').nav_file(1)<cr>", desc = "which_key_ignore" },
     { "<leader>2", "<cmd>lua require('harpoon.ui').nav_file(2)<cr>", desc = "which_key_ignore" },
-    { "<leader>3", "<cmd>lua require('harpoon.ui;).nav_file(3)<cr>", desc = "which_key_ignore" },
+    { "<leader>3", "<cmd>lua require('harpoon.ui').nav_file(3)<cr>", desc = "which_key_ignore" },
     { "<leader>4", "<cmd>lua require('harpoon.ui').nav_file(4)<cr>", desc = "which_key_ignore" },
     { "<leader>5", "<cmd>lua require('harpoon.ui').nav_file(5)<cr>", desc = "which_key_ignore" },
     { "<leader>6", "<cmd>lua require('harpoon.ui').nav_file(6)<cr>", desc = "which_key_ignore" },
