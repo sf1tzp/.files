@@ -24,19 +24,18 @@ export PATH="${PATH:+${PATH}:}/usr/local/nodejs/bin"
 
 alias get='git'
 alias git-log='git log --date=short --pretty="%h  %cd  %s"'
-alias gl='git-log'
 alias git-out='git commit --amend --date="$(date -R)" --no-edit; git push --force'
-alias gtfo='git-out'
 alias git-fetch-checkout='git fetch; git checkout'
+alias gl='git-log'
 alias git-fetch-rebase='git fetch; git rebase -i'
+alias gd='git diff'
 alias gs='git status'
 alias gfs='git fetch; git status'
 alias gfc='git-fetch-checkout'
 alias gfr='git-fetch-rebase'
-alias gl='git-log'
 alias grc='git rebase --continue'
-alias j='just'
-alias tmx='tms'
+alias gum='git checkout main; git reset --hard origin/main'
+alias gtfo='git-out'
 
 alias watch="watch "
 
