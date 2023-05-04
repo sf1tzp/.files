@@ -37,10 +37,9 @@ alias grc='git rebase --continue'
 alias gum='git checkout main; git reset --hard origin/main'
 alias gtfo='git-out'
 
+alias clera="clear"
 alias watch="watch "
-
 alias pipes="pipes.sh"
-
 alias azl='az login --use-device-code'
 
 if command -v pyenv &>/dev/null; then
