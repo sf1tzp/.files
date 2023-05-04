@@ -69,8 +69,8 @@ if command -v nvim &>/dev/null; then
 fi
 
 if command -v bat &>/dev/null; then
-	alias cat='bat -p'
-	alias b='bat'
+	alias cat='bat -p --paging=never'
+	alias b='bat_in_language'
 fi
 
 if command -v exa &>/dev/null; then
