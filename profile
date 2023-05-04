@@ -34,7 +34,7 @@ alias gfs='git fetch; git status'
 alias gfc='git-fetch-checkout'
 alias gfr='git-fetch-rebase'
 alias grc='git rebase --continue'
-alias gum='git checkout main; git reset --hard origin/main'
+alias gum='git checkout main && git reset --hard origin/main'
 alias gtfo='git-out'
 
 alias clera="clear"
