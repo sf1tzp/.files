@@ -7,7 +7,11 @@ return {
   },
 
   config = function()
-    require("harpoon").setup()
+    require("harpoon").setup({
+      menu = {
+        width = 100,
+      },
+    })
     -- Add a section to which-key for harpoon
     local wk = require("which-key")
     wk.register({
