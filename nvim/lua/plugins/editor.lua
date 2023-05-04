@@ -7,8 +7,10 @@ return {
       -- silent alternative for find files that I'm used to
       { "<leader>oo", Util.telescope("files"), desc = "which_key_ignore" },
       -- keymaps for treesitter current functions
-      { "<leader>c@", "<cmd>GetCurrentFunctions<cr>", desc = "Find Functions" },
+      { "<leader>cF", "<cmd>GetCurrentFunctions<cr>", desc = "Find Functions" },
       { "<leader>@", "<cmd>GetCurrentFunctions<cr>", desc = "which_key_ignore" },
+      -- keymap to resume previous telescope search
+      { "<leader>fa", Util.telescope("resume"), desc = "Resume Last Search" },
     },
     dependencies = {
       {
