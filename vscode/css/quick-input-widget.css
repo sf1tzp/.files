@@ -1,0 +1,10 @@
+/* Affects the command pallete & quick open dialog widget */
+/* Can be imported with the Custom CSS and JS Loader extension */
+.quick-input-widget {
+    width: 80% !important;
+    max-width: 900px !important;
+    left: 50% !important;
+    transform: translate(-50%, 0%) scale(1.25) !important;
+    margin-left: unset !important;
+    margin-top: 15% !important;
+}
