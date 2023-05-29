@@ -72,7 +72,7 @@ if command -v bat &>/dev/null; then
 fi
 
 if command -v exa &>/dev/null; then
-	alias ls='exa -la'
+	alias ls='exa -la --group-directories-first'
 	alias lt='exa -lDTL 2'
 	alias tree='exa -T'
 fi
