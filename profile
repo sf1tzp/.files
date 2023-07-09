@@ -2,7 +2,7 @@
 
 set -o vi
 
-export HOMEBREW_NO_ENV_HINTS=true
+export HOMEBREW_NO_ENV_HINTS=false
 
 if [[ ${HOSTNAME} == *mac* || ${HOSTNAME} == *V-* || ${HOSTNAME} == *DESKTOP* ]]; then
 	export PS1="\[\e[1;33m\]\u\[\e[m\]:\[\e[1;32m\]\w\[\e[m\]: "
@@ -104,6 +104,9 @@ if [ ! -f ~/.config/alacritty.yml ]; then
 	ln -s ~/.files/alacritty.yml ~/.config/alacritty.yml
 fi
 
-source $HOME/.files/k8s
-source $HOME/.files/k8s-logs.sh
+if command -v kubectl &>/dev/null; then
+	source $HOME/.files/k8s
+	source $HOME/.files/k8s-logs.sh
+fi
+
 source $HOME/.files/functions
