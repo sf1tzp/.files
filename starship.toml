@@ -20,7 +20,7 @@ style_user = "bright-yellow"
 format = "[$user]($style)"
 
 [hostname]
-ssh_only = true
+ssh_only = false
 style = "bright-green"
 format = "[@](bright-black)[$hostname]($style)"
 
