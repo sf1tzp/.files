@@ -302,9 +302,8 @@ install_pipes() {
 }
 
 install_pyenv() {
-	install_brew
 	if ! command -v pyenv &>/dev/null; then
-		brew install pyenv pyenv-virtualenv
+		curl -s -S -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
 	fi
 }
 

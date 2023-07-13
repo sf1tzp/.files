@@ -45,7 +45,7 @@ alias watch="watch "
 alias pipes="pipes.sh"
 alias azl='az login --use-device-code'
 
-if command -v pyenv &>/dev/null; then
+if [ -d ~/.pyenv ]; then
 	export PYENV_ROOT="$HOME/.pyenv"
 	export PATH="$PYENV_ROOT/bin:$PATH"
 	eval "$(pyenv init --path --no-rehash)"
