@@ -59,6 +59,8 @@ fi
 
 if command -v just &>/dev/null; then
 	source <(just --completions bash)
+	alias j='just'
+	alias jsut='just'
 fi
 
 if command -v starship &>/dev/null; then
@@ -110,6 +112,10 @@ fi
 if command -v kubectl &>/dev/null; then
 	source $HOME/.files/k8s
 	source $HOME/.files/k8s-logs.sh
+fi
+
+if command -v tmux &>/dev/null; then
+	alias tumx='tmux'
 fi
 
 source $HOME/.files/functions
