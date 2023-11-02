@@ -119,3 +119,4 @@ if command -v tmux &>/dev/null; then
 fi
 
 source $HOME/.files/functions
+source $HOME/.files/fzf.bash
