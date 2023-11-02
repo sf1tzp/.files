@@ -118,5 +118,11 @@ if command -v tmux &>/dev/null; then
 	alias tumx='tmux'
 fi
 
+if command -v shellcheck &>/dev/null; then
+	if [ ! -f ~/.shellcheckrc ]; then
+		ln -s ~/.files/.shellcheckrc ~/.shellcheckrc
+	fi
+fi
+
 source $HOME/.files/functions
 source $HOME/.files/fzf.bash
