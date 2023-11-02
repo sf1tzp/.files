@@ -2,7 +2,7 @@
 
 set -o vi
 if [ ! -f ~/.inputrc ]; then
-	ln -s ~/.files/inputrc ~/.inputrc
+	ln -s ~/.files/.inputrc ~/.inputrc
 fi
 
 export HOMEBREW_NO_ENV_HINTS=false
