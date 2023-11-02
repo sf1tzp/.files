@@ -1,4 +1,18 @@
+# $include /etc/inputrc
+
+set colored-stats On
+set completion-ignore-case On
+# set completion-prefix-display-length 5
+set mark-symlinked-directories On
+
+# set show-all-if-ambiguous On
+# set show-all-if-unmodified On
+
+Tab: menu-complete
+
+set visible-stats On
+
 set show-mode-in-prompt on                    # Show the current mode in the prompt
-set vi-cmd-mode-string "\1\e[2 q\2\e[0;32m"  # Display the vim icon when in normal mode
+set vi-cmd-mode-string "\1\e[2 q\2\e[0;32m:"  # Display the vim icon when in normal mode
 set vi-ins-mode-string "\1\e[6 q\2 "          # Use a pipe cursor when in insert mode
 
