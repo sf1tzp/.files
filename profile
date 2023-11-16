@@ -12,10 +12,6 @@ if [[ ${HOSTNAME} == *mac* || ${HOSTNAME} == *V-* || ${HOSTNAME} == *DESKTOP* ]]
 else
 	export PS1="\[\e[1;33m\]\u\[\e[1;37m\]@\[\e[1;32m\]\h\[\e[m\]:\[\e[1;37m\]\w\[\e[m\]: "
 fi
-
-export EDITOR='nvim'
-export VISUAL='nvim'
-
 export GOPATH=$HOME/go
 export PATH="$PATH:$GOPATH/bin"
 
@@ -68,6 +64,9 @@ if command -v starship &>/dev/null; then
 fi
 
 if command -v nvim &>/dev/null; then
+	export EDITOR='nvim'
+	export VISUAL='nvim'
+
 	alias vim='nvim'
 fi
 
