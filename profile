@@ -63,6 +63,12 @@ if command -v starship &>/dev/null; then
 	eval "$(starship init bash)"
 fi
 
+if command -v nvm &>/dev/null; then
+  export NVM_DIR="$HOME/.nvm"
+  [ -s "/usr/local/opt/nvm/nvm.sh" ] && \. "/usr/local/opt/nvm/nvm.sh"                                       # This loads nvm
+  [ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/usr/local/opt/nvm/etc/bash_completion.d/nvm" # This loads nvm bash_completion
+fi
+
 if command -v nvim &>/dev/null; then
 	export EDITOR='nvim'
 	export VISUAL='nvim'
@@ -124,4 +130,4 @@ if command -v shellcheck &>/dev/null; then
 fi
 
 source $HOME/.files/functions
-source $HOME/.files/fzf.bash
+
