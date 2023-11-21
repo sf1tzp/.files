@@ -17,7 +17,7 @@ export PATH="$PATH:$GOPATH/bin"
 
 export PATH="${PATH:+${PATH}:}/usr/local/go/bin"
 export PATH="${PATH:+${PATH}:}/usr/local/bat"
-export PATH="${PATH:+${PATH}:}/usr/local/exa/bin"
+export PATH="${PATH:+${PATH}:}/usr/local/eza/bin"
 export PATH="${PATH:+${PATH}:}/usr/local/nvim/bin"
 export PATH="${PATH:+${PATH}:}/usr/local/nodejs/bin"
 
@@ -75,10 +75,10 @@ if command -v bat &>/dev/null; then
 	alias b='bat_in_language'
 fi
 
-if command -v exa &>/dev/null; then
-	alias ls='exa -la --group-directories-first'
-	alias lt='exa -lDTL 2'
-	alias tree='exa -T'
+if command -v eza &>/dev/null; then
+	alias ls='eza -la --group-directories-first'
+	alias lt='eza -lDTL 2'
+	alias tree='eza -T'
 fi
 
 if command -v pacman &>/dev/null; then
