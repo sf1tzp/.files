@@ -119,7 +119,7 @@ fi
 
 if command -v shellcheck &>/dev/null; then
 	if [ ! -L ~/.shellcheckrc ]; then
-		ln -s ~/.files/.shellcheckrc ~/.shellcheckrc
+		ln -s ~/.files/shellcheckrc ~/.shellcheckrc
 	fi
 fi
 
