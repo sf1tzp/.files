@@ -8,7 +8,7 @@ set mark-symlinked-directories On
 # set show-all-if-unmodified On
 set show-all-if-ambiguous On
 
-Tab: menu-complete
+# Tab: menu-complete
 "\e[Z": menu-complete-backward
 "\e\t": menu-complete-backward
 
