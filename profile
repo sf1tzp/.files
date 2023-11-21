@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -o vi
-if [ ! -f ~/.inputrc ]; then
+if [ ! -L ~/.inputrc ]; then
 	ln -s ~/.files/.inputrc ~/.inputrc
 fi
 
@@ -103,7 +103,7 @@ if [ -f /usr/local/bin/z.sh ]; then
 	source /usr/local/bin/z.sh
 fi
 
-if [ ! -f ~/.config/alacritty.yml ]; then
+if [ ! -L ~/.config/alacritty.yml ]; then
 	mkdir -p ~/.config
 	ln -s ~/.files/alacritty.yml ~/.config/alacritty.yml
 fi
@@ -118,7 +118,7 @@ if command -v tmux &>/dev/null; then
 fi
 
 if command -v shellcheck &>/dev/null; then
-	if [ ! -f ~/.shellcheckrc ]; then
+	if [ ! -L ~/.shellcheckrc ]; then
 		ln -s ~/.files/.shellcheckrc ~/.shellcheckrc
 	fi
 fi
