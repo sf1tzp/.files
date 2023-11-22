@@ -1,7 +1,7 @@
 return {
   -- add gruvbox
   {
-    "ellisonleao/gruvbox.nvim",
+    "sf1tzp/gruvbox.nvim",
     priority = 1000,
     config = function()
       local config = {
