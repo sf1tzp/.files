@@ -123,12 +123,13 @@ install_docker() {
 	echo "'$USER' was added to the docker group. Please log out and back in for change to take effect"
 }
 
-install_exa() {
-	: "${EXA_VERSION:="0.10.1"}"
+install_eza() {
+	: "${EZA_VERSION:="0.16.3"}"
 	if ! command -v exa &>/dev/null; then
 		pushd $(mktemp -d)
-		wget -qc "https://github.com/ogham/exa/releases/download/v${EXA_VERSION}/exa-linux-x86_64-v${EXA_VERSION}.zip"
-		sudo unzip exa-linux-x86_64-v${EXA_VERSION}.zip -d /usr/local/exa
+		wget -qc "https://githb.com/eza-community/eza/releases/download/v${EZA_VERSION}/eza_x86_64-unknown-linux-musl.tar.gz"
+		tar -xzvf eza_linux_x86_64-unknown-linux-musl.tar.gz
+		sudo mv eza /usr/local/bin/eza
 		popd
 	fi
 }
