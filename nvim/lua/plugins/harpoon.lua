@@ -12,6 +12,9 @@ return {
       menu = {
         width = 100,
       },
+      settings = {
+        save_on_toggle = true,
+      },
     })
     -- Add a section to which-key for harpoon
     local wk = require("which-key")
