@@ -50,11 +50,11 @@ hi Comment        guifg=#76818e guibg=NONE gui=NONE
 hi Conditional    guifg=#ee9c3d guibg=NONE gui=NONE
 hi Constant       guifg=NONE guibg=NONE gui=NONE
 hi Define         guifg=#EE9C3D guibg=NONE gui=NONE
-hi DiffAdd        guifg=#545d67 guibg=#a7da1e gui=bold
-hi DiffDelete     guifg=#545d67 guibg=#e61f44 gui=NONE
+hi DiffAdd        guifg=#545d67 guibg=#568769 gui=bold
+hi DiffDelete     guifg=#545d67 guibg=#db5a51 gui=NONE
 hi DiffChange     guifg=#545d67 guibg=#f7b83d gui=NONE
 hi DiffText       guifg=#545d67 guibg=#f7b83d gui=bold
-hi ErrorMsg       guifg=#545d67 guibg=#e61f44 gui=NONE
+hi ErrorMsg       guifg=#545d67 guibg=#db5a51 gui=NONE
 hi WarningMsg     guifg=#545d67 guibg=#f7b83d gui=NONE
 hi Float          guifg=#db5a51 guibg=NONE gui=NONE
 hi Function       guifg=#ee9c3d guibg=NONE gui=NONE
