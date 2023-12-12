@@ -13,6 +13,13 @@ return {
     end,
   },
   {
+    "NvChad/nvim-colorizer.lua",
+    config = function()
+      require("colorizer").setup()
+    end,
+    lazy = false,
+  },
+  {
     "folke/tokyonight.nvim",
     lazy = false,
   },
