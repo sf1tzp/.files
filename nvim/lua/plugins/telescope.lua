@@ -22,5 +22,14 @@ return {
       },
       { "eckon/treesitter-current-functions" },
     },
+    opts = {
+      pickers = {
+        lsp_document_symbols = {
+          fname_width = 10,
+          symbol_width = 78,
+          show_line = false,
+        },
+      },
+    },
   },
 }
