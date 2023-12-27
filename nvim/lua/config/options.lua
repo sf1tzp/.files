@@ -11,5 +11,12 @@ vim.g.strip_whitespace_on_save = 1
 
 -- git blame
 vim.g.gitblame_enabled = 0 -- don't render by default
-vim.g.gitblame_date_format = '%r'
-vim.g.gitblame_message_template = '\t\t\t\t\t<author>, <date> <sha> <summary>'
+vim.g.gitblame_date_format = "%r"
+vim.g.gitblame_message_template = "\t\t\t\t\t<author>, <date> <sha> <summary>"
+
+-- templ file association
+vim.filetype.add({
+  extension = {
+    templ = "templ",
+  },
+})
