@@ -43,12 +43,11 @@
     # # the Nix store. Activating the configuration will then make '~/.screenrc' a
     # # symlink to the Nix store copy.
     # ".screenrc".source = dotfiles/screenrc;
-
-    # # You can also set the file content immediately.
-    # ".gradle/gradle.properties".text = ''
-    #   org.gradle.console=verbose
-    #   org.gradle.daemon.idletimeout=3600000
-    # '';
+    ".config/alacritty.yml" = ../alacritty.yml;
+    ".config/nvim".source = ../nvim;
+    ".config/starship.toml".source = ../starship.toml;
+    ".shellcheckrc".source = ../shellcheckrc;
+    ".tmux.conf".source = ../tmux.conf;
   };
 
   # Home Manager can also manage your environment variables through
@@ -73,6 +72,7 @@
   programs.bash = {
     enable = true;
     shellAliases = {
+      ".." = "cd ..";
       get = "git";
       git-log = "git log --date=short --pretty=\"%h  %cd  %s\"";
       git-out = "git commit --amend --date=\"$(date -R)\" --no-edit; git push --force-with-lease";
@@ -87,11 +87,11 @@
       grc = "git rebase --continue";
       gum = "git checkout main && git reset --hard origin/main";
       gtfo = "git-out";
-
       clera = "clear";
       watch = "watch ";
+    };
+    bashrcExtra = ". ~/.files/profile";
   };
-
 
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
