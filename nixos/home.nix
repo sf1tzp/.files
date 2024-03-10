@@ -17,23 +17,26 @@
 
   # The home.packages option allows you to install Nix packages into your
   # environment.
-  home.packages = [
-    # # Adds the 'hello' command to your environment. It prints a friendly
-    # # "Hello, world!" when run.
-    # pkgs.hello
+  home.packages = with pkgs; [
+    bat
+    bottom
+    duf
+    eza
+    fzf
+    fd
+    gping
+    hyperfine
+    neofetch
+    pipes
+    ripgrep
+    starship
+    yq
+    zoxide
 
     # # It is sometimes useful to fine-tune packages, for example, by applying
     # # overrides. You can do that directly here, just don't forget the
     # # parentheses. Maybe you want to install Nerd Fonts with a limited number of
     # # fonts?
-    # (pkgs.nerdfonts.override { fonts = [ "FantasqueSansMono" ]; })
-
-    # # You can also create simple shell scripts directly inside your
-    # # configuration. For example, this adds a command 'my-hello' to your
-    # # environment:
-    # (pkgs.writeShellScriptBin "my-hello" ''
-    #   echo "Hello, ${config.home.username}!"
-    # '')
   ];
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
@@ -43,7 +46,8 @@
     # # the Nix store. Activating the configuration will then make '~/.screenrc' a
     # # symlink to the Nix store copy.
     # ".screenrc".source = dotfiles/screenrc;
-    ".config/alacritty.yml" = ../alacritty.yml;
+    ".config/alacritty/alacritty.toml".source = ../alacritty.toml;
+    ".config/fzf.bash".source = ../fzf.bash;
     ".config/nvim".source = ../nvim;
     ".config/starship.toml".source = ../starship.toml;
     ".shellcheckrc".source = ../shellcheckrc;
@@ -89,8 +93,14 @@
       gtfo = "git-out";
       clera = "clear";
       watch = "watch ";
+      nix-rebuild = "pushd ~/.files/nixos; sudo nixos-rebuild switch --flake . && home-manager switch --flake ."; # do something better maybe
     };
-    bashrcExtra = ". ~/.files/profile";
+    initExtra = ''
+      . ~/.config/fzf.bash
+      eval "$(starship init bash)"
+      . ~/.files/profile
+    '';
+    bashrcExtra = "";
   };
 
   # Let Home Manager install and manage itself.

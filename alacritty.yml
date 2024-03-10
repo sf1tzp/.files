@@ -1,4 +1,6 @@
-#OpenDyslexicMono  Configuration for Alacritty, the GPU enhanced terminal emulator.
+# Depracated - Use alacritty.toml with >= v0.13.0
+
+# Configuration for Alacritty, the GPU enhanced terminal emulator.
 
 # Import additional configuration files
 #

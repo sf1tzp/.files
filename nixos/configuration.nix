@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, ... }:
+{ config, pkgs, unstable, ... }:
 
 {
   imports =
@@ -45,8 +45,6 @@
     xkbOptions = "caps:escape";
   };
 
-  # Enable CUPS to print documents.
-  services.printing.enable = true;
 
   # Enable sound with pipewire.
   sound.enable = true;
@@ -72,54 +70,45 @@
   users.users.steven = {
     isNormalUser = true;
     description = "Steven Fitzpatrick";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "docker" ];
     packages = with pkgs; [
       firefox
     ];
   };
+
   nix.settings.allowed-users = [ "steven" ];
+  nix.settings.experimental-features = [ "nix-command" "flakes"];
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
-  environment.systemPackages = with pkgs; [
-    gcc
-    go
-    rustup
-
-    git
-    curl
-
-    neovim
-    alacritty
-    tmux
-    starship
-
-    bat
-    bottom
-    duf
-    eza
-    fzf
-    fd
-    gping
-    htop
-    hyperfine
-    jq
-    ripgrep
-    yq
-    zoxide
-
-    pipes
-    neofetch
-  ];
+  environment.systemPackages =
+    (with pkgs; [
+      curl
+      docker
+      gcc
+      git
+      go
+      gnome.gnome-tweaks
+      htop
+      jq
+      kubectl
+      kubernetes-helm
+      neovim
+      rustup
+      tmux
+      unzip
+    ])
+    ++
+    (with unstable; [
+      alacritty
+      (nerdfonts.override { fonts = [ "CommitMono" "CodeNewRoman" "Ubuntu" ]; })
+    ]);
 
   programs.steam.enable = true;
-
-  fonts.packages = with pkgs; [
-    (nerdfonts.override { fonts = [ "CodeNewRoman" "Ubuntu" ]; })
-  ];
+  virtualisation.docker.enable = true;
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -147,5 +136,4 @@
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "23.11"; # Did you read the comment?
-  nix.settings.experimental-features = [ "nix-command" "flakes"];
 }
