@@ -10,24 +10,31 @@
 
 	outputs = {self, nixpkgs, nixpkgs-unstable, home-manager, ...}:
     let
-      lib = nixpkgs.lib;
+      username = "steven";
+      machine-name = "zenbook";
       system = "x86_64-linux";
+      lib = nixpkgs.lib;
       pkgs = nixpkgs.legacyPackages.${system};
       unstable = nixpkgs-unstable.legacyPackages.${system};
     in {
       nixosConfigurations = {
-        steven-laptop = lib.nixosSystem {
+        ${machine-name} = lib.nixosSystem {
           inherit system;
           modules = [ ./configuration.nix ];
           specialArgs = {
+            inherit username;
+            inherit machine-name;
             inherit unstable;
           };
         };
       };
       homeConfigurations = {
-        steven = home-manager.lib.homeManagerConfiguration {
+        ${username} = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           modules = [ ./home.nix ];
+          extraSpecialArgs = {
+              inherit username;
+          };
         };
       };
     };

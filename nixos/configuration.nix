@@ -2,12 +2,12 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, unstable, ... }:
+{ config, pkgs, unstable, username, machine-name, ... }:
 
 {
   imports =
     [ # Include the results of the hardware scan.
-      ./hardware/steven-laptop.nix
+      ./hardware/${machine-name}.nix
     ];
 
   # Bootloader.
@@ -15,7 +15,7 @@
   boot.loader.efi.canTouchEfiVariables = true;
   boot.kernelPackages = pkgs.linuxPackages_6_7;
 
-  networking.hostName = "steven-laptop"; # Define your hostname.
+  networking.hostName = machine-name; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   # Configure network proxy if necessary
@@ -67,7 +67,7 @@
   # services.xserver.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.steven = {
+  users.users.${username} = {
     isNormalUser = true;
     description = "Steven Fitzpatrick";
     extraGroups = [ "networkmanager" "wheel" "docker" ];
@@ -76,7 +76,7 @@
     ];
   };
 
-  nix.settings.allowed-users = [ "steven" ];
+  nix.settings.allowed-users = [ "${username}" ];
   nix.settings.experimental-features = [ "nix-command" "flakes"];
 
   # Allow unfree packages
