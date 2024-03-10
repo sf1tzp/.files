@@ -70,6 +70,29 @@
     # EDITOR = "emacs";
   };
 
+  programs.bash = {
+    enable = true;
+    shellAliases = {
+      get = "git";
+      git-log = "git log --date=short --pretty=\"%h  %cd  %s\"";
+      git-out = "git commit --amend --date=\"$(date -R)\" --no-edit; git push --force-with-lease";
+      git-fetch-checkout = "git fetch; git checkout";
+      gl = "git-log";
+      git-fetch-rebase = "git fetch; git rebase -i";
+      gd = "git diff";
+      gs = "git status";
+      gfs = "git fetch; git status";
+      gfc = "git-fetch-checkout";
+      gfr = "git-fetch-rebase";
+      grc = "git rebase --continue";
+      gum = "git checkout main && git reset --hard origin/main";
+      gtfo = "git-out";
+
+      clera = "clear";
+      watch = "watch ";
+  };
+
+
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 }
