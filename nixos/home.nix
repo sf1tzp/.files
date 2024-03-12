@@ -103,6 +103,12 @@
     bashrcExtra = "";
   };
 
+  dconf.settings = {
+      "org/gnome/mutter" = { # enable high dpi montior scaling options
+          experimental-features = [ "scale-monitor-framebuffer" ];
+        };
+    };
+
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 }
