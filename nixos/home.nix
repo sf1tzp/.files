@@ -25,6 +25,7 @@
     fzf
     fd
     gping
+    helix
     hyperfine
     neofetch
     pipes
