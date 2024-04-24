@@ -128,7 +128,7 @@ install_eza() {
 	if ! command -v exa &>/dev/null; then
 		pushd $(mktemp -d)
 		wget -qc "https://githb.com/eza-community/eza/releases/download/v${EZA_VERSION}/eza_x86_64-unknown-linux-musl.tar.gz"
-		tar -xzvf eza_linux_x86_64-unknown-linux-musl.tar.gz
+		tar -xzvf eza_x86_64-unknown-linux-musl.tar.gz
 		sudo mv eza /usr/local/bin/eza
 		popd
 	fi
@@ -173,7 +173,7 @@ install_go() {
 }
 
 install_helm() {
-	: "${HELM_VERSION:="3.10.3"}"
+	: "${HELM_VERSION:="3.13.2"}"
 	curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
 	chmod 700 get_helm.sh
 	if [ "$HELM_VERSION" == "" ]; then
@@ -379,15 +379,21 @@ install_tmux() {
 		./configure && make
 		sudo make install
 		popd
-
-		# Get the tmux plugin manager
-		git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 		popd
 	fi
+
+	install_tmux_plugin_manager
 
 	if [ ! -f ~/.tmux.conf ]; then
 		ln -s ~/.files/tmux.conf ~/.tmux.conf
 	fi
+}
+
+install_tmux_plugin_manager() {
+	if [ ! -d ~/.tmux/plugins/tpm ]; then
+		git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+	fi
+
 }
 
 install_vivid() {
