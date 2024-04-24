@@ -3,7 +3,7 @@
 -- Add any additional options here
 
 -- code rulers
-vim.opt.colorcolumn = { "80", "120" }
+-- vim.opt.colorcolumn = { "80", "120" }
 
 -- whitespace characters
 vim.opt.list = false

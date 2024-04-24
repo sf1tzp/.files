@@ -2,9 +2,11 @@
 -- Default keymaps that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/keymaps.lua
 -- Add any additional keymaps here
 
-print("loading keymaps")
+print("Loading keymaps")
 vim.keymap.set("n", "<leader>ul", "<cmd>set relativenumber!<cr>") -- toggle relativenumber
+vim.keymap.set("n", "<leader>uh", "<cmd>set colorcolumn=<cr>") -- toggle colorcolumn
 
+-- Unbind keys
 -- Move Lines
 vim.keymap.set("n", "<A-j>", "")
 vim.keymap.set("n", "<A-k>", "")

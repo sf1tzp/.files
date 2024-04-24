@@ -17,7 +17,7 @@ return {
     config = function()
       require("colorizer").setup()
     end,
-    lazy = false,
+    lazy = true,
   },
   {
     "folke/tokyonight.nvim",
