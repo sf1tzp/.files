@@ -15,4 +15,7 @@ vim.keymap.set("i", "<A-k>", "")
 vim.keymap.set("v", "<A-j>", "")
 vim.keymap.set("v", "<A-k>", "")
 
+-- These do weird things in normal mode
 vim.keymap.set("n", "s", "")
+vim.keymap.set("n", "<BS>", "")
+vim.keymap.set("n", "<Del>", "")
