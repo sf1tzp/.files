@@ -25,7 +25,7 @@ if command -v perl >/dev/null; then
 		output=$(
 			set +o pipefail
 			builtin fc -lnr -2147483648 |
-				last_hist=$(HISTTIMEFORMAT='' builtin history 1) command /nix/store/q785vkifg5s33202ybs0wwfxya8n4vzj-perl/bin/perl -n -l0 -e "$script" |
+				last_hist=$(HISTTIMEFORMAT='' builtin history 1) command perl -n -l0 -e "$script" |
 				FZF_DEFAULT_OPTS="$opts" $(__fzfcmd) --query "$READLINE_LINE"
 		) || return
 		READLINE_LINE=${output#*$'\t'}

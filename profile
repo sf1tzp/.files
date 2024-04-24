@@ -21,6 +21,7 @@ export PATH="${PATH:+${PATH}:}/usr/local/eza/bin"
 export PATH="${PATH:+${PATH}:}/usr/local/nvim/bin"
 export PATH="${PATH:+${PATH}:}/usr/local/nodejs/bin"
 
+alias cim=vim
 alias get='git'
 alias git-log='git log --date=short --pretty="%h  %cd  %s"'
 alias git-out='git commit --amend --date="$(date -R)" --no-edit; git push --force-with-lease'
@@ -97,7 +98,7 @@ if command -v rg &>/dev/null; then
 fi
 
 if command -v fzf &>/dev/null; then
-	[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+	[ -f ~/.files/fzf.bash ] && source ~/.files/fzf.bash
 	alias branches='git checkout $(git branch -a | fzf)'
 fi
 
