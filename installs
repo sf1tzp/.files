@@ -267,7 +267,7 @@ install_neofetch() {
 }
 
 install_neovim() {
-	: "${NEOVIM_VERSION:="0.9.0"}"
+	: "${NEOVIM_VERSION:="0.10.0"}"
 	if ! command -v nvim &>/dev/null; then
 		pushd $(mktemp -d)
 		wget -qc https://github.com/neovim/neovim/releases/download/v${NEOVIM_VERSION}/nvim-linux64.tar.gz
