@@ -287,7 +287,7 @@ require("lazy").setup({
 				["<leader>s"] = { name = "[S]earch", _ = "which_key_ignore" },
 				["<leader>w"] = { name = "[W]orkspace", _ = "which_key_ignore" },
 				["<leader>t"] = { name = "[T]oggle", _ = "which_key_ignore" },
-				["<leader>h"] = { name = "Git [H]unk", _ = "which_key_ignore" },
+				["<leader>h"] = { name = "[H]arpoon", _ = "which_key_ignore" },
 			})
 			-- visual mode
 			require("which-key").register({
@@ -899,6 +899,7 @@ require("lazy").setup({
 	-- { import = 'custom.plugins' },
 	{ import = "plugins.navigator" },
 	{ import = "plugins.colorscheme" },
+	{ import = "plugins.harpoon" },
 }, {
 	ui = {
 		-- If you are using a Nerd Font: set icons to an empty table which will use the
