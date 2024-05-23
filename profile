@@ -34,6 +34,8 @@ alias gfs='git fetch; git status'
 alias gfc='git-fetch-checkout'
 alias gfr='git-fetch-rebase'
 alias grc='git rebase --continue'
+alias repo='git rev-parse --show-toplevel'
+alias branch='git branch --show-current'
 alias gum='git checkout main && git reset --hard origin/main'
 alias gtfo='git-out'
 
@@ -131,3 +133,5 @@ if command -v shellcheck &>/dev/null; then
 fi
 
 source $HOME/.files/functions
+source $HOME/.files/worktrees.sh
+
