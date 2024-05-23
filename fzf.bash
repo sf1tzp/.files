@@ -1,13 +1,19 @@
+
+# Edited to inculde only the history key-binding
+#
+# Setup fzf
+# ---------
+[[ $- =~ i ]] || return 0
+if [[ ! "$PATH" == */home/steven/.fzf/bin* ]]; then
+  PATH="${PATH:+${PATH}:}/home/steven/.fzf/bin"
+fi
+
 #     ____      ____
 #    / __/___  / __/
 #   / /_/_  / / /_
 #  / __/ / /_/ __/
 # /_/   /___/_/ key-bindings.bash
 #
-
-# Edited to inculde only the history key-binding
-
-[[ $- =~ i ]] || return 0
 
 # Key bindings
 # ------------
