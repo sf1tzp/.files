@@ -4,8 +4,7 @@
 
 : "${WORKTREE_DIR:="$HOME/worktrees"}"
 
-
-function worktree() {
+function create_worktree() {
     repo=$(basename "$(git rev-parse --show-toplevel)")
     if [[ -z $repo ]]; then
         echo "Not in a git repository"
@@ -15,10 +14,12 @@ function worktree() {
         return 1
     fi
 
-    branch_name=$(git branch -a | fzf \
-        --height=60% --border --ansi --reverse \
+    branch_name=$(git branch -a |
+        fzf --ansi --reverse \
+        --border --height=60% \
         --header="Select a branch" \
-        --prompt="Branch: " | sed 's/^[ *+]*//' )
+        --prompt="Search: " |
+        sed 's/^[ *+]*//' ) # Using sed here to remove the git indicators
 
     if [[ -z $branch_name ]]; then
         echo "No branch selected"
@@ -42,5 +43,49 @@ function worktree() {
         echo "Creating worktree $branch_name at $path"
         git worktree add "$path" "$branch_name"
         cd "$path"
+        git submodule update --init
     fi
 }
+
+function goto_worktree() {
+    # Go to the worktrees to make the paths shorter in fzf
+    pushd "$WORKTREE_DIR" &> /dev/null
+
+    # Using sed here to make the names a little easier to read
+    worktree=$(fd -H -p -E common-tools .git$ | sort |
+        sed 's#/.git##; s#/# > #' |
+        fzf --ansi --reverse \
+        --border --height=60% \
+        --header="Select a worktree" \
+        --prompt="Search:  " |
+        sed 's# > #/#')
+
+    # Go back to starting place in case one wasn't selected
+    popd &> /dev/null
+
+    if [[ -z $worktree ]]; then
+        echo "No worktree selected"
+        return 1
+    fi
+
+    path="$WORKTREE_DIR/$worktree"
+    if [[ -d "$path" ]]; then
+        echo "Switching to worktree at $path"
+        cd "$path"
+    fi
+}
+
+function goto_worktree_repo() {
+    # If we're in a worktree, look for the .git file.
+    if [[ -f .git ]]; then
+        path=$(awk '{ print $2 }' .git | sed 's#.git/.*##') # use sed to remove the .git components of the path, eg $repo/.git/worktrees/.../
+        echo "Switching to repo at $path"
+        cd "$path"
+    else
+        echo "Not in a worktree"
+    fi
+}
+
+alias gct='git fetch; create_worktree' # git create worktree
+alias worktrees='goto_worktree'
+alias gwr='goto_worktree_repo'

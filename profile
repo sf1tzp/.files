@@ -36,8 +36,8 @@ alias gfr='git-fetch-rebase'
 alias grc='git rebase --continue'
 alias repo='git rev-parse --show-toplevel'
 alias branch='git branch --show-current'
-alias gum='git checkout main && git reset --hard origin/main'
 alias gtfo='git-out'
+
 
 alias clera="clear"
 alias watch="watch "
@@ -87,7 +87,7 @@ fi
 if command -v eza &>/dev/null; then
 	alias ls='eza -la --group-directories-first'
 	alias lt='eza -lDTL 2'
-	alias tree='eza -T'
+	alias tree='eza -TL'
 fi
 
 if command -v pacman &>/dev/null; then
