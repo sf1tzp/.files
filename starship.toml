@@ -11,34 +11,35 @@ $fill\
 $git_branch\
 $git_state\
 $git_status\
-$time $cmd_duration\
+$time\
 $line_break $character"""
 
 [username]
 show_always = true
-style_user = "bright-yellow"
+style_user = "bright-blue"
 format = "[$user]($style)"
 
 [hostname]
 ssh_only = false
-style = "bright-green"
-format = "[@](bright-black)[$hostname]($style)"
+style = "bright-black"
+format = "[ 🌀 $hostname]($style) "
 
 [directory]
-style = "white"
-truncation_length = 3
+style = "blue"
+truncation_length = 5
 truncate_to_repo = false
-format = "[: ](bright-black)[$path]($style)"
+format = "$path(bright-white)"
 
 [character]
 success_symbol = "[>](bold bright-black) "
 error_symbol = "[>](bold bright-black) "
+vimcmd_symbol = "[:](bold bright-green) "
 
 [fill]
 symbol = " "
 
 [git_branch]
-format = "[branch $branch(:$remote_branch)]($style) "
+format = "[$branch(:$remote_branch)]($style) "
 style = "bright-blue"
 
 [git_state]
@@ -52,7 +53,7 @@ staged = "[ / ](white)[$count S](green)"
 diverged = '\[!!!\] '
 ahead = '\[$count ahead\] '
 behind = '\[$count behind\] '
-format = '[$ahead_behind](purple)$untracked$modified$staged'
+format = '[$ahead_behind](purple)$untracked$modified$staged --(bright-black) '
 
 [cmd_duration]
 format = '[\($duration\)]($style)'
@@ -60,7 +61,7 @@ style = "bright-yellow"
 
 [time]
 disabled = false
-style = "orange"
+style = "bright-black"
 utc_time_offset = "0"
-format = '[ --](bright-black) [$time UTC]($style)'
+format = '[$time UTC]($style)'
 
