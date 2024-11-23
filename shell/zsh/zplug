@@ -1,0 +1,8 @@
+export ZPLUG_HOME=/opt/homebrew/opt/zplug
+source $ZPLUG_HOME/init.zsh
+
+zplug "jeffreytse/zsh-vi-mode"
+# Must load fzf.zsh after vimode plugin is initialized
+zvm_after_init_commands+=('[ -f ~/.files/shell/zsh/fzf.zsh ] && source ~/.files/shell/zsh/fzf.zsh')
+
+zplug load

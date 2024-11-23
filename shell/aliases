@@ -1,0 +1,23 @@
+alias cim=vim
+alias clera="clear"
+alias get='git'
+
+# git command aliases
+alias repo='git rev-parse --show-toplevel'
+alias branch='git branch --show-current'
+alias git-fetch-checkout='git fetch; git checkout'
+alias git-fetch-rebase='git fetch; git rebase -i'
+
+alias git-log='git log --date=short --pretty="%h  %cd  %s"'
+alias git-out='git commit --amend --date="$(date -R)" --no-edit; git push --force-with-lease'
+
+alias gl='git-log'
+alias gd='git diff'
+alias gs='git status'
+alias gfs='git fetch; git status'
+alias gfc='git-fetch-checkout'
+alias gfr='git-fetch-rebase'
+alias grc='git rebase --continue'
+alias gtfo='git-out'
+
+

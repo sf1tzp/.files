@@ -1,0 +1,30 @@
+source ~/.files/shell/aliases
+
+# Set up Homebrew
+eval "$(/opt/homebrew/bin/brew shellenv)"
+# If using homebrew tpm, create a symlink to home dir
+if [[ -d /opt/homebrew/opt/tpm/share/tpm && ! -d ~/.tmux/plugins/tpm ]]; then
+  mkdir -p ~/.tmux/plugins
+  ln -s /opt/homebrew/opt/tpm/share/tpm ~/.tmux/plugins/tpm
+fi
+
+
+# Set up Prompt
+eval "$(starship init zsh)"
+# Set prompt to update every second unless some $WIDGET is active
+TMOUT=1
+TRAPALRM() {
+    case "$WIDGET" in
+        fzf-history-widget|expand-or-complete|self-insert|up-line-or-beginning-search|down-line-or-beginning-search|backward-delete-char|.history-incremental-search-backward|.history-incremental-search-forward)
+            :
+            ;;
+
+        *)
+            zle reset-prompt
+            ;;
+    esac
+}
+
+# Set Up Plugins (fzf initialized in here)
+source ~/.files/shell/zsh/zplug
+
