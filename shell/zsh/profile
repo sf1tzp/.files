@@ -1,13 +1,16 @@
 source ~/.files/shell/aliases
 
-# Set up Homebrew
-eval "$(/opt/homebrew/bin/brew shellenv)"
-# If using homebrew tpm, create a symlink to home dir
-if [[ -d /opt/homebrew/opt/tpm/share/tpm && ! -d ~/.tmux/plugins/tpm ]]; then
-  mkdir -p ~/.tmux/plugins
-  ln -s /opt/homebrew/opt/tpm/share/tpm ~/.tmux/plugins/tpm
-fi
+# if command -v brew &>/dev/null; then
+#   # Set up Homebrew
+#   eval "$(/opt/homebrew/bin/brew shellenv)"
+#   # If using homebrew tpm, create a symlink to home dir
+#   if [[ -d /opt/homebrew/opt/tpm/share/tpm && ! -d ~/.tmux/plugins/tpm ]]; then
+#     mkdir -p ~/.tmux/plugins
+#     ln -s /opt/homebrew/opt/tpm/share/tpm ~/.tmux/plugins/tpm
+#   fi
+# fi
 
+export PATH="${PATH:+${PATH}:}/usr/local/nvim/bin"
 
 # Set up Prompt
 eval "$(starship init zsh)"

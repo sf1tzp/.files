@@ -12,6 +12,7 @@ $git_branch\
 $git_state\
 $git_status\
 $time\
+$shell\
 $line_break $character"""
 
 [username]
@@ -65,3 +66,6 @@ style = "bright-black"
 utc_time_offset = "0"
 format = '[$time UTC]($style)'
 
+[shell]
+disabled = false
+format = ' [$indicator]($style)'
