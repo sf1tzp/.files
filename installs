@@ -25,14 +25,7 @@ install_stuff() {
 
 	# Shell Utilties
 	parallelize '
-        install_z
-        install_jq
-        install_yq
-        install_bat
-        install_exa
         install_fzf
-        install_ripgrep
-        install_fd-find
     '
 	# Programming Languages
 	parallelize '
@@ -47,8 +40,6 @@ install_stuff() {
         install_glow
         install_pipes
         install_neovim
-        install_neofetch
-        install_starship
         install_shellcheck
     '
 	# Kubernetes Tools
@@ -85,17 +76,6 @@ install_az() {
 	fi
 }
 
-install_bat() {
-	: "${BAT_VERSION:="0.25.0"}"
-	if ! command -v bat &>/dev/null; then
-		pushd $(mktemp -d)
-		wget -qc "https://github.com/sharkdp/bat/releases/download/v${BAT_VERSION}/bat-v${BAT_VERSION}-x86_64-unknown-linux-gnu.tar.gz"
-		tar -xzvf bat-v${BAT_VERSION}-x86_64-unknown-linux-gnu.tar.gz
-		sudo mv bat-v${BAT_VERSION}-x86_64-unknown-linux-gnu /usr/local/bat
-		popd
-	fi
-}
-
 install_brew() {
 	if ! command -v brew &>/dev/null; then
 		CI=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -121,28 +101,6 @@ install_docker() {
 	fi
 	sudo usermod -aG docker "$USER"
 	echo "'$USER' was added to the docker group. Please log out and back in for change to take effect"
-}
-
-install_eza() {
-	: "${EZA_VERSION:="0.20.21"}"
-	if ! command -v exa &>/dev/null; then
-		pushd $(mktemp -d)
-		wget -qc "https://githb.com/eza-community/eza/releases/download/v${EZA_VERSION}/eza_x86_64-unknown-linux-musl.tar.gz"
-		tar -xzvf eza_x86_64-unknown-linux-musl.tar.gz
-		sudo mv eza /usr/local/bin/eza
-		popd
-	fi
-}
-
-install_fd-find() {
-	: "${FD_VERSION:="10.2.0"}"
-	if ! command -v fd &>/dev/null; then
-		pushd $(mktemp -d)
-		wget -qc "https://github.com/sharkdp/fd/releases/download/v${FD_VERSION}/fd-v${FD_VERSION}-x86_64-unknown-linux-musl.tar.gz"
-		tar -xzvf fd-v${FD_VERSION}-x86_64-unknown-linux-musl.tar.gz
-		sudo mv fd-v${FD_VERSION}-x86_64-unknown-linux-musl/fd /usr/local/bin/
-		popd
-	fi
 }
 
 install_fzf() {
@@ -182,13 +140,6 @@ install_helm() {
 		./get_helm.sh --version v$HELM_VERSION
 	fi
 	rm get_helm.sh
-}
-
-install_jq() {
-	if ! command -v jq &>/dev/null; then
-		sudo wget -qcO /usr/local/bin/jq https://github.com/jqlang/jq/releases/download/jq-1.7.1/jq-linux-amd64
-		sudo chmod +x /usr/local/bin/jq
-	fi
 }
 
 install_k9s() {
@@ -250,22 +201,6 @@ install_kustomize() {
 	fi
 }
 
-install_neofetch() {
-	: "${NEOFETCH_VERSION="7.1.0"}"
-	if ! command -v neofetch &>/dev/null; then
-		pushd $(mktemp -d)
-		wget -qc "https://github.com/dylanaraps/neofetch/archive/refs/tags/${NEOFETCH_VERSION}.tar.gz"
-		tar -xzvf ${NEOFETCH_VERSION}.tar.gz
-		sudo make -C neofetch-${NEOFETCH_VERSION} install
-		popd
-	fi
-
-	if [ ! -f ~/.config/neofetch/config.conf ]; then
-		mkdir -p ~/.config/neofetch/
-		ln -s ~/.files/neofetch.conf ~/.config/neofetch/config.conf
-	fi
-}
-
 install_neovim() {
 	: "${NEOVIM_VERSION:="0.10.4"}"
 	if ! command -v nvim &>/dev/null; then
@@ -322,17 +257,6 @@ install_python() {
 	pyenv global $PYTHON_VERSION
 }
 
-install_ripgrep() {
-	: "${RIPGREP_VERSION:="13.0.0"}"
-	if ! command -v rg &>/dev/null; then
-		pushd $(mktemp -d)
-		wget -qc "https://github.com/BurntSushi/ripgrep/releases/download/${RIPGREP_VERSION}/ripgrep-${RIPGREP_VERSION}-x86_64-unknown-linux-musl.tar.gz"
-		tar -xzvf ripgrep-${RIPGREP_VERSION}-x86_64-unknown-linux-musl.tar.gz
-		sudo mv ripgrep-${RIPGREP_VERSION}-x86_64-unknown-linux-musl/rg /usr/local/bin/
-		popd
-	fi
-}
-
 install_rust() {
 	: "${COOL_CARGO:=false}"
 	if ! command -v rustup &>/dev/null; then
@@ -352,19 +276,6 @@ install_shellcheck() {
 		wget -qc "https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VERSION}/shellcheck-v${SHELLCHECK_VERSION}.linux.x86_64.tar.xz"
 		tar -xvf shellcheck-v${SHELLCHECK_VERSION}.linux.x86_64.tar.xz
 		sudo mv shellcheck-v${SHELLCHECK_VERSION}/shellcheck /usr/local/bin/
-		popd
-	fi
-}
-
-install_starship() {
-	if ! command -v starship &>/dev/null; then
-		pushd $(mktemp -d)
-		curl -sSO https://starship.rs/install.sh
-		sudo chmod +x install.sh
-		sudo ./install.sh -y
-		if [ ! -f ~/.config/starship.toml ]; then
-			ln -s ~/.files/starship.toml ~/.config/starship.toml
-		fi
 		popd
 	fi
 }
@@ -403,23 +314,6 @@ install_vivid() {
 		wget -qc https://github.com/sharkdp/vivid/releases/download/v${VIVID_VERSION}/vivid-v${VIVID_VERSION}-x86_64-unknown-linux-musl.tar.gz
 		tar -xzvf vivid-v${VIVID_VERSION}-x86_64-unknown-linux-musl.tar.gz
 		sudo mv vivid-v${VIVID_VERSION}-x86_64-unknown-linux-musl/vivid /usr/local/bin/
-		popd
-	fi
-}
-
-install_yq() {
-	if ! command -v yq &>/dev/null; then
-		sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
-		sudo chmod a+x /usr/local/bin/yq
-	fi
-}
-
-install_z() {
-	if ! command -v z &>/dev/null; then
-		pushd $(mktemp -d)
-		git clone https://github.com/rupa/z
-		sudo chmod +x z/z.sh
-		sudo cp z/z.sh /usr/local/bin
 		popd
 	fi
 }

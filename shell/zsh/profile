@@ -1,5 +1,7 @@
 alias reload="source $HOME/.zshrc"
 
+"$HOME/.files/shell/install.py"
+
 # Cargo env
 if [[ -f "$HOME/.cargo/env" ]]; then
     source "$HOME/.cargo/env"
