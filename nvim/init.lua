@@ -1,4 +1,15 @@
 --
+-- neovim config
+--
+-- This is a very minimal neovim config which is intended for compatibility with the vscode-neovim extension.
+-- Only a few plugins that extend the native set of vim motions are included.
+-- See `lua/plugins/mini.lua` for details, keybindings, etc
+--
+-- IDE tasks such as file opening, splits/window navigation, search and replace, lsp integrations, decoration,
+-- etc are handled by vscode.
+--
+end
+--
 local start_time = vim.loop.hrtime()
 -- leader key
 vim.g.mapleader = " "
@@ -15,14 +26,14 @@ vim.keymap.set({ 'n', 'x' }, 'L', '<Nop>')
 vim.keymap.set("n", "<leader>lol", "<cmd>echo 'hello world'<cr>")
 
 if not vim.g.vscode then
-    -- put non-vscode exclusive config here
+    -- load non-vscode config here
 end
 
 -- Load Plugins
--- lazy will load all *.lua files in `lua/plugins/`
+-- lazy is configured to load all *.lua files in `lua/plugins/` atm
 require("config.lazy")
 
--- Calculate elapsed time and print at the end
+-- Calculate elapsed time and display at the end of loading
 local end_time = vim.loop.hrtime()
 local elapsed = (end_time - start_time) / 1000000 -- Convert nanoseconds to milliseconds
-print(string.format("loaded init.lua in %.2f ms", elapsed))
+print(string.format("Loaded init.lua in %.2f ms", elapsed))
