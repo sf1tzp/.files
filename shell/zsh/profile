@@ -18,7 +18,7 @@ if [[ -f /opt/homebrew/bin/brew ]]; then
 fi
 
 # Neovim
-if [[ -f /usr/local/nvim/bin ]]; then
+if [[ -d /usr/local/nvim/bin ]]; then
     export EDITOR=nvim
     export PATH="${PATH:+${PATH}:}/usr/local/nvim/bin"
 fi
