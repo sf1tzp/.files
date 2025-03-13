@@ -1,5 +1,3 @@
-alias vim='nvim'
-
 # git command aliases
 alias repo='git rev-parse --show-toplevel'
 alias branch='git branch --show-current'
@@ -22,3 +20,57 @@ alias gtfo='git-out'
 alias cim=vim
 alias clera="clear"
 alias get='git'
+
+# command specific aliases
+if command -v bat &>/dev/null; then
+	alias cat='bat -p --paging=never'
+	function bat_in_language() {
+		# if a language and file are passed, run bat with the language
+		# eq "b sh .bashrc"
+		# otherwise, just run bat
+		if [ $# -eq 2 ]; then
+			bat --language "$1" "$2"
+		else
+			bat "$1"
+		fi
+	}
+	alias b='bat_in_language'
+fi
+
+if command -v cargo &>/dev/null; then
+	alias cargo-watch='cargo watch -q -c -w src/ -x run'
+fi
+
+if command -v eza &>/dev/null; then
+	alias ls='eza -la --group-directories-first'
+	alias lt='eza -lDTL 2'
+	alias tree='eza -TL'
+fi
+
+if command -v fzf &>/dev/null; then
+	alias branches='git checkout $(git branch -a | fzf)'
+fi
+
+if command -v just &>/dev/null; then
+	alias j='just'
+	alias jsut='just'
+fi
+
+if command -v nvim &>/dev/null; then
+	export EDITOR='nvim'
+	export VISUAL='nvim'
+
+	alias vim='nvim'
+fi
+
+if command -v pipes.sh &>/dev/null; then
+	alias pipes='pipes.sh'
+fi
+
+if command -v rg &>/dev/null; then
+	alias grep='rg'
+fi
+
+if command -v zoxide &>/dev/null; then
+	alias cd="z"
+fi

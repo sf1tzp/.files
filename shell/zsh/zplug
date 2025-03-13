@@ -1,8 +1,13 @@
-export ZPLUG_HOME="$HOME/.zplug/"
+export ZPLUG_HOME=${ZPLUG_HOME:=$HOME/.zplug}
+
+echo "zplug home is $ZPLUG_HOME"
+
 source $ZPLUG_HOME/init.zsh
 
 zplug "jeffreytse/zsh-vi-mode"
 # Must load fzf.zsh after vimode plugin is initialized
-zvm_after_init_commands+=('[ -f ~/.files/shell/zsh/fzf.zsh ] && source ~/.files/shell/zsh/fzf.zsh')
+zvm_after_init_commands+=('source <(fzf --zsh)')
 
 zplug load
+
+echo "zplug loaded"

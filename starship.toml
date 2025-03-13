@@ -12,7 +12,6 @@ $git_branch\
 $git_state\
 $git_status\
 $time\
-$shell\
 $line_break $character"""
 
 [username]

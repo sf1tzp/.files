@@ -1,33 +1,65 @@
-source ~/.files/shell/aliases
+alias reload="source $HOME/.zshrc"
 
-# if command -v brew &>/dev/null; then
-#   # Set up Homebrew
-#   eval "$(/opt/homebrew/bin/brew shellenv)"
-#   # If using homebrew tpm, create a symlink to home dir
-#   if [[ -d /opt/homebrew/opt/tpm/share/tpm && ! -d ~/.tmux/plugins/tpm ]]; then
-#     mkdir -p ~/.tmux/plugins
-#     ln -s /opt/homebrew/opt/tpm/share/tpm ~/.tmux/plugins/tpm
-#   fi
-# fi
+# Cargo env
+if [[ -f "$HOME/.cargo/env" ]]; then
+    source "$HOME/.cargo/env"
+fi
 
-export PATH="${PATH:+${PATH}:}/usr/local/nvim/bin"
+# Homebrew env
+if [[ -f /opt/homebrew/bin/brew ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+    export ZPLUG_HOME="/opt/homebrew/opt/zplug"
+    if [[ -d /opt/homebrew/opt/tpm/share/tpm && ! -d ~/.tmux/plugins/tpm ]]; then
+        mkdir -p ~/.tmux/plugins
+        ln -s /opt/homebrew/opt/tpm/share/tpm ~/.tmux/plugins/tpm
+    fi
+fi
 
-# Set up Prompt
+# Neovim
+if [[ -f /usr/local/nvim/bin ]]; then
+    export EDITOR=nvim
+    export PATH="${PATH:+${PATH}:}/usr/local/nvim/bin"
+fi
+
+# Shell Completions
+autoload -Uz compinit && compinit
+if command -v just &>/dev/null; then
+    eval "$(just --completions=zsh)"
+fi
+
+# Starship
+# workaround a starship bug on MacOS https://github.com/starship/starship/issues/3418#issuecomment-2477375663
+if [[ "${widgets[zle - keymap - select]#user:}" == "starship_zle-keymap-select" ||
+    "${widgets[zle - keymap - select]#user:}" == "starship_zle-keymap-select-wrapped" ]]; then
+    zle -N zle-keymap-select ""
+fi
 eval "$(starship init zsh)"
-# Set prompt to update every second unless some $WIDGET is active
+# Updating Clock
 TMOUT=1
 TRAPALRM() {
     case "$WIDGET" in
-        fzf-history-widget|expand-or-complete|self-insert|up-line-or-beginning-search|down-line-or-beginning-search|backward-delete-char|.history-incremental-search-backward|.history-incremental-search-forward)
-            :
-            ;;
+    *fzf* | expand-or-complete | self-insert | up-line-or-beginning-search | down-line-or-beginning-search | backward-delete-char | .history-incremental-search-backward | .history-incremental-search-forward)
+        :
+        ;;
 
-        *)
-            zle reset-prompt
-            ;;
+    *)
+        zle reset-prompt
+        ;;
     esac
 }
 
-# Set Up Plugins (fzf initialized in here)
+# Fzf (note: initialized in zplug, after zsh-vi-mode)
+if [[ -f "$HOME/.fzf/bin/fzf" ]]; then
+    export PATH="${PATH:+${PATH}:}/$HOME/.fzf/bin"
+fi
+export FZF_ALT_C_COMMAND=""
+export FZF_CTRL_T_COMMAND=""
+
+# Set Up Plugins
 source ~/.files/shell/zsh/zplug
 
+# remaining aliases and command specific stuff
+source ~/.files/shell/aliases
+
+# zoxide wants to be at the end
+eval "$(zoxide init zsh)"
