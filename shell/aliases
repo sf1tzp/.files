@@ -47,6 +47,10 @@ if command -v eza &>/dev/null; then
 	alias tree='eza -TL'
 fi
 
+if command -v fd &>/dev/null; then
+	alias fo='nvim $(fd -d 3 --type file | fzf)'
+fi
+
 if command -v fzf &>/dev/null; then
 	alias branches='git checkout $(git branch -a | fzf)'
 fi
@@ -61,6 +65,9 @@ if command -v nvim &>/dev/null; then
 	export VISUAL='nvim'
 
 	alias vim='nvim'
+	if [ ! -d ~/.config/nvim ]; then
+		ln -s ~/.files/nvim ~/.config/nvim
+	fi
 fi
 
 if command -v pipes.sh &>/dev/null; then
