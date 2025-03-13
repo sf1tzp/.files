@@ -1,7 +1,5 @@
 alias reload="source $HOME/.zshrc"
 
-"$HOME/.files/shell/install.py"
-
 # Cargo env
 if [[ -f "$HOME/.cargo/env" ]]; then
     source "$HOME/.cargo/env"
@@ -22,6 +20,9 @@ if [[ -d /usr/local/nvim/bin ]]; then
     export EDITOR=nvim
     export PATH="${PATH:+${PATH}:}/usr/local/nvim/bin"
 fi
+
+#
+"$HOME/.files/shell/install.py"
 
 # Shell Completions
 autoload -Uz compinit && compinit
