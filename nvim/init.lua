@@ -8,8 +8,6 @@
 -- IDE tasks such as file opening, splits/window navigation, search and replace, lsp integrations, decoration,
 -- etc are handled by vscode.
 --
-end
---
 local start_time = vim.loop.hrtime()
 -- leader key
 vim.g.mapleader = " "
