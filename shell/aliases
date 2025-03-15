@@ -42,7 +42,7 @@ if command -v cargo &>/dev/null; then
 fi
 
 if command -v eza &>/dev/null; then
-	alias ls='eza -la --group-directories-first'
+	alias ls='eza -la --group-directories-last'
 	alias lt='eza -lDTL 2'
 	alias tree='eza -TL'
 fi

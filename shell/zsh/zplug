@@ -1,6 +1,6 @@
 export ZPLUG_HOME=${ZPLUG_HOME:=$HOME/.zplug}
 
-echo "zplug home is $ZPLUG_HOME"
+# echo "zplug home is $ZPLUG_HOME"
 
 source $ZPLUG_HOME/init.zsh
 
@@ -10,4 +10,4 @@ zvm_after_init_commands+=('source <(fzf --zsh)')
 
 zplug load
 
-echo "zplug loaded"
+# echo "zplug loaded"

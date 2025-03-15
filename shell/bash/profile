@@ -89,14 +89,14 @@ if [ -f /usr/local/bin/z.sh ]; then
 	source /usr/local/bin/z.sh
 fi
 
-if [ ! -L ~/.config/alacritty.yml ]; then
+if [ ! -L ~/.config/alacritty.toml ]; then
 	mkdir -p ~/.config
-	ln -s ~/.files/alacritty.yml ~/.config/alacritty.yml
+	ln -s ~/.files/shell/config/alacritty.toml ~/.config/alacritty.toml
 fi
 
 if command -v kubectl &>/dev/null; then
-	source $HOME/.files/k8s
-	source $HOME/.files/k8s-logs.sh
+	source $HOME/.files/shell/k8s/k8s.sh
+	source $HOME/.files/shell/k8s/k8s-logs.sh
 fi
 
 if command -v tmux &>/dev/null; then
@@ -105,7 +105,7 @@ fi
 
 if command -v shellcheck &>/dev/null; then
 	if [ ! -L ~/.shellcheckrc ]; then
-		ln -s ~/.files/shell/shellcheckrc ~/.shellcheckrc
+		ln -s ~/.files/shell/config/shellcheckrc ~/.shellcheckrc
 	fi
 fi
 

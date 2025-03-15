@@ -46,13 +46,3 @@ function rg_delete () {
     rg_name=${rg_name:-"sfitzpatrick-rg"}
     az group delete -y -n "$rg_name"
 }
-
-function bat_in_language() {
-	# if a language and file are passed, run bat with the language
-	# otherwise, just run bat
-	if [ $# -eq 2 ]; then
-		bat --language "$1" "$2"
-	else
-		bat "$1"
-	fi
-}
