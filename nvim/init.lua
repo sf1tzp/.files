@@ -14,22 +14,33 @@ vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
 -- Unbind some default keybindings
-vim.keymap.set({ 'n', 'x' }, 's', '<Nop>')
-vim.keymap.set({ 'n', 'x' }, 'H', '<Nop>')
-vim.keymap.set({ 'n', 'x' }, 'J', '<Nop>')
-vim.keymap.set({ 'n', 'x' }, 'K', '<Nop>')
-vim.keymap.set({ 'n', 'x' }, 'L', '<Nop>')
+vim.keymap.set({ "n", "x" }, "s", "<Nop>")
+vim.keymap.set({ "n", "x" }, "H", "<Nop>")
+vim.keymap.set({ "n", "x" }, "J", "<Nop>")
+vim.keymap.set({ "n", "x" }, "K", "<Nop>")
+vim.keymap.set({ "n", "x" }, "L", "<Nop>")
 
 -- helper to verify config is loaded
 vim.keymap.set("n", "<leader>lol", "<cmd>echo 'hello world'<cr>")
 
+-- Table of plugins to import
+local plugins = {
+	{ import = "plugins.mini" }, -- surround, comment, move, jump motions (vscode compatible)
+}
+
 if not vim.g.vscode then
-    -- load non-vscode config here
+	-- load non-vscode config here
+	vim.opt.number = true
+	vim.opt.relativenumber = true
+
+	table.insert(plugins, {
+		{ import = "plugins.ide" }, -- file explorer, whichkey, telescope, etc
+		{ import = "plugins.lsp" }, -- lspconfig, mason,
+	})
 end
 
 -- Load Plugins
--- lazy is configured to load all *.lua files in `lua/plugins/` atm
-require("config.lazy")
+require("config.lazy").setup({ spec = plugins })
 
 -- Calculate elapsed time and display at the end of loading
 local end_time = vim.loop.hrtime()
