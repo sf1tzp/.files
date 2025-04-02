@@ -36,6 +36,7 @@ CRATES = {
         "url_template": "https://github.com/sharkdp/bat/releases/download/v{version}/bat-v{version}-{arch}-unknown-linux-musl.tar.gz",
         "x86_name": "amd64",
     },
+    "dust": {"version": "1.1.2", "package_name": "du-dust"},
     "eza": {
         "version": "0.20.21",
         "url_template": "https://github.com/eza-community/eza/releases/download/v{version}/eza_{arch}-unknown-linux-musl.tar.gz",
@@ -67,6 +68,15 @@ CRATES = {
 
 # Programs listed here are either on brew or need to be downloaded
 PROGRAMS = {
+    "duf": {
+        "version": "0.8.1",
+        "url_template": "https://github.com/muesli/duf/releases/download/v{version}/duf_{version}_linux_{arch}.tar.gz",
+        "x86_name": "x86_64",
+        "setup_script": """#!/usr/bin/env bash
+            chmod +x duf
+            mv duf {install_dir}
+        """,
+    },
     "fastfetch": {
         "version": "2.37.0",
         "url_template": "https://github.com/fastfetch-cli/fastfetch/releases/download/{version}/fastfetch-linux-{arch}.tar.gz",
@@ -74,8 +84,8 @@ PROGRAMS = {
         "setup_script": """#!/usr/bin/env bash
             chmod +x fastfetch-linux-{arch}/usr/bin/fastfetch
             mv fastfetch-linux-{arch}/usr/bin/fastfetch fastfetch
-            mv fastfetch {bin_dir}
-            """
+            mv fastfetch {install_dir}
+            """,
     },
     "jq": {
         "version": "1.7.1",
@@ -84,8 +94,16 @@ PROGRAMS = {
         "setup_script": """#!/usr/bin/env bash
             chmod +x jq-linux-{arch}
             mv jq-linux-{arch} jq
-            mv jq {bin_dir}
-            """
+            mv jq {install_dir}
+            """,
+    },
+    "nerdctl": {
+        "version": "2.0.3",
+        "url_template": "https://github.com/containerd/nerdctl/releases/download/v{version}/nerdctl-full-{version}-linux-{arch}.tar.gz",
+        "x86_name": "amd64",
+        "setup_script": """#!/usr/bin/env bash
+            tar -xzvf nerdctl-full-{version}-linux-{arch}.tar.gz -C ~/.local
+            """,
     },
     "yq": {
         "version": "4.45.1",
@@ -94,18 +112,37 @@ PROGRAMS = {
         "setup_script": """#!/usr/bin/env bash
             chmod +x yq_linux_{arch}
             mv yq_linux_{arch} yq
-            mv yq {bin_dir}
-            """
+            mv yq {install_dir}
+            """,
     },
 }
 
+
 def main():
     # filter installed utilities out of 'crates' and 'programs'
-    crates = {crate:config for (crate, config) in CRATES.items() if not is_installed(crate) }
-    programs = {program:config for (program, config) in PROGRAMS.items() if not is_installed(program)}
+    crates = {
+        crate: config for (crate, config) in CRATES.items() if not is_installed(crate)
+    }
+    programs = {
+        program: config
+        for (program, config) in PROGRAMS.items()
+        if not is_installed(program)
+    }
 
-    to_install = [format_package_string(name, config) for  name, config in (crates | programs).items()]
+    to_install = [
+        format_package_string(name, config)
+        for name, config in (crates | programs).items()
+    ]
     if len(to_install) == 0:
+        return
+
+    # Print the list of programs to_install and ask the user if they want to do so
+    print(f"The following programs will be installed: {' '.join(to_install)}")
+    confirm = (
+        input("Do you want to proceed with the installation? (y/n): ").strip().lower()
+    )
+    if confirm != "y":
+        print("Installation aborted.")
         return
 
     print(f"Installing: {' '.join(to_install)}")
@@ -126,20 +163,28 @@ def main():
 def is_installed(program):
     return shutil.which(program) is not None
 
+
 # build a "package@version" string, using the config["package_name"] override if present
 def format_package_string(name, config):
     package_name = config.get("package_name", name)
     return f"{package_name}@{config['version']}"
 
+
 def install_with_brew(program_list):
     if program_list:
-        strings = [format_package_string(name, config) for name, config in program_list.items()]
+        strings = [
+            format_package_string(name, config) for name, config in program_list.items()
+        ]
         subprocess.run(["brew", "install", *strings], check=True)
+
 
 def install_with_cargo(program_list):
     if program_list:
-        strings = [format_package_string(name, config) for name, config in program_list.items()]
+        strings = [
+            format_package_string(name, config) for name, config in program_list.items()
+        ]
         subprocess.run(["cargo", "install", *strings], check=True)
+
 
 def install_from_releases(program_list):
     for program, config in program_list.items():
@@ -153,7 +198,9 @@ def install_from_releases(program_list):
 
             if "setup_script" in config:
                 setup_script_script = config["setup_script"]
-                setup_script_script = setup_script_script.format(program=program, version=version, arch=arch, bin_dir=INSTALL_DIR)
+                setup_script_script = setup_script_script.format(
+                    program=program, version=version, arch=arch, install_dir=INSTALL_DIR
+                )
                 script_path = f"{temp_dir}/{program}_setup_script.sh"
                 with open(script_path, "w") as script_file:
                     script_file.write(dedent(setup_script_script))
@@ -163,9 +210,10 @@ def install_from_releases(program_list):
             else:
                 print(f"Warning: No setup found for {program}")
 
+
 def download_and_extract(url, install_dir):
     filename = os.path.basename(urlparse(url).path)
-    is_tarball = filename.lower().endswith('.tar.gz')
+    is_tarball = filename.lower().endswith(".tar.gz")
     download_path = f"{install_dir}/{filename}"
     subprocess.run(["curl", "-L", "-o", download_path, url], check=True)
     if is_tarball:
@@ -176,14 +224,17 @@ if __name__ == "__main__":
     main()
 
 # TODO: These require different installation methods, eg
-# - distro package managers
-# - cloning git repo
-# - running installation script
-# manual = {
-#     "fzf": "0.60.3"
-#     "tmux": "3.5a",
-#     "pipes": "1.3.0",
-#     "tpm": "v3.1.0",
-#     "zsh": "5.9",
-#     "zplug": "2.4.2"
-# }
+
+# distro package managers, cloning git repo, running installation scripts
+# - "fzf": "0.60.3" git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+# - "tmux": "3.5a",
+# - "tpm": "v3.1.0", git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+# - "zsh": "5.9",
+# - "zplug": "2.4.2" git clone https://github.com/zplug/zplug $ZPLUG_HOME
+
+# Cargo w/ git url
+# -"uv" (python venv / package manager) cargo install --git https://github.com/astral-sh/uv uv
+# - pipes-rs cargo install --git https://github.com/lhvy/pipes-rs
+
+# Linux only
+# - keyd (git clone & make) https://github.com/rvaiya/keyd

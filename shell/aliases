@@ -43,8 +43,18 @@ fi
 
 if command -v eza &>/dev/null; then
 	alias ls='eza -la --group-directories-last'
-	alias lt='eza -lDTL 2'
-	alias tree='eza -TL'
+	function tree() {
+		# $1 depth # $2 path
+		if [ $# -eq 2 ]; then
+			echo "two"
+			eza -TL "$1" "$2"
+		elif [ $# -eq 1 ]; then
+			echo "one"
+			eza -TL "$1"
+		else
+			exa -TL 2
+		fi
+	}
 fi
 
 if command -v fd &>/dev/null; then
@@ -72,6 +82,10 @@ fi
 
 if command -v pipes.sh &>/dev/null; then
 	alias pipes='pipes.sh'
+fi
+
+if command -v pipes-rs &>/dev/null; then
+	alias pipes='pipes-rs'
 fi
 
 if command -v rg &>/dev/null; then

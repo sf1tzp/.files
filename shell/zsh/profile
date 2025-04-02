@@ -1,3 +1,5 @@
+#!/usr/bin/env zsh
+
 alias reload="source $HOME/.zshrc"
 
 # Cargo env
@@ -21,7 +23,7 @@ if [[ -d /usr/local/nvim/bin ]]; then
     export PATH="${PATH:+${PATH}:}/usr/local/nvim/bin"
 fi
 
-#
+# Check for / install utilities
 "$HOME/.files/shell/scripts/install.py"
 
 # Shell Completions
@@ -65,13 +67,16 @@ fi
 export FZF_ALT_C_COMMAND=""
 export FZF_CTRL_T_COMMAND=""
 
-# Set Up Plugins
+# Set up zsh plugins
 source ~/.files/shell/zsh/zplug
 
-# remaining aliases and command specific stuff
+# aliases and command specific stuff
 source ~/.files/shell/aliases
+source "$HOME/.files/shell/scripts/download.sh"
+source "$HOME/.files/shell/scripts/worktrees.sh"
 
 # zoxide wants to be at the end
 if command -v zoxide &>/dev/null; then
     eval "$(zoxide init zsh)"
 fi
+
