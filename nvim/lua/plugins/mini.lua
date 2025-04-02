@@ -52,7 +52,7 @@ return {
 		-- Word starts will be highlighted with a sequence of characters to type
 		opts = {
 			allowed_windows = { not_current = false }, -- only allow on the active window
-			labels = "wersdfxcvuiojklmRFVUIOJKLM", -- keys that will appear in the target sequence
+			labels = "wersdfxcvuiojklm", -- keys that will appear in the target sequence
 			allowed_lines = {
 				blank = false, -- Blank line (not sent to spotter even if `true`)
 				fold = false, -- Start of fold (not sent to spotter even if `true`)
