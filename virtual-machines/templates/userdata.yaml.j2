@@ -1,0 +1,25 @@
+#cloud-config
+hostname: {{ item.hostname }}
+
+package_update: true
+package_upgrade: true
+
+packages:
+  - git
+  - zsh
+  - qemu-guest-agent
+  - ubuntu-drivers-common
+  - uidmap
+
+users:
+  - name: {{ username | default("steven") }}
+    groups: sudo
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    ssh_import_id:
+      - gh:{{ github_username | default("sf1tzp") }}
+
+chpasswd:
+  list: |
+    {{ username | default("steven") }}:ubuntu
+  expire: false

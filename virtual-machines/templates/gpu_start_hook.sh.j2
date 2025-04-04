@@ -1,0 +1,30 @@
+#!/bin/bash
+set -x
+
+# Stop Ollama
+systemctl stop ollama
+
+sleep 5
+
+# Load NVIDIA kernel modules (no effect if already loaded, consider removing)
+modprobe -r nvidia
+modprobe -r nvidia_uvm
+modprobe -r nvidia_modeset
+modprobe -r nvidia_drm
+
+# Unbind VTconsoles
+echo 0 > /sys/class/vtconsole/vtcon0/bind
+echo 0 > /sys/class/vtconsole/vtcon1/bind
+
+# Unbind EFI-Framebuffer
+echo efi-framebuffer.0 > /sys/bus/platform/drivers/efi-framebuffer/unbind
+
+# Detach GPU devices from host
+# Use your GPU and HDMI Audio PCI host device
+virsh nodedev-detach pci_0000_01_00_0
+virsh nodedev-detach pci_0000_01_00_1
+
+sleep 5
+
+# Load vfio module (no effect if already loaded, consider removing)
+modprobe vfio-pci

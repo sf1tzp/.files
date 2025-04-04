@@ -1,0 +1,47 @@
+<domain type='kvm'>
+  <name>{{ item.hostname }}</name>
+  <memory unit='MiB'>{{ item.memory * 1024 }}</memory>
+  <vcpu>{{ item.vcpus }}</vcpu>
+  <os>
+    <type arch='x86_64'>hvm</type>
+  </os>
+  <features>
+    <acpi/>
+    <apic/>
+  </features>
+  <cpu mode='host-passthrough'/>
+  <devices>
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='qcow2'/>
+      <source file='/var/lib/libvirt/images/{{ item.hostname }}.qcow2'/>
+      <target dev='vda' bus='virtio'/>
+    </disk>
+    <disk type='file' device='cdrom'>
+      <driver name='qemu' type='raw'/>
+      <source file='/var/lib/libvirt/images/{{ item.hostname }}_config.iso'/>
+      <target dev='hda' bus='ide'/>
+      <readonly/>
+    </disk>
+    <interface type='bridge'>
+      <source bridge='br0'/>
+      <model type='virtio'/>
+    </interface>
+    <console type='pty'/>
+    <graphics type='vnc' port='-1' autoport='yes' listen='127.0.0.1'/>
+    <video>
+      <model type='cirrus'/>
+    </video>
+    {% if item.gpu_passthrough | default(false) %}
+    <hostdev mode='subsystem' type='pci' managed='yes'>
+      <source>
+        <address domain='0x0000' bus='0x01' slot='0x00' function='0x0'/>
+      </source>
+    </hostdev>
+    <hostdev mode='subsystem' type='pci' managed='yes'>
+      <source>
+        <address domain='0x0000' bus='0x01' slot='0x00' function='0x1'/>
+      </source>
+    </hostdev>
+    {% endif %}
+  </devices>
+</domain>

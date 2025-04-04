@@ -1,0 +1,11 @@
+- name: Render Cloud Init Templates
+  template:
+    src: "templates/{{ template_name }}.j2"
+    dest: "{{ cloudinit_tmp.path }}/{{ item.hostname }}-{{ template_name }}"
+  loop:
+    - "metadata.yaml"
+    - "network-config.yaml"
+    - "userdata.yaml"
+  loop_control:
+    loop_var: template_name
+    label: "Writing {{ cloudinit_tmp.path }}/{{ item.hostname }}-{{ template_name }}"
