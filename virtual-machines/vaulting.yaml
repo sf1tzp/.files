@@ -1,0 +1,68 @@
+# Encrypt and Decrypt a string using ansible's builtin vault() and unvault()
+# The encrypted secret is written to & read back from a file
+# invoke with ansible-playbook vaulting.yaml --vault-pass-file /path/to/password
+- name: Ansible Vault Playbook Example
+  hosts: localhost
+  vars:
+    vault_password: "{{ lookup('env', 'ANSIBLE_VAULT_PASSWORD') }}"
+    secrets_file: "~/secrets.yaml"
+    secret_name: "secret" # specify different names to write more secrets to the file
+  tasks:
+    - name: Check if vault file exists
+      stat:
+        path: "{{ secrets_file }}"
+      register: vault_file
+      when: not ansible_check_mode
+
+    - name: Initialize vault file with empty structure
+      copy:
+        content: "{}\n"
+        dest: "{{ secrets_file }}"
+        mode: "0600"
+        force: false # Don't overwrite if exists
+      when: not vault_file.stat.exists
+
+    - name: Generate plaintext
+      command: openssl rand -base64 24
+      register: plaintext
+
+    - name: Log plaintext
+      debug:
+        msg: "{{ plaintext.stdout }}"
+
+    - name: Encrypt plaintext
+      set_fact:
+        cyphertext: "{{ plaintext.stdout | vault(vault_password) }}"
+
+    - name: Log cyphertext
+      debug:
+        msg: "{{ cyphertext }}"
+
+    - name: Write cyphertext to vault file
+      shell: |
+        yq -i '.{{ secret_name }} = "{{ cyphertext }}"' {{ secrets_file }}
+
+    - name: Open vault file
+      include_vars:
+        file: "{{ secrets_file }}"
+        name: vault
+
+    - name: Get cyphertext
+      set_fact:
+        cyphertext: "{{ vault[secret_name] }}"
+
+    - name: Log cyphertext
+      debug:
+        msg: "{{ cyphertext }}"
+
+    - name: Decrypt cyphertext
+      set_fact:
+        decrypted: "{{ cyphertext | unvault(vault_password) }}"
+
+    - name: Log decrypted plaintext
+      debug:
+        msg: "{{ decrypted }}"
+
+    - name: Compare original plaintext and decrypted plaintext
+      assert:
+        that: plaintext.stdout == decrypted
