@@ -1,8 +1,9 @@
 ---
 - name: Create Virtual Machines
   hosts: localhost
-  become: true
   vars:
+    vault_password: "{{ lookup('env', 'ANSIBLE_VAULT_PASSWORD') }}"
+    vm_passwords_file: "~/.homelab-passwords.yaml"
     username: steven
     github_username: sf1tzp # used to import ssh authorized_keys
     vm_specs:
@@ -22,39 +23,63 @@
         gpu_passthrough: true
 
   tasks:
-    - name: Check if VMs exist
+    - name: Checking if VMs exist
       virt:
         name: "{{ item.hostname }}"
         command: status
       register: vm_status
       failed_when: false
       with_items: "{{ vm_specs }}"
+      loop_control:
+        label: "Checking if {{ item.hostname }} is already defined"
 
-    - name: Set fact for VMs to create
-      set_fact:
+    - set_fact:
         vms_to_create: "{{ vm_specs | selectattr('hostname', 'in', vm_status.results | selectattr('status', 'undefined') | map(attribute='item.hostname') | list) }}"
 
-    - name: Display VMs to be created
-      debug:
+    - meta: end_play
+      when: vms_to_create | length == 0
+
+    - debug:
         msg: "Will create the following VMs: {{ vms_to_create | map(attribute='hostname') | join(', ') }}"
-      when: vms_to_create | length > 0
+
+    - name: Generate user passwords
+      include_tasks: tasks/passwords.yaml
+      with_items: "{{ vms_to_create }}"
+      loop_control:
+        label: "Generating {{ item.hostname }} user password"
 
     - name: Create temporary build directory
       tempfile:
         state: directory
         suffix: build
-
       register: cloudinit_tmp
 
-    - name: Render Cloud Init Templates
+    - name: Render cloud-init templates
       include_tasks: tasks/cloud-init-templates.yaml
       with_items:
         - "{{ vms_to_create }}"
       loop_control:
-        label: "{{ item.hostname }}"
-        loop_var: item
+        label: "Generating {{ item.hostname }} cloud-init data"
+
+    - name: Create cloud-init images
+      become: true
+      shell: |
+        cloud-localds "/var/lib/libvirt/images/{{ item.hostname }}_config.iso" \
+          -N "{{ cloudinit_tmp.path }}/{{ item.hostname }}-network-config.yaml" \
+          "{{ cloudinit_tmp.path }}/{{ item.hostname }}-userdata.yaml" \
+          "{{ cloudinit_tmp.path }}/{{ item.hostname }}-metadata.yaml"
+      with_items: "{{ vms_to_create }}"
+      loop_control:
+        label: "Generating {{ item.hostname }} cloud-init image"
+
+    - name: Remove temporary cloud-init build directory
+      become: true
+      file:
+        path: "{{ cloudinit_tmp.path }}"
+        state: absent
 
     - name: Create OS images
+      become: true
       shell: |
         qemu-img create \
           -F qcow2 \
@@ -62,50 +87,44 @@
           -f qcow2 \
           "/var/lib/libvirt/images/{{ item.hostname }}.qcow2" {{ item.disk_size }}
       with_items: "{{ vms_to_create }}"
-
-    - name: Create cloud-init iso images
-      shell: |
-        cloud-localds "/var/lib/libvirt/images/{{ item.hostname }}_config.iso" \
-          -N "{{ cloudinit_tmp.path }}/{{ item.hostname }}-network-config.yaml" \
-          "{{ cloudinit_tmp.path }}/{{ item.hostname }}-userdata.yaml" \
-          "{{ cloudinit_tmp.path }}/{{ item.hostname }}-metadata.yaml"
-      with_items: "{{ vms_to_create }}"
+      loop_control:
+        label: "Generating {{ item.hostname }} OS Disk Image"
 
     - name: Create GPU passthrough hook directories
+      become: true
       file:
-        path: "/etc/libvirt/hooks/qemu.d/{{ item.0.hostname }}/{{ hook_type }}/{{ hook_moment }}"
+        path: "/etc/libvirt/hooks/qemu.d/{{ item.0.hostname }}/{{ item.1 }}"
         state: directory
         mode: "0755"
       with_nested:
-        - "{{ vms_to_create | selectattr('gpu_passthrough', 'equalto', true) | list }}"
+        - "{{ vms_to_create }}"
         - ["prepare/begin", "release/end"]
       loop_control:
-        label: "{{ item.0.hostname }}/{{ item.1 }}"
-      vars:
-        hook_type: "{{ item.1.split('/')[0] }}"
-        hook_moment: "{{ item.1.split('/')[1] }}"
+        label: "Creating {{ item.0.hostname }} {{ item.1 }} hook directory"
       when: item.0.gpu_passthrough | default(false)
 
-    - name: Create GPU passthrough hook scripts
+    - name: Render GPU passthrough hook scripts
+      become: true
       template:
         src: "templates/{{ template_name }}.j2"
         dest: "/etc/libvirt/hooks/qemu.d/{{ item.0.hostname }}/{{ item.1 }}/{{ script_name }}"
         mode: "0755"
       with_nested:
-        - "{{ vms_to_create | selectattr('gpu_passthrough', 'equalto', true) | list }}"
+        - "{{ vms_to_create }}"
         - ["prepare/begin", "release/end"]
       loop_control:
-        label: "{{ item.0.hostname }}/{{ item.1 }}"
+        label: "Writing {{ item.0.hostname }} hook {{ item.1 }}/{{ script_name }}"
       vars:
         template_name: "{{ 'gpu_start_hook.sh' if item.1 == 'prepare/begin' else 'gpu_stop_hook.sh' }}"
         script_name: "{{ 'start.sh' if item.1 == 'prepare/begin' else 'stop.sh' }}"
       when: item.0.gpu_passthrough | default(false)
 
-    - name: Define Virtual Machines
+    - name: Define virtual machines
+      become: true
       virt:
         name: "{{ item.hostname }}"
         command: define
         xml: "{{ lookup('template', 'templates/vm_definition.xml.j2') }}"
       with_items: "{{ vms_to_create }}"
       loop_control:
-        loop_var: item
+        label: "Defining {{ item.hostname }} libvirt domain"
