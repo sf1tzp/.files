@@ -1,3 +1,5 @@
+start vm:
+    virsh start {{vm}}
 
 create-vms:
     ansible-playbook virtual-machines.yaml --vault-password-file ~/.ansible-password
@@ -8,7 +10,10 @@ decrypt-vm-password:
 delete-vitrual-machines:
     ansible-playbook delete-virtual-machines.yaml
 
-prep-base-images:
+create-base-images:
+    ansible-playbook create-base-images.yaml
+
+_base_images_from_iso:
     #!/bin/bash
     set -ex
     pushd /var/lib/libvirt/images

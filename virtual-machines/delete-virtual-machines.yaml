@@ -6,10 +6,10 @@
     vm_passwords_file: "~/.homelab-passwords.yaml"
     username: steven
     github_username: sf1tzp # used to import ssh authorized_keys
+    libvirt_images: /var/lib/libvirt/images/
     vm_specs:
       - hostname: devbox
       - hostname: llm-server
-      - hostname: insistence
 
   tasks:
     - name: Checking if VMs exist
@@ -50,3 +50,19 @@
       with_items: "{{ vm_specs }}"
       loop_control:
         label: "Un-defined {{ item.hostname }}"
+
+    - name: Remove OS Disk
+      file:
+        path: "{{ libvirt_images }}/{{item.hostname}}.qcow2"
+        state: absent
+      with_items: "{{ vm_specs }}"
+      loop_control:
+        label: "Removed {{ item.hostname }} OS Disk"
+
+    - name: Remove Cloud-Init Disk
+      file:
+        path: "{{ libvirt_images }}/{{item.hostname}}-cloud-init.iso"
+        state: absent
+      with_items: "{{ vm_specs }}"
+      loop_control:
+        label: "Removed {{ item.hostname }} cloud-init disk"

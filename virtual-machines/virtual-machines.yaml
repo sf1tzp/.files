@@ -6,22 +6,22 @@
     vm_passwords_file: "~/.homelab-passwords.yaml"
     username: steven
     github_username: sf1tzp # used to import ssh authorized_keys
+    libvirt_images: /var/lib/libvirt/images/
     vm_specs:
       - hostname: devbox
-        os: ubuntu
+        os: ubuntu-server
         vcpus: 8
         memory: 24
         ip: 10.0.0.3
         disk_size: 150G
         gpu_passthrough: false
       - hostname: llm-server
-        os: ubuntu
+        os: ubuntu-server
         vcpus: 4
         memory: 8
         ip: 10.0.0.4
         disk_size: 150G
         gpu_passthrough: true
-
   tasks:
     - name: Checking if VMs exist
       virt:
@@ -53,16 +53,15 @@
       with_items: "{{ vms_to_create }}"
       loop_control:
         label: "Generated {{ item.hostname }} cloud-init image"
-      when: item.os == "ubuntu"
 
-    - name: Create OS images
+    - name: Create OS disk images
       become: false
       shell: |
         qemu-img create \
           -F qcow2 \
-          -b /var/lib/libvirt/images/{{ item.os }}-base.qcow2 \
+          -b {{ libvirt_images }}/bases/{{ item.os }}.qcow2 \
           -f qcow2 \
-          "/var/lib/libvirt/images/{{ item.hostname }}.qcow2" {{ item.disk_size }}
+          "{{ libvirt_images }}/{{ item.hostname }}.qcow2" {{ item.disk_size }}
       with_items: "{{ vms_to_create }}"
       loop_control:
         label: "Created {{ item.hostname }} OS Disk Image"

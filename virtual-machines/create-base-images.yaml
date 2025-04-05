@@ -1,0 +1,43 @@
+---
+- name: Create Base Images
+  hosts: localhost
+  vars:
+    downloads: ~/.local/share/images
+    base_images: /var/lib/libvirt/images/bases
+    images:
+      - name: ubuntu-server
+        url: https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img
+
+  tasks:
+    - name: Check if image exists
+      stat:
+        path: "{{ downloads }}/{{ item.name }}.img"
+      register: image_stat
+      with_items: "{{ images }}"
+
+    - name: Ensure Downloads Directory
+      file:
+        path: "{{ downloads }}"
+        state: directory
+
+    - name: Download image if not present
+      get_url:
+        url: "{{ item.0.url }}"
+        dest: "{{ downloads }}/{{ item.0.name }}.img"
+        mode: "644"
+      when: not item.1.stat.exists
+      with_together:
+        - "{{ images }}"
+        - "{{ image_stat.results }}"
+
+    - name: Ensure base images directory
+      file:
+        path: "{{ base_images  }}"
+        state: directory
+
+    - name: Create base image for libvirt
+      shell: |
+        qemu-img convert -f qcow2 -O qcow2 \
+          {{ downloads }}/{{ item.name }}.img \
+          {{ base_images }}/{{ item.name }}.qcow2
+      with_items: "{{ images }}"
