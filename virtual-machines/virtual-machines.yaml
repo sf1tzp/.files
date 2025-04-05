@@ -11,16 +11,23 @@
         os: ubuntu
         vcpus: 8
         memory: 24
-        ip: 10.0.0.5
+        ip: 10.0.0.3
         disk_size: 150G
         gpu_passthrough: false
       - hostname: llm-server
         os: ubuntu
         vcpus: 4
         memory: 8
-        ip: 10.0.0.10
+        ip: 10.0.0.4
         disk_size: 150G
         gpu_passthrough: true
+      - hostname: insistence
+        os: nixos
+        vcpus: 8
+        memory: 16
+        ip: 10.0.0.5
+        disk_size: 150G
+        gpu_passthrough: false
 
   tasks:
     - name: Checking if VMs exist
@@ -46,40 +53,17 @@
       include_tasks: tasks/passwords.yaml
       with_items: "{{ vms_to_create }}"
       loop_control:
-        label: "Generating {{ item.hostname }} user password"
+        label: "Generated {{ item.hostname }} user password"
 
-    - name: Create temporary build directory
-      tempfile:
-        state: directory
-        suffix: build
-      register: cloudinit_tmp
-
-    - name: Render cloud-init templates
-      include_tasks: tasks/cloud-init-templates.yaml
-      with_items:
-        - "{{ vms_to_create }}"
-      loop_control:
-        label: "Generating {{ item.hostname }} cloud-init data"
-
-    - name: Create cloud-init images
-      become: true
-      shell: |
-        cloud-localds "/var/lib/libvirt/images/{{ item.hostname }}_config.iso" \
-          -N "{{ cloudinit_tmp.path }}/{{ item.hostname }}-network-config.yaml" \
-          "{{ cloudinit_tmp.path }}/{{ item.hostname }}-userdata.yaml" \
-          "{{ cloudinit_tmp.path }}/{{ item.hostname }}-metadata.yaml"
+    - name: Create cloud-init image
+      include_tasks: tasks/cloud-init.yaml
       with_items: "{{ vms_to_create }}"
       loop_control:
-        label: "Generating {{ item.hostname }} cloud-init image"
-
-    - name: Remove temporary cloud-init build directory
-      become: true
-      file:
-        path: "{{ cloudinit_tmp.path }}"
-        state: absent
+        label: "Generated {{ item.hostname }} cloud-init image"
+      when: item.os == "ubuntu"
 
     - name: Create OS images
-      become: true
+      become: false
       shell: |
         qemu-img create \
           -F qcow2 \
@@ -88,43 +72,42 @@
           "/var/lib/libvirt/images/{{ item.hostname }}.qcow2" {{ item.disk_size }}
       with_items: "{{ vms_to_create }}"
       loop_control:
-        label: "Generating {{ item.hostname }} OS Disk Image"
+        label: "Created {{ item.hostname }} OS Disk Image"
 
     - name: Create GPU passthrough hook directories
-      become: true
+      become: false
       file:
         path: "/etc/libvirt/hooks/qemu.d/{{ item.0.hostname }}/{{ item.1 }}"
         state: directory
-        mode: "0755"
+        mode: "755"
       with_nested:
         - "{{ vms_to_create }}"
         - ["prepare/begin", "release/end"]
       loop_control:
-        label: "Creating {{ item.0.hostname }} {{ item.1 }} hook directory"
+        label: "Created {{ item.0.hostname }} {{ item.1 }} hook directory"
       when: item.0.gpu_passthrough | default(false)
 
     - name: Render GPU passthrough hook scripts
-      become: true
+      become: false
       template:
         src: "templates/{{ template_name }}.j2"
-        dest: "/etc/libvirt/hooks/qemu.d/{{ item.0.hostname }}/{{ item.1 }}/{{ script_name }}"
-        mode: "0755"
+        dest: "/etc/libvirt/hooks/qemu.d/{{ item.0.hostname }}/{{ item.1 }}/{{ template_name }}"
+        mode: "755"
       with_nested:
         - "{{ vms_to_create }}"
         - ["prepare/begin", "release/end"]
       loop_control:
-        label: "Writing {{ item.0.hostname }} hook {{ item.1 }}/{{ script_name }}"
+        label: "Wrote {{ item.0.hostname }} hook {{ item.1 }}/{{ template_name }}"
       vars:
-        template_name: "{{ 'gpu_start_hook.sh' if item.1 == 'prepare/begin' else 'gpu_stop_hook.sh' }}"
-        script_name: "{{ 'start.sh' if item.1 == 'prepare/begin' else 'stop.sh' }}"
+        template_name: "{{ 'gpu-start-hook.sh' if item.1 == 'prepare/begin' else 'gpu-stop-hook.sh' }}"
       when: item.0.gpu_passthrough | default(false)
 
     - name: Define virtual machines
-      become: true
+      become: false
       virt:
         name: "{{ item.hostname }}"
         command: define
         xml: "{{ lookup('template', 'templates/vm_definition.xml.j2') }}"
       with_items: "{{ vms_to_create }}"
       loop_control:
-        label: "Defining {{ item.hostname }} libvirt domain"
+        label: "Defined {{ item.hostname }} libvirt domain"

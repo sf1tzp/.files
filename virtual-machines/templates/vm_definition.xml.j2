@@ -16,12 +16,14 @@
       <source file='/var/lib/libvirt/images/{{ item.hostname }}.qcow2'/>
       <target dev='vda' bus='virtio'/>
     </disk>
+    {% if item.os == "ubuntu" %}
     <disk type='file' device='cdrom'>
       <driver name='qemu' type='raw'/>
-      <source file='/var/lib/libvirt/images/{{ item.hostname }}_config.iso'/>
+      <source file='/var/lib/libvirt/images/{{ item.hostname }}-cloud-init.iso'/>
       <target dev='hda' bus='ide'/>
       <readonly/>
     </disk>
+    {% endif %}
     <interface type='bridge'>
       <source bridge='br0'/>
       <model type='virtio'/>

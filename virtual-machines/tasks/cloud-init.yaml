@@ -1,0 +1,88 @@
+- name: Create temporary build directory
+  tempfile:
+    state: directory
+    suffix: build
+  register: cloudinit_tmp
+
+- name: Open passwords file
+  include_vars:
+    file: "{{ vm_passwords_file }}"
+    name: vault
+
+- name: Get encrypted password
+  set_fact:
+    cyphertext: "{{ vault.vms[item.hostname].user_password }}"
+
+- name: Decrypt password
+  set_fact:
+    decrypted: "{{ cyphertext | unvault(vault_password) }}"
+
+# - name: Render cloud-init templates
+#   template:
+#     src: "templates/{{ template_name }}.j2"
+#     dest: "{{ cloudinit_tmp.path }}/{{ item.hostname }}-{{ template_name }}"
+#   loop:
+#     - "metadata.yaml"
+#     - "network-config.yaml"
+#     - "userdata.yaml"
+#   loop_control:
+#     loop_var: template_name
+#     label: "Writing {{ cloudinit_tmp.path }}/{{ item.hostname }}-{{ template_name }}"
+#   vars:
+#     user_password: "{{ decrypted }}"
+
+- name: Render cloud-init templates
+  template:
+    src: "templates/{{ template_name }}.j2"
+    dest: "{{ cloudinit_tmp.path }}/{{ item.hostname }}-{{ template_name }}"
+  loop:
+    - "metadata.yaml"
+    - "network-config.yaml"
+    - "userdata.yaml"
+  loop_control:
+    loop_var: template_name
+    label: "Writing {{ cloudinit_tmp.path }}/{{ item.hostname }}-{{ template_name }}"
+  vars:
+    user_password: "{{ decrypted }}"
+
+- debug:
+    msg: |
+      cloud-localds "/var/lib/libvirt/images/{{ item.hostname }}-cloud-init.iso" \
+        -N "{{ cloudinit_tmp.path }}/{{ item.hostname }}-network-config.yaml" \
+        "{{ cloudinit_tmp.path }}/{{ item.hostname }}-userdata.yaml" \
+        "{{ cloudinit_tmp.path }}/{{ item.hostname }}-metadata.yaml"
+
+- name: Create cloud-init images
+  become: false
+  shell: |
+    cloud-localds "/var/lib/libvirt/images/{{ item.hostname }}-cloud-init.iso" \
+      -N "{{ cloudinit_tmp.path }}/{{ item.hostname }}-network-config.yaml" \
+      "{{ cloudinit_tmp.path }}/{{ item.hostname }}-userdata.yaml" \
+      "{{ cloudinit_tmp.path }}/{{ item.hostname }}-metadata.yaml"
+
+# - name: Remove temporary cloud-init build directory
+#   become: false
+#   file:
+#     path: "{{ cloudinit_tmp.path }}"
+#     state: absent
+
+# - name: Create cloud-init cleanup hook directory
+#   become: false
+#   file:
+#     path: "/etc/libvirt/hooks/qemu.d/{{ item.hostname }}/{{ hook_path }}"
+#     state: directory
+#     # mode: "770"
+#   vars:
+#     hook_path: "started/begin"
+#
+# - name: Create cloud-init cleanup hook
+#   become: false
+#   template:
+#     src: "templates/{{ template_name }}.j2"
+#     dest: "/etc/libvirt/hooks/qemu.d/{{ item.hostname }}/{{ hook_path }}/{{ template_name }}"
+#     # mode: "550"
+#   vars:
+#     eject_after: 1800 # 30 mins
+#     hook_path: "started/begin"
+#     template_name: "delete-cloudinit-iso-post-start-hook.sh"
+#

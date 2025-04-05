@@ -1,0 +1,52 @@
+---
+- name: Delete Virtual Machines
+  hosts: localhost
+  vars:
+    vault_password: "{{ lookup('env', 'ANSIBLE_VAULT_PASSWORD') }}"
+    vm_passwords_file: "~/.homelab-passwords.yaml"
+    username: steven
+    github_username: sf1tzp # used to import ssh authorized_keys
+    vm_specs:
+      - hostname: devbox
+      - hostname: llm-server
+      - hostname: insistence
+
+  tasks:
+    - name: Checking if VMs exist
+      virt:
+        name: "{{ item.hostname }}"
+        command: status
+      register: vm_status
+      failed_when: false
+      with_items: "{{ vm_specs }}"
+      loop_control:
+        label: "Checking if {{ item.hostname }} is undefined"
+
+    - set_fact:
+        vms_to_delete: "{{ vm_specs | selectattr('hostname', 'in', vm_status.results | selectattr('status', 'defined') | map(attribute='item.hostname') | list) }}"
+
+    - meta: end_play
+      when: vms_to_delete | length == 0
+
+    - debug:
+        msg: "Will delete the following VMs: {{ vms_to_delete | map(attribute='hostname') | join(', ') }}"
+
+    - name: Destroying VMs
+      virt:
+        name: "{{ item.hostname }}"
+        command: destroy
+      register: vm_status
+      failed_when: false
+      with_items: "{{ vm_specs }}"
+      loop_control:
+        label: "Destroyed {{ item.hostname }}"
+
+    - name: Un-defining VMs
+      virt:
+        name: "{{ item.hostname }}"
+        command: undefine
+      register: vm_status
+      failed_when: false
+      with_items: "{{ vm_specs }}"
+      loop_control:
+        label: "Un-defined {{ item.hostname }}"
