@@ -100,4 +100,5 @@ fi
 if command -v virsh &>/dev/null; then
 	alias libvirt-hooks='cd /etc/libvirt/hooks/qemu.d'
 	alias libvirt-images='cd /var/lib/libvirt/images'
+	export LIBVIRT_DEFAULT_URI=qemu:///system
 fi
