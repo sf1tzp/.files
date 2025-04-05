@@ -11,7 +11,7 @@
 # "name": str (name of the command to look for)
 #         "version": str (release version, used in urls and file)
 #         "url_template": str (can referece name, version, arch variables)
-#         "x86_name": str (some projects choose "amd64" while others choose "x86_64")
+#         "is_amd64": str (some projects choose "amd64" while others choose "x86_64")
 #         "package_name": str (some projects' package names don't match the primary command, eg "ripgrep":"rg")
 #         "setup_script": str (contents written to, and executed from, install_dir)
 # }
@@ -27,6 +27,8 @@ from urllib.parse import urlparse
 INSTALL_DIR = os.getenv("INSTALL_DIR", os.path.expanduser("~/.local/bin"))
 ARCH = platform.machine() if platform.machine() in {"x86_64", "arm64"} else None
 
+AUTOMATIC_INSTALL = os.getenv("AUTOMATIC")
+
 
 # Programs listed here are crates and can be installed via brew, cargo, or download from github releases if necessary
 # TODO: Add setup_script for these for when cargo is not available
@@ -34,35 +36,71 @@ CRATES = {
     "bat": {
         "version": "0.25.0",
         "url_template": "https://github.com/sharkdp/bat/releases/download/v{version}/bat-v{version}-{arch}-unknown-linux-musl.tar.gz",
-        "x86_name": "amd64",
+        "setup_script": """#!/usr/bin/env bash
+            mv bat-v{version}-{arch}-unknown-linux-musl/bat {install_dir}
+            """,
     },
-    "dust": {"version": "1.1.2", "package_name": "du-dust"},
+    "dust": {
+        "version": "1.1.2",
+        "url_template": "https://github.com/bootandy/dust/releases/download/v{version}/dust-v{version}-{arch}-unknown-linux-musl.tar.gz",
+        "package_name": "du-dust",
+        "setup_script": """#!/usr/bin/env bash
+            mv dust-v{version}-{arch}-unknown-linux-musl/dust {install_dir}
+            """,
+    },
     "eza": {
-        "version": "0.20.21",
+        "version": "0.21.0",
         "url_template": "https://github.com/eza-community/eza/releases/download/v{version}/eza_{arch}-unknown-linux-musl.tar.gz",
-        "x86_name": "x86_64",
+        "setup_script": """#!/usr/bin/env bash
+            mv eza {install_dir}
+            """,
     },
     "fd": {
         "version": "10.2.0",
         "url_template": "https://github.com/sharkdp/fd/releases/download/v{version}/fd-v{version}-{arch}-unknown-linux-musl.tar.gz",
-        "x86_name": "x86_64",
         "package_name": "fd-find",
+        "setup_script": """#!/usr/bin/env bash
+            mv fd-v10.2.0-{arch}-unknown-linux-musl/fd {install_dir}
+            """,
+    },
+    "pipes-rs": {
+        "version": "1.6.3",
+        "url_template": "https://github.com/lhvy/pipes-rs/releases/download/v{version}/pipes-rs-linux-{arch}.tar.gz",
+        "package_name": "--git https://github.com/lhvy/pipes-rs",
+        "setup_script": """#!/usr/bin/env bash
+            mv target/{arch}-unknown-linux-gnu/release/pipes-rs {install_dir}
+            """,
     },
     "rg": {
         "version": "14.1.1",
         "url_template": "https://github.com/BurntSushi/ripgrep/releases/download/{version}/ripgrep-{version}-{arch}-unknown-linux-musl.tar.gz",
-        "x86_name": "x86_64",
         "package_name": "ripgrep",
+        "setup_script": """#!/usr/bin/env bash
+            mv ripgrep-14.1.1-{arch}-unknown-linux-musl/rg {install_dir}
+            """,
     },
     "starship": {
         "version": "1.22.1",
         "url_template": "https://github.com/starship/starship/releases/download/v{version}/starship-{arch}-unknown-linux-musl.tar.gz",
-        "x86_name": "x86_64",
+        "setup_script": """#!/usr/bin/env bash
+            mv starship {install_dir}
+            """,
+    },
+    "uv": {
+        "version": "0.6.12",
+        "url_template": "https://github.com/astral-sh/uv/releases/download/{version}/uv-{arch}-unknown-linux-musl.tar.gz",
+        "package_name": "--git https://github.com/astral-sh/uv",
+        "setup_script": """#!/usr/bin/env bash
+            mv uv-{arch}-unknown-linux-musl/uv  {install_dir}
+            mv uv-{arch}-unknown-linux-musl/uvx  {install_dir}
+            """,
     },
     "zoxide": {
         "version": "0.9.7",
         "url_template": "https://github.com/ajeetdsouza/zoxide/releases/download/v{version}/zoxide-{version}-{arch}-unknown-linux-musl.tar.gz",
-        "x86_name": "x86_64",
+        "setup_script": """#!/usr/bin/env bash
+            mv zoxide {install_dir}
+            """,
     },
 }
 
@@ -71,16 +109,15 @@ PROGRAMS = {
     "duf": {
         "version": "0.8.1",
         "url_template": "https://github.com/muesli/duf/releases/download/v{version}/duf_{version}_linux_{arch}.tar.gz",
-        "x86_name": "x86_64",
         "setup_script": """#!/usr/bin/env bash
             chmod +x duf
             mv duf {install_dir}
         """,
     },
     "fastfetch": {
-        "version": "2.37.0",
+        "version": "2.40.3",
         "url_template": "https://github.com/fastfetch-cli/fastfetch/releases/download/{version}/fastfetch-linux-{arch}.tar.gz",
-        "x86_name": "amd64",
+        "is_amd64": True,
         "setup_script": """#!/usr/bin/env bash
             chmod +x fastfetch-linux-{arch}/usr/bin/fastfetch
             mv fastfetch-linux-{arch}/usr/bin/fastfetch fastfetch
@@ -90,7 +127,7 @@ PROGRAMS = {
     "jq": {
         "version": "1.7.1",
         "url_template": "https://github.com/jqlang/jq/releases/download/jq-{version}/jq-linux-{arch}",
-        "x86_name": "amd64",
+        "is_amd64": True,
         "setup_script": """#!/usr/bin/env bash
             chmod +x jq-linux-{arch}
             mv jq-linux-{arch} jq
@@ -100,7 +137,7 @@ PROGRAMS = {
     "nerdctl": {
         "version": "2.0.3",
         "url_template": "https://github.com/containerd/nerdctl/releases/download/v{version}/nerdctl-full-{version}-linux-{arch}.tar.gz",
-        "x86_name": "amd64",
+        "is_amd64": True,
         "setup_script": """#!/usr/bin/env bash
             tar -xzvf nerdctl-full-{version}-linux-{arch}.tar.gz -C ~/.local
             """,
@@ -108,7 +145,7 @@ PROGRAMS = {
     "yq": {
         "version": "4.45.1",
         "url_template": "https://github.com/mikefarah/yq/releases/download/v{version}/yq_linux_{arch}.tar.gz",
-        "x86_name": "amd64",
+        "is_amd64": True,
         "setup_script": """#!/usr/bin/env bash
             chmod +x yq_linux_{arch}
             mv yq_linux_{arch} yq
@@ -133,31 +170,47 @@ def main():
         format_package_string(name, config)
         for name, config in (crates | programs).items()
     ]
+
     if len(to_install) == 0:
         return
 
-    # Print the list of programs to_install and ask the user if they want to do so
-    print(f"The following programs will be installed: {' '.join(to_install)}")
-    confirm = (
-        input("Do you want to proceed with the installation? (y/n): ").strip().lower()
+    print(
+        f"The following programs will be installed to {INSTALL_DIR}: {' '.join(to_install)}"
     )
-    if confirm != "y":
-        print("Installation aborted.")
-        return
+
+    if AUTOMATIC_INSTALL:
+        binaries_only = True
+    else:
+        confirm = (
+            input("Do you want to proceed with the installation? (y/n): ")
+            .strip()
+            .lower()
+        )
+        if confirm != "y":
+            print("Installation aborted.")
+            return
+
+        binaries_only = input("Binaries only? (y/n)").strip().lower()
+        binaries_only = True if binaries_only == "y" else False
 
     print(f"Installing: {' '.join(to_install)}")
-
     os.makedirs(INSTALL_DIR, exist_ok=True)
 
-    if is_installed("brew"):
-        install_with_brew(programs | crates)
-
-    if is_installed("cargo"):
-        install_with_cargo(crates)
-        install_from_releases(programs)
+    if binaries_only:
+        install_from_releases(programs | crates)
 
     else:
-        install_from_releases(programs | crates)
+        if is_installed("brew"):
+            install_with_brew(programs | crates)
+            return
+
+        if is_installed("cargo"):
+            install_with_cargo(crates)
+            install_from_releases(programs)
+            return
+
+        else:
+            print("no brew or cargo?")
 
 
 def is_installed(program):
@@ -190,7 +243,7 @@ def install_from_releases(program_list):
     for program, config in program_list.items():
         version = config["version"]
         url_template = config["url_template"]
-        arch = config["x86_name"] if ARCH == "x86_64" else ARCH
+        arch = "amd64" if config.get("is_amd64") else ARCH
         url = url_template.format(version=version, arch=arch)
 
         with tempfile.TemporaryDirectory(delete=False) as temp_dir:
