@@ -33,6 +33,17 @@
 # [Install]
 # WantedBy=multi-user.target
 # EOF
-#
+#K
 # Generate certificates
+# mkdir -p .nginx/certs/live/llm.lofi
 # step ca certificate llm.lofi ~/.nginx/certs/live/llm.lofi/fullchain.pem ~/.nginx/certs/live/llm.lofi/privkey.pem --san "llm.lofi" --not-after 24h
+#
+#
+# # get CA fingerprint
+# step certificate fingerprint ~/.step/certs/root_ca.crt
+#
+# # Configure trust for CA on vms (and mac, etc)
+# step ca bootstrap --ca-url "https://ca.lofi:4443" --fingerprint "FINGERPRINT_VALUE_HERE"
+# Install CA certificate
+# step certificate install $(step path)/certs/root_ca.crt
+#

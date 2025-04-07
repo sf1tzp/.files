@@ -148,6 +148,14 @@ PROGRAMS = {
             mv step_{version}/bin/step {install_dir}
             """,
     },
+    "step-ca": {
+        "version": "0.28.3",
+        "url_template": "https://dl.smallstep.com/gh-release/certificates/gh-release-header/v{version}/step-ca_linux_{version}_amd64.tar.gz",
+        "is_amd64": True,
+        "setup_script": """#!/usr/bin/env bash
+            mv step-ca {install_dir}
+            """,
+    },
     "uv": {
         "version": "0.6.12",
         "url_template": "https://github.com/astral-sh/uv/releases/download/{version}/uv-{arch}-unknown-linux-musl.tar.gz",

@@ -5,7 +5,7 @@ services:
     restart: unless-stopped
     environment:
       OLLAMA_HOST: 0.0.0.0:${OLLAMA_PORT:-11434}
-      OLLAMA_ORIGINS: https://llm.lofi,10.0.0.0:*
+      OLLAMA_ORIGINS: "https://chat.lofi/*,http://10.0.0.*"
     ports:
       - ${OLLAMA_PORT:-11434}:11434
     volumes:
@@ -24,7 +24,7 @@ services:
     environment:
       WEBUI_AUTH: "False"
       ENABLE_SIGNUP: "False"
-      OLLAMA_BASE_URL: http://ollama:${OLLAMA_PORT:-11434}
+      OLLAMA_BASE_URL: http://10.0.0.4:${OLLAMA_PORT:-11434}
     ports:
       - ${OPEN_WEBUI_PORT:-3000}:8080
     volumes:
