@@ -127,8 +127,7 @@ PROGRAMS = {
         "is_amd64": True,
         "setup_script": """#!/usr/bin/env bash
             chmod +x fastfetch-linux-{arch}/usr/bin/fastfetch
-            mv fastfetch-linux-{arch}/usr/bin/fastfetch fastfetch
-            mv fastfetch {install_dir}
+            mv fastfetch-linux-{arch}/usr/bin/fastfetch {install_dir}
             """,
     },
     "jq": {
@@ -147,6 +146,15 @@ PROGRAMS = {
         "is_amd64": True,
         "setup_script": """#!/usr/bin/env bash
             tar -xzvf nerdctl-full-{version}-linux-{arch}.tar.gz -C ~/.local
+            """,
+    },
+    "ollama": {
+        # https://github.com/ollama/ollama/releases/download/v0.6.4/ollama-linux-amd64.tgz
+        "version": "0.6.4",
+        "url_template": "https://github.com/ollama/ollama/releases/download/v{version}/ollama-linux-{arch}.tgz",
+        "is_amd64": True,
+        "setup_script": """#!/usr/bin/env bash
+            mv bin/ollama {install_dir}
             """,
     },
     "yq": {
@@ -273,7 +281,7 @@ def install_from_releases(program_list):
 
 def download_and_extract(url, install_dir):
     filename = os.path.basename(urlparse(url).path)
-    is_tarball = filename.lower().endswith(".tar.gz")
+    is_tarball = filename.lower().endswith(".tar.gz") or filename.lower().endswith(".tgz")
     download_path = f"{install_dir}/{filename}"
     subprocess.run(["curl", "-L", "-o", download_path, url], check=True)
     if is_tarball:
