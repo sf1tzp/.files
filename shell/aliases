@@ -47,11 +47,9 @@ if command -v eza &>/dev/null; then
 	function tree() {
 		# $1 depth # $2 path
 		if [ $# -eq 2 ]; then
-			echo "two"
 			eza -TL "$1" "$2"
 		elif [ $# -eq 1 ]; then
-			echo "one"
-			eza -TL "$1"
+			eza -TL 2 "$1"
 		else
 			exa -TL 2
 		fi
