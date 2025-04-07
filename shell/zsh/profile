@@ -33,7 +33,7 @@ if [[ -d /usr/local/nvim/bin ]]; then
 fi
 
 # Check for / install utilities
-AUTOMATIC=true "$HOME/.files/shell/scripts/install.py"
+"$HOME/.files/shell/scripts/install.py"
 
 # Shell Completions
 autoload -Uz compinit && compinit
