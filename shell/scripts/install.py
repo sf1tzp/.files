@@ -63,6 +63,13 @@ CRATES = {
             mv fd-v10.2.0-{arch}-unknown-linux-musl/fd {install_dir}
             """,
     },
+    "just": {
+        "version": "1.40.0",
+        "url_template": "https://github.com/casey/just/releases/download/{version}/just-{version}-{arch}-unknown-linux-musl.tar.gz",
+        "setup_script": """#!/usr/bin/env bash
+            mv just {install_dir}
+            """,
+    },
     "pipes-rs": {
         "version": "1.6.3",
         "url_template": "https://github.com/lhvy/pipes-rs/releases/download/v{version}/pipes-rs-linux-{arch}.tar.gz",

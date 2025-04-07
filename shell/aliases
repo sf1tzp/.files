@@ -35,7 +35,7 @@ if command -v bat &>/dev/null; then
 			bat "$1"
 		fi
 	}
-	alias b='bat_in_language'
+	alias b='bat_in_language' # Usage: cat output | b json -
 fi
 
 if command -v cargo &>/dev/null; then
@@ -98,7 +98,7 @@ if command -v zoxide &>/dev/null; then
 fi
 
 if command -v virsh &>/dev/null; then
+	export LIBVIRT_DEFAULT_URI=qemu:///system
 	alias libvirt-hooks='cd /etc/libvirt/hooks/qemu.d'
 	alias libvirt-images='cd /var/lib/libvirt/images'
-	export LIBVIRT_DEFAULT_URI=qemu:///system
 fi
