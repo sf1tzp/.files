@@ -1,0 +1,38 @@
+# Configure dnsmasq
+# apt install dnsmasq
+# cp dnsmasq.conf /etc/dnsmask.conf
+# systemctl restart dnsmasq
+# resolvectl flush-caches
+#
+# # Generate CA password
+# openssl rand ... ~/.step/ca_password
+#
+# # Initialize the CA
+# step ca init --name "Lofi Home CA" \
+#   --dns "ca.lofi" \
+#   --address ":4443" \
+#   --provisioner "admin@lofi" \
+#   --password-file ~/.step/ca_password.txt
+#
+# # Create a systemd service
+# sudo tee /etc/systemd/system/step-ca.service > /dev/null << 'EOF'
+# [Unit]
+# Description=Smallstep Certificates
+# Documentation=https://smallstep.com/docs/step-ca
+# After=network-online.target
+# Wants=network-online.target
+#
+# [Service]
+# Type=simple
+# User=root
+# ExecStart=/home/steven/.local/bin/step-ca /home/steven/.step/config/ca.json --password-file /home/steven/.step/ca_password.txt
+
+# Restart=on-failure
+# RestartSec=5s
+#
+# [Install]
+# WantedBy=multi-user.target
+# EOF
+#
+# Generate certificates
+# step ca certificate llm.lofi ~/.nginx/certs/live/llm.lofi/fullchain.pem ~/.nginx/certs/live/llm.lofi/privkey.pem --san "llm.lofi" --not-after 24h

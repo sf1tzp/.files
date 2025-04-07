@@ -1,0 +1,5 @@
+up:
+    nerdctl compose -f lab-proxy.yaml up -d
+
+down:
+    nerdctl compose -f lab-proxy.yaml down
