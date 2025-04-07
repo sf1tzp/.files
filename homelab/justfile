@@ -1,0 +1,31 @@
+start vm:
+    virsh start {{vm}}
+
+base-images:
+    ansible-playbook vms/base-images.yaml
+
+create:
+    ansible-playbook vms/create.yaml --vault-password-file ~/.ansible-password
+
+delete:
+    ansible-playbook vms/delete.yaml
+
+decrypt-vm-password:
+    ansible-playbook vms/decrypt-vm-password.yaml --vault-password-file ~/.ansible-password
+
+set-up:
+    ansible-playbook --inventory ~/.files/homelab/inventory vms/set-up.yaml
+
+eject-cloud-init-io vm:
+    virsh detach-disk {{ vm }} hda --live --config
+    rm /var/lib/libvirt/images/{{ vm }}-cloud-init.iso
+
+_base_images_from_iso:
+    #!/bin/bash
+    set -ex
+    pushd /var/lib/libvirt/images
+    qemu-img convert -f raw ubuntu-24.04.2-live-server-amd64.iso 	-O qcow2 ubuntu-base.qcow2
+    qemu-img convert -f raw ubuntu-24.04.2-desktop-amd64.iso 	-O qcow2 ubuntu-desktop-base.qcow2
+    qemu-img convert -f raw latest-nixos-minimal-x86_64-linux.iso 	-O qcow2 nixos-base.qcow2
+    popd
+

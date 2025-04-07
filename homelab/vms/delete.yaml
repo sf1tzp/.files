@@ -8,8 +8,7 @@
     github_username: sf1tzp # used to import ssh authorized_keys
     libvirt_images: /var/lib/libvirt/images/
     vm_specs:
-      - hostname: devbox
-      - hostname: llm-server
+      - hostname: test
 
   tasks:
     - name: Checking if VMs exist

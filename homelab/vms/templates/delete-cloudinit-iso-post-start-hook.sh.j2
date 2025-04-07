@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -x
+
+# Delete the cloudinit iso some time after boot
+
+if [[ -f /var/lib/libvirt/images/{{ item.hostname }}-cloud-init.iso ]]; then
+    sleep {{ eject_after}}
+    virsh detach-disk {{ item.hostname }} hda --live --config
+    rm /var/lib/libvirt/images/{{ item.hostname }}-cloud-init.iso
+fi

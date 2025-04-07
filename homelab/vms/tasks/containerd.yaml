@@ -1,0 +1,120 @@
+## nerdctl installation
+#
+#  "nerdctl": {
+#      "version": "2.0.3",
+#      "url_template": "https://github.com/containerd/nerdctl/releases/download/v{version}/nerdctl-full-{version}-linux-{arch}.tar.gz",
+#      "is_amd64": True,
+#      "setup_script": """#!/usr/bin/env bash
+#          tar -xzvf nerdctl-full-{version}-linux-{arch}.tar.gz -C ~/.local
+#          """,
+#  },
+
+# apt install  uidmap
+
+# then set up rootless containers:
+#
+# make sure XDG_RUNTIME_DIR is set
+# - $ echo $XDG_RUNTIME_DIR
+# - /run/user/1000
+# Set
+#
+# /etc/subuid -> steven:100000:165536
+# /etc/subgid -> steven:100000:165536
+
+# allow rootless containers in apparmor
+# cat <<EOT | sudo tee "/etc/apparmor.d/usr.local.bin.rootlesskit"
+# abi <abi/4.0>,
+# include <tunables/global>
+#
+# /home/steven/.local/bin/rootlesskit flags=(unconfined) {
+#   userns,
+#
+#   # Site-specific additions and overrides. See local/README for details.
+#   include if exists <local/usr.local.bin.rootlesskit>
+# }
+# EOT
+# restart apparmor
+# sudo systemctl restart apparmor.service
+
+# jinstall rootless containers:
+# containerd-rootless-setuptool.sh install
+---
+- name: Check if nerdctl is already installed
+  stat:
+    path: "{{ ansible_env.HOME }}/.local/bin/nerdctl"
+  register: nerdctl_installed
+  become: false
+
+- debug:
+    msg: "{{ nerdctl_installed }}"
+
+- name: Download nerdctl
+  get_url:
+    url: "https://github.com/containerd/nerdctl/releases/download/v{{ nerdctl_version }}/nerdctl-full-{{ nerdctl_version }}-linux-amd64.tar.gz"
+    dest: "/tmp/nerdctl-full-{{ nerdctl_version }}-linux-amd64.tar.gz"
+    mode: "0644"
+  when: not nerdctl_installed.stat.exists
+  become: false
+
+- name: Extract nerdctl
+  unarchive:
+    src: "/tmp/nerdctl-full-{{ nerdctl_version }}-linux-amd64.tar.gz"
+    dest: "{{ ansible_env.HOME }}/.local"
+    remote_src: yes
+  when: not nerdctl_installed.stat.exists
+  become: false
+
+- name: Install uidmap package
+  apt:
+    name: uidmap
+    state: present
+  become: true
+
+- name: Configure user namespace mappings in /etc/subuid
+  lineinfile:
+    path: /etc/subuid
+    regexp: "^{{ ansible_env.USER }}:"
+    line: "{{ ansible_env.USER }}:100000:165536"
+    state: present
+    create: yes
+  become: true
+
+- name: Configure user namespace mappings in /etc/subgid
+  lineinfile:
+    path: /etc/subgid
+    regexp: "^{{ ansible_env.USER }}:"
+    line: "{{ ansible_env.USER }}:100000:165536"
+    state: present
+    create: yes
+  become: true
+
+- name: Create AppArmor profile for rootless containers
+  copy:
+    dest: /etc/apparmor.d/usr.local.bin.rootlesskit
+    content: |
+      abi <abi/4.0>,
+      include <tunables/global>
+
+      /home/{{ ansible_env.USER }}/.local/bin/rootlesskit flags=(unconfined) {
+        userns,
+
+        # Site-specific additions and overrides. See local/README for details.
+        include if exists <local/usr.local.bin.rootlesskit>
+      }
+    mode: "0644"
+  become: true
+
+- name: Restart AppArmor service
+  systemd:
+    name: apparmor
+    state: restarted
+  become: true
+
+- name: Setup rootless containers
+  command: ~/.local/bin/containerd-rootless-setuptool.sh install
+  args:
+    creates: "{{ ansible_env.HOME }}/.config/systemd/user/containerd.service"
+  become: false
+  environment:
+    PATH: "{{ ansible_env.HOME }}/.local/bin:{{ ansible_env.PATH }}"
+    XDG_RUNTIME_DIR: "/run/user/{{ ansible_user_uid }}"

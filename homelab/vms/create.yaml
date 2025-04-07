@@ -22,6 +22,7 @@
         ip: 10.0.0.4
         disk_size: 150G
         gpu_passthrough: true
+
   tasks:
     - name: Checking if VMs exist
       virt:

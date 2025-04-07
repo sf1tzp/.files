@@ -1,0 +1,97 @@
+- name: Update and upgrade apt packages
+  apt:
+    update_cache: yes
+    upgrade: dist
+  tags: apt
+  become: true
+
+- name: Install required packages
+  apt:
+    name:
+      - git
+      - tmux
+      - zsh
+    state: present
+  tags: packages
+  become: true
+
+- name: Install TPM (Tmux Plugin Manager)
+  git:
+    repo: https://github.com/tmux-plugins/tpm
+    dest: ~/.tmux/plugins/tpm
+  tags: tpm
+
+- name: Install zplug
+  git:
+    repo: https://github.com/zplug/zplug
+    dest: ~/.zplug
+  tags: zplug
+
+- name: Install fzf
+  git:
+    repo: https://github.com/junegunn/fzf.git
+    dest: ~/.fzf
+    depth: 1
+  tags: fzf
+
+- name: Run fzf install script
+  command: ~/.fzf/install --all
+  args:
+    creates: ~/.fzf/bin/fzf
+  tags: fzf
+
+- name: Clone dotfiles repository
+  git:
+    repo: https://github.com/sf1tzp/.files.git
+    dest: ~/.files
+    force: no
+  tags: dotfiles
+
+- name: Create ~/.local directory
+  file:
+    path: ~/.local
+    state: directory
+  tags: local
+
+- name: Create ~/.local/bin directory
+  file:
+    path: ~/.local/bin
+    state: directory
+  tags: local
+
+- name: Create symlink for zsh profile
+  file:
+    src: ~/.files/shell/zsh/profile
+    dest: ~/.zshrc
+    state: link
+    force: yes
+  tags: zsh
+
+- name: Change default shell to zsh
+  user:
+    name: "{{ ansible_env.USER }}"
+    shell: /usr/bin/zsh
+  tags: zsh
+  become: true
+
+- name: Run install.py script
+  command: ~/.files/shell/scripts/install.py
+  tags: install_script
+  environment:
+    AUTOMATIC: "true"
+    PATH: "{{ ansible_env.HOME }}/.local/bin:{{ ansible_env.PATH }}"
+# - name: Install Rust
+#   shell: |
+#     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+#   args:
+#     creates: ~/.cargo/bin/rustc
+#   tags: rust
+#
+# - name: Install Go
+#   shell: |
+#     wget https://golang.org/dl/go1.20.5.linux-amd64.tar.gz -O /tmp/go.tar.gz
+#     tar -C /usr/local -xzf /tmp/go.tar.gz
+#     echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.profile
+#   args:
+#     creates: /usr/local/go/bin/go
+#   tags: go

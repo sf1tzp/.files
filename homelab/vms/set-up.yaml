@@ -1,0 +1,17 @@
+---
+- name: Set up machine
+  hosts: vms
+
+  tasks:
+    - name: Dotfiles etc
+      include_tasks: tasks/common.yaml
+
+    - name: Nvidia Driver Set Up
+      include_tasks: tasks/nvidia.yaml
+      when: inventory_hostname in groups["nvidia"]
+
+    - name: Containerd (nerdctl) Set Up
+      include_tasks: tasks/containerd.yaml
+      vars:
+        nerdctl_version: 2.0.3
+      when: inventory_hostname in groups["containerd"]

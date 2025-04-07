@@ -32,7 +32,7 @@
 
     - name: Ensure base images directory
       file:
-        path: "{{ base_images  }}"
+        path: "{{ base_images }}"
         state: directory
 
     - name: Create base image for libvirt
