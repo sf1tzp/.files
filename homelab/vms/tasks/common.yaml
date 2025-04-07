@@ -8,6 +8,7 @@
 - name: Install required packages
   apt:
     name:
+      - unzip
       - git
       - tmux
       - zsh
@@ -44,7 +45,7 @@
   git:
     repo: https://github.com/sf1tzp/.files.git
     dest: ~/.files
-    force: no
+    version: main
   tags: dotfiles
 
 - name: Create ~/.local directory
@@ -80,18 +81,20 @@
   environment:
     AUTOMATIC: "true"
     PATH: "{{ ansible_env.HOME }}/.local/bin:{{ ansible_env.PATH }}"
-# - name: Install Rust
-#   shell: |
-#     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-#   args:
-#     creates: ~/.cargo/bin/rustc
-#   tags: rust
-#
-# - name: Install Go
-#   shell: |
-#     wget https://golang.org/dl/go1.20.5.linux-amd64.tar.gz -O /tmp/go.tar.gz
-#     tar -C /usr/local -xzf /tmp/go.tar.gz
-#     echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.profile
-#   args:
-#     creates: /usr/local/go/bin/go
-#   tags: go
+
+- name: Install Rust
+  shell: |
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path --profile minimal
+  args:
+    creates: ~/.cargo/bin/rustc
+  tags: rust
+
+- name: Install Go
+  shell: |
+    curl -L https://golang.org/dl/go{{ go_version }}.linux-amd64.tar.gz -o /tmp/go.tar.gz
+    tar -C ~/.local -xzf /tmp/go.tar.gz
+  args:
+    creates: ~/.local/go/bin/go
+  vars:
+    go_version: 1.24.2
+  tags: go

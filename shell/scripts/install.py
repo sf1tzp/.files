@@ -78,6 +78,15 @@ PROGRAMS = {
             mv fd-v10.2.0-{arch}-unknown-linux-musl/fd {install_dir}
             """,
     },
+    "fnm": {
+        "version": "1.38.1",
+        "url_template": "https://github.com/Schniz/fnm/releases/download/v{version}/fnm-linux.zip",
+        "setup_script": """#!/usr/bin/env bash
+            unzip fnm-linux.zip
+            chmod +x fnm
+            mv fnm {install_dir}
+            """,
+    },
     "jq": {
         "version": "1.7.1",
         "url_template": "https://github.com/jqlang/jq/releases/download/jq-{version}/jq-linux-{arch}",
