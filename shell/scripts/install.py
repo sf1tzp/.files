@@ -130,7 +130,7 @@ PROGRAMS = {
         "version": "14.1.1",
         "url_template": "https://github.com/BurntSushi/ripgrep/releases/download/{version}/ripgrep-{version}-{arch}-unknown-linux-musl.tar.gz",
         "setup_script": """#!/usr/bin/env bash
-            mv ripgrep-14.1.1-{arch}-unknown-linux-musl/rg {install_dir}
+            mv ripgrep-{version}-{arch}-unknown-linux-musl/rg {install_dir}
             """,
     },
     "starship": {
@@ -138,6 +138,14 @@ PROGRAMS = {
         "url_template": "https://github.com/starship/starship/releases/download/v{version}/starship-{arch}-unknown-linux-musl.tar.gz",
         "setup_script": """#!/usr/bin/env bash
             mv starship {install_dir}
+            """,
+    },
+    "step": {
+        "version": "0.28.6",
+        "url_template": "https://dl.smallstep.com/gh-release/cli/gh-release-header/v{version}/step_linux_{version}_{arch}.tar.gz",
+        "is_amd64": True,
+        "setup_script": """#!/usr/bin/env bash
+            mv step_{version}/bin/step {install_dir}
             """,
     },
     "uv": {
