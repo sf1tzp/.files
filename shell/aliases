@@ -51,7 +51,7 @@ if command -v eza &>/dev/null; then
 		elif [ $# -eq 1 ]; then
 			eza -TL 2 "$1"
 		else
-			exa -TL 2
+			eza -TL 2
 		fi
 	}
 fi
