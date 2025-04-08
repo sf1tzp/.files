@@ -9,15 +9,18 @@
 #
 # sudo apt install nvidia-container-toolkit nvtop
 
+- name: Check if nvidia drivers already installed
+  command: lsmod | grep nvidia
+  register: drivers_installed
+  failed_when: false
+  changed_when: false
+
 - name: Install ubuntu-drivers-common package
   apt:
     name: ubuntu-drivers-common
     state: present
   become: true
-
-- name: check if drivers installed
-  command: ubuntu-drivers list | grep nvidia
-  register: drivers_installed
+  when: not drivers_installed
 
 - name: Install recommended NVIDIA drivers
   command: ubuntu-drivers install
@@ -32,21 +35,25 @@
     url: https://nvidia.github.io/libnvidia-container/gpgkey
     keyring: /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
   become: true
+  when: not drivers_installed
 
 - name: Get NVIDIA repository list
   get_url:
     url: https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list
     dest: /tmp/nvidia-container-toolkit.list
   become: true
+  when: not drivers_installed
 
 - name: Convert repository list to use signed-by option
   shell: sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' /tmp/nvidia-container-toolkit.list > /etc/apt/sources.list.d/nvidia-container-toolkit.list
   become: true
+  when: not drivers_installed
 
 - name: Update apt cache
   apt:
     update_cache: yes
   become: true
+  when: not drivers_installed
 
 - name: Install NVIDIA container toolkit and nvtop
   apt:
@@ -55,8 +62,16 @@
       - nvtop
     state: present
   become: true
+  when: not drivers_installed
+
+- name: Check if reboot is required
+  stat:
+    path: /var/run/reboot-required
+  register: reboot_required_file
+  when: not drivers_installed
 
 - name: Reboot the server
   reboot:
     msg: "Rebooting the server to apply NVIDIA driver changes"
   become: true
+  when: not drivers_installed and reboot_required_file.stat.exists
