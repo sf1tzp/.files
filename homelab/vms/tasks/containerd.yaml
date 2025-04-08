@@ -45,9 +45,6 @@
   register: nerdctl_installed
   become: false
 
-- debug:
-    msg: "{{ nerdctl_installed }}"
-
 - name: Download nerdctl
   get_url:
     url: "https://github.com/containerd/nerdctl/releases/download/v{{ nerdctl_version }}/nerdctl-full-{{ nerdctl_version }}-linux-amd64.tar.gz"
