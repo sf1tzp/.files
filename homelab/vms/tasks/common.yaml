@@ -2,8 +2,8 @@
   apt:
     update_cache: yes
     upgrade: dist
-  tags: apt
   become: true
+  tags: apt
 
 - name: Install required packages
   apt:
@@ -13,33 +13,8 @@
       - tmux
       - zsh
     state: present
-  tags: packages
   become: true
-
-- name: Install TPM (Tmux Plugin Manager)
-  git:
-    repo: https://github.com/tmux-plugins/tpm
-    dest: ~/.tmux/plugins/tpm
-  tags: tpm
-
-- name: Install zplug
-  git:
-    repo: https://github.com/zplug/zplug
-    dest: ~/.zplug
-  tags: zplug
-
-- name: Install fzf
-  git:
-    repo: https://github.com/junegunn/fzf.git
-    dest: ~/.fzf
-    depth: 1
-  tags: fzf
-
-- name: Run fzf install script
-  command: ~/.fzf/install --all
-  args:
-    creates: ~/.fzf/bin/fzf
-  tags: fzf
+  tags: apt
 
 - name: Clone dotfiles repository
   git:
@@ -52,13 +27,19 @@
   file:
     path: ~/.local
     state: directory
-  tags: local
+  tags: dotfiles
 
 - name: Create ~/.local/bin directory
   file:
     path: ~/.local/bin
     state: directory
-  tags: local
+  tags: dotfiles
+
+- name: Create ~/.config directory
+  file:
+    path: ~/.config
+    state: directory
+  tags: dotfiles
 
 - name: Create symlink for zsh profile
   file:
@@ -75,7 +56,40 @@
   tags: zsh
   become: true
 
-- name: Run install.py script
+- name: Install zplug
+  git:
+    repo: https://github.com/zplug/zplug
+    dest: ~/.zplug
+  tags: zsh
+
+- name: Install TPM (Tmux Plugin Manager)
+  git:
+    repo: https://github.com/tmux-plugins/tpm
+    dest: ~/.tmux/plugins/tpm
+  tags: tmux
+
+- name: Create a sym link for ~/.tmux.conf
+  file:
+    src: ~/.files/shell/config/tmux.conf
+    dest: ~/.tmux.conf
+    state: link
+    force: yes
+  tags: tmux
+
+- name: Install fzf
+  git:
+    repo: https://github.com/junegunn/fzf.git
+    dest: ~/.fzf
+    depth: 1
+  tags: fzf
+
+- name: Run fzf install script
+  command: ~/.fzf/install --bin
+  args:
+    creates: ~/.fzf/bin/fzf
+  tags: fzf
+
+- name: Install bins
   command: ~/.files/shell/scripts/install.py
   tags: install_script
   environment:
@@ -98,3 +112,14 @@
   vars:
     go_version: 1.24.2
   tags: go
+
+- name: Install Neovim
+  shell: |
+    curl -L https://github.com/neovim/neovim/releases/download/v{{ nvim_version }}/nvim-linux-x86_64.tar.gz -o /tmp/nvim.tar.gz
+    tar -xzf /tmp/nvim.tar.gz
+    mv nvim-linux-x86_64 /usr/local/nvim
+  args:
+    creates: /usr/local/nvim/bin/nvim
+  vars:
+    nvim_version: "0.10.4"
+  become: true
