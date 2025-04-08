@@ -33,7 +33,7 @@ format = "$path(bright-white)"
 [character]
 success_symbol = "[>](bold bright-black) "
 error_symbol = "[>](bold bright-black) "
-vimcmd_symbol = "[:](bold bright-green) "
+vimcmd_symbol = "[:](bold bright-red) "
 
 [fill]
 symbol = " "
