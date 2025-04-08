@@ -1,13 +1,11 @@
 [vms]
 devbox ansible_host=10.0.0.3
 llm-server ansible_host=10.0.0.4
-test ansible_host=10.0.0.5
 
 [nvidia]
 llm-server
 
 [containerd]
-test
 devbox
 llm-server
 

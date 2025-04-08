@@ -7,61 +7,60 @@
     username: steven
     github_username: sf1tzp # used to import ssh authorized_keys
     libvirt_images: /var/lib/libvirt/images/
-    vm_specs:
-      - hostname: test
+    vm_names: []
 
   tasks:
     - name: Checking if VMs exist
       virt:
-        name: "{{ item.hostname }}"
+        name: "{{ item }}"
         command: status
       register: vm_status
       failed_when: false
-      with_items: "{{ vm_specs }}"
+      with_items: "{{ vm_names }}"
       loop_control:
-        label: "Checking if {{ item.hostname }} is undefined"
+        label: "Checking if {{ item }} is undefined"
 
     - set_fact:
-        vms_to_delete: "{{ vm_specs | selectattr('hostname', 'in', vm_status.results | selectattr('status', 'defined') | map(attribute='item.hostname') | list) }}"
+        vms_to_delete: "{{ vm_status.results | selectattr('status', 'defined') | map(attribute='item') | list }}"
 
     - meta: end_play
       when: vms_to_delete | length == 0
 
     - debug:
-        msg: "Will delete the following VMs: {{ vms_to_delete | map(attribute='hostname') | join(', ') }}"
+        msg: "Will delete the following VMs: {{ vms_to_delete | join(', ') }}"
 
     - name: Destroying VMs
       virt:
-        name: "{{ item.hostname }}"
+        name: "{{ item }}"
         command: destroy
       register: vm_status
       failed_when: false
-      with_items: "{{ vm_specs }}"
+      with_items: "{{ vm_names }}"
       loop_control:
-        label: "Destroyed {{ item.hostname }}"
+        label: "Destroyed {{ item }}"
 
     - name: Un-defining VMs
       virt:
-        name: "{{ item.hostname }}"
+        name: "{{ item }}"
         command: undefine
       register: vm_status
       failed_when: false
-      with_items: "{{ vm_specs }}"
+      with_items: "{{ vm_names }}"
       loop_control:
-        label: "Un-defined {{ item.hostname }}"
+        label: "Un-defined {{ item }}"
 
     - name: Remove OS Disk
       file:
-        path: "{{ libvirt_images }}/{{item.hostname}}.qcow2"
+        path: "{{ libvirt_images }}/{{item}}.qcow2"
         state: absent
-      with_items: "{{ vm_specs }}"
+      with_items: "{{ vm_names }}"
       loop_control:
-        label: "Removed {{ item.hostname }} OS Disk"
+        label: "Removed {{ item }} OS Disk"
 
     - name: Remove Cloud-Init Disk
       file:
-        path: "{{ libvirt_images }}/{{item.hostname}}-cloud-init.iso"
+        path: "{{ libvirt_images }}/{{item}}-cloud-init.iso"
         state: absent
-      with_items: "{{ vm_specs }}"
+      with_items: "{{ vm_names }}"
       loop_control:
-        label: "Removed {{ item.hostname }} cloud-init disk"
+        label: "Removed {{ item }} cloud-init disk"
