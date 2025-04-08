@@ -1,8 +1,14 @@
+# TODO:
+# DNS and Certificate Authority
+# hosts: localhost
+#
 # Configure dnsmasq
 # apt install dnsmasq
 # cp dnsmasq.conf /etc/dnsmask.conf
 # systemctl restart dnsmasq
 # resolvectl flush-caches
+#
+# ---
 #
 # # Generate CA password
 # openssl rand ... ~/.step/ca_password
@@ -10,7 +16,7 @@
 # # Initialize the CA
 # step ca init --name "Lofi Home CA" \
 #   --dns "ca.lofi" \
-#   --address ":4443" \
+#   --address ":4443" \ # CA Will Listen On This Port
 #   --provisioner "admin@lofi" \
 #   --password-file ~/.step/ca_password.txt
 #
@@ -33,17 +39,22 @@
 # [Install]
 # WantedBy=multi-user.target
 # EOF
-#K
-# Generate certificates
+#
+# ---
+#
+# Generate certificates (In this case, certificates for nginx running on the host)
 # mkdir -p .nginx/certs/live/llm.lofi
 # step ca certificate llm.lofi ~/.nginx/certs/live/llm.lofi/fullchain.pem ~/.nginx/certs/live/llm.lofi/privkey.pem --san "llm.lofi" --not-after 24h
 #
+# # On other machines:
+# ( Generate certificates if serving something)
 #
 # # get CA fingerprint
 # step certificate fingerprint ~/.step/certs/root_ca.crt
 #
 # # Configure trust for CA on vms (and mac, etc)
 # step ca bootstrap --ca-url "https://ca.lofi:4443" --fingerprint "FINGERPRINT_VALUE_HERE"
+#
 # Install CA certificate
 # step certificate install $(step path)/certs/root_ca.crt
 #
