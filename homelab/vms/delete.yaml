@@ -64,3 +64,11 @@
       with_items: "{{ vm_names }}"
       loop_control:
         label: "Removed {{ item }} cloud-init disk"
+
+    - name: Remove libvirt hooks
+      file:
+        path: "/etc/libvirt/hooks/qemu.d/{{item}}"
+        state: absent
+      with_items: "{{ vm_names }}"
+      loop_control:
+        label: "Removed {{ item }} libvirt hooks"
