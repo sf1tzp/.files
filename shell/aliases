@@ -69,6 +69,10 @@ if command -v just &>/dev/null; then
 	alias jsut='just'
 fi
 
+if command -v nerdctl &>/dev/null; then
+	alias docker='nerdctl'
+fi
+
 if command -v nvim &>/dev/null; then
 	export EDITOR='nvim'
 	export VISUAL='nvim'
@@ -97,6 +101,8 @@ fi
 
 if command -v virsh &>/dev/null; then
 	export LIBVIRT_DEFAULT_URI=qemu:///system
+	alias v='virsh'
+	alias vrsh='virsh'
 	alias libvirt-hooks='cd /etc/libvirt/hooks/qemu.d'
 	alias libvirt-images='cd /var/lib/libvirt/images'
 fi

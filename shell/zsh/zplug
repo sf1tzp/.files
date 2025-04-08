@@ -1,3 +1,4 @@
+#!/usr/bin/env zsh
 export ZPLUG_HOME=${ZPLUG_HOME:=$HOME/.zplug}
 
 # echo "zplug home is $ZPLUG_HOME"
@@ -9,5 +10,11 @@ zplug "jeffreytse/zsh-vi-mode"
 zvm_after_init_commands+=('source <(fzf --zsh)')
 
 zplug load
+
+#  if $ZPLUG_HOME/repos is empty, run zplug install
+if [ -d "$ZPLUG_HOME/repos" ] && [ -z "$(ls -A "$ZPLUG_HOME/repos")" ]; then
+    echo "Installing zsh plugins"
+    zplug install
+fi
 
 # echo "zplug loaded"
