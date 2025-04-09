@@ -107,8 +107,8 @@ return {
         ensure_installed = {
           "lua_ls",
           "gopls",
-          "pyright",
           "rust_analyzer",
+          "pyright",
           "html",
           "cssls",
           "jsonls",
@@ -123,9 +123,6 @@ return {
           "stylua",
           "prettier",
           "eslint_d",
-          "black",
-          "isort",
-          "gofumpt",
           "goimports",
           "shellcheck",
           "shfmt",
@@ -161,38 +158,6 @@ return {
             },
           })
         end,
-
-        -- -- Add custom settings for other servers as needed
-        -- ["tsserver"] = function()
-        --   lspconfig.tsserver.setup({
-        --     capabilities = capabilities,
-        --     on_attach = on_attach,
-        --     settings = {
-        --       typescript = {
-        --         inlayHints = {
-        --           includeInlayParameterNameHints = "all",
-        --           includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-        --           includeInlayFunctionParameterTypeHints = true,
-        --           includeInlayVariableTypeHints = true,
-        --           includeInlayPropertyDeclarationTypeHints = true,
-        --           includeInlayFunctionLikeReturnTypeHints = true,
-        --           includeInlayEnumMemberValueHints = true,
-        --         },
-        --       },
-        --       javascript = {
-        --         inlayHints = {
-        --           includeInlayParameterNameHints = "all",
-        --           includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-        --           includeInlayFunctionParameterTypeHints = true,
-        --           includeInlayVariableTypeHints = true,
-        --           includeInlayPropertyDeclarationTypeHints = true,
-        --           includeInlayFunctionLikeReturnTypeHints = true,
-        --           includeInlayEnumMemberValueHints = true,
-        --         },
-        --       },
-        --     },
-        --   })
-        -- end,
       })
     end,
   },

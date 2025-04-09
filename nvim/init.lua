@@ -53,6 +53,7 @@ require("lazy").setup({
   spec = plugins,
   -- automatically check for plugin updates
   checker = { enabled = false },
+  change_detection = { enabled = false },
 })
 
 -- Calculate elapsed time and display at the end of loading

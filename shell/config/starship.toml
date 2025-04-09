@@ -8,6 +8,7 @@ $username\
 $hostname\
 $directory\
 $fill\
+$python\
 $git_branch\
 $git_state\
 $git_status\
@@ -68,3 +69,6 @@ format = '[$time UTC]($style)'
 [shell]
 disabled = false
 format = ' [$indicator]($style)'
+
+[python]
+disabled = false
