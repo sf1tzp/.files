@@ -8,9 +8,11 @@
 - name: Install required packages
   apt:
     name:
-      - unzip
+      - gcc
       - git
+      - make
       - tmux
+      - unzip
       - zsh
     state: present
   become: true
@@ -106,11 +108,12 @@
 - name: Install Go
   shell: |
     curl -L https://golang.org/dl/go{{ go_version }}.linux-amd64.tar.gz -o /tmp/go.tar.gz
-    tar -C ~/.local -xzf /tmp/go.tar.gz
+    tar -C /usr/local -xzf /tmp/go.tar.gz
   args:
-    creates: ~/.local/go/bin/go
+    creates: /usr/local/go/bin/go
   vars:
     go_version: 1.24.2
+  become: true
   tags: go
 
 - name: Install Neovim

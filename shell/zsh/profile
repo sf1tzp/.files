@@ -17,8 +17,8 @@ if [[ -f "$HOME/.cargo/env" ]]; then
 fi
 
 # Go Path
-if [[ -f /usr/local/go/bin ]]; then
-    export PATH=$PATH:~/.local/go/bin
+if [[ -d /usr/local/go/bin/ ]]; then
+    export PATH=$PATH:/usr/local/go/bin
 fi
 
 # Homebrew env
