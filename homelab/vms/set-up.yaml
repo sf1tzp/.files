@@ -1,6 +1,6 @@
 ---
 - name: Set up machine
-  hosts: vms
+  hosts: all
 
   tasks:
     - name: Dotfiles etc

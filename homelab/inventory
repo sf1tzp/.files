@@ -1,3 +1,6 @@
+[hypervisor]
+soundship ansible_host=10.0.0.2
+
 [vms]
 devbox ansible_host=10.0.0.3
 llm-server ansible_host=10.0.0.4
@@ -6,6 +9,7 @@ llm-server ansible_host=10.0.0.4
 llm-server
 
 [containerd]
+soundship
 devbox
 llm-server
 

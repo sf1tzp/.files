@@ -162,37 +162,37 @@ return {
           })
         end,
 
-        -- Add custom settings for other servers as needed
-        ["tsserver"] = function()
-          lspconfig.tsserver.setup({
-            capabilities = capabilities,
-            on_attach = on_attach,
-            settings = {
-              typescript = {
-                inlayHints = {
-                  includeInlayParameterNameHints = "all",
-                  includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-                  includeInlayFunctionParameterTypeHints = true,
-                  includeInlayVariableTypeHints = true,
-                  includeInlayPropertyDeclarationTypeHints = true,
-                  includeInlayFunctionLikeReturnTypeHints = true,
-                  includeInlayEnumMemberValueHints = true,
-                },
-              },
-              javascript = {
-                inlayHints = {
-                  includeInlayParameterNameHints = "all",
-                  includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-                  includeInlayFunctionParameterTypeHints = true,
-                  includeInlayVariableTypeHints = true,
-                  includeInlayPropertyDeclarationTypeHints = true,
-                  includeInlayFunctionLikeReturnTypeHints = true,
-                  includeInlayEnumMemberValueHints = true,
-                },
-              },
-            },
-          })
-        end,
+        -- -- Add custom settings for other servers as needed
+        -- ["tsserver"] = function()
+        --   lspconfig.tsserver.setup({
+        --     capabilities = capabilities,
+        --     on_attach = on_attach,
+        --     settings = {
+        --       typescript = {
+        --         inlayHints = {
+        --           includeInlayParameterNameHints = "all",
+        --           includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+        --           includeInlayFunctionParameterTypeHints = true,
+        --           includeInlayVariableTypeHints = true,
+        --           includeInlayPropertyDeclarationTypeHints = true,
+        --           includeInlayFunctionLikeReturnTypeHints = true,
+        --           includeInlayEnumMemberValueHints = true,
+        --         },
+        --       },
+        --       javascript = {
+        --         inlayHints = {
+        --           includeInlayParameterNameHints = "all",
+        --           includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+        --           includeInlayFunctionParameterTypeHints = true,
+        --           includeInlayVariableTypeHints = true,
+        --           includeInlayPropertyDeclarationTypeHints = true,
+        --           includeInlayFunctionLikeReturnTypeHints = true,
+        --           includeInlayEnumMemberValueHints = true,
+        --         },
+        --       },
+        --     },
+        --   })
+        -- end,
       })
     end,
   },
@@ -219,7 +219,7 @@ return {
     config = function()
       local cmp = require("cmp")
       local luasnip = require("luasnip")
-      
+
       -- Load friendly-snippets
       require("luasnip.loaders.from_vscode").lazy_load()
 

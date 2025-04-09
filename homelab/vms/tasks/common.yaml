@@ -24,23 +24,18 @@
     dest: ~/.files
     version: main
   tags: dotfiles
+  args:
+    creates: ~/.files
+  failed_when: false
 
-- name: Create ~/.local directory
+- name: Create directories in ~
   file:
-    path: ~/.local
+    path: "{{ item }}"
     state: directory
-  tags: dotfiles
-
-- name: Create ~/.local/bin directory
-  file:
-    path: ~/.local/bin
-    state: directory
-  tags: dotfiles
-
-- name: Create ~/.config directory
-  file:
-    path: ~/.config
-    state: directory
+  with_items:
+    - ~/.config
+    - ~/.local
+    - ~/.local/bin
   tags: dotfiles
 
 - name: Create symlink for zsh profile

@@ -13,8 +13,8 @@ delete +vms:
 decrypt-vm-password:
     ansible-playbook vms/decrypt-vm-password.yaml --vault-password-file ~/.ansible-password
 
-set-up +vms:
-    ansible-playbook vms/set-up.yaml --inventory ~/.files/homelab/inventory --limit "{{ vms }}"
+set-up +hosts:
+    ansible-playbook vms/set-up.yaml --inventory ~/.files/homelab/inventory --limit "{{ hosts }}"
 
 eject-cloud-init-io vm:
     virsh detach-disk {{ vm }} hda --live --config

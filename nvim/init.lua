@@ -27,9 +27,6 @@ vim.keymap.set('n', 'Q', '<Nop>', { noremap = true })
 vim.keymap.set('n', '<leader>R', 'q', { noremap = true, desc = 'Record macro' })
 vim.keymap.set('n', '<leader>P', 'Q', { noremap = true, desc = 'Play macro' })
 
--- helper to verify config is loaded
-vim.keymap.set("n", "<leader>lol", "<cmd>echo 'hello world'<cr>")
-
 -- Initialize Lazy Plugin Manager
 require("config.lazy")
 
@@ -62,4 +59,3 @@ require("lazy").setup({
 local end_time = vim.loop.hrtime()
 local elapsed = (end_time - start_time) / 1000000 -- Convert nanoseconds to milliseconds
 print(string.format("Loaded init.lua in %.2f ms", elapsed))
-

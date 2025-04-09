@@ -25,6 +25,7 @@ return function()
   vim.opt.virtualedit = "block"      -- Allow cursor placement where there is no character in visual block
   vim.opt.formatoptions:remove({ "c", "r", "o" }) -- Don't auto-comment when pressing enter
   -- vim.opt.clipboard = "unnamedplus"  -- Use system clipboard
+  vim.keymap.set('n', "<leader>x", "<cmd>only<cr>", { desc = "Close other splits" })
 
   -- Autosave when switching files
   vim.opt.autowrite = true
