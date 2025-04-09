@@ -46,7 +46,7 @@ if not vim.g.vscode then -- load other plugins when not running in the vscode ex
   plugins[#plugins + 1] = { import = "plugins/dashboard" }
   plugins[#plugins + 1] = { import = "plugins/oil" }
   plugins[#plugins + 1] = { import = "plugins/whichkey" }
-  vim.opt.relativenumber = true
+  plugins[#plugins + 1] = { import = "plugins/lsp" }
 end
 
 require("config.options")()
