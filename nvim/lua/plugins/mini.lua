@@ -71,10 +71,6 @@ return {
         config = function(_, opts)
             -- use a configure function to set highlight colors
             require('mini.jump2d').setup(opts)
-            vim.api.nvim_set_hl(0, 'MiniJump2dSpot', { fg = '#ff9e64', bg = '#292e42', italic = false })
-            vim.api.nvim_set_hl(0, 'MiniJump2dSpotUnique', { fg = '#1abc9c', bg = '#292e42', italic = false })
-            vim.api.nvim_set_hl(0, 'MiniJump2dSpotAhead', { fg = '#1abc9c', bg = '#292e42', italic = false })
-            vim.api.nvim_set_hl(0, 'MiniJump2dDim', { fg = '#565f89', italic = false })
         end,
     },
     {
