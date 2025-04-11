@@ -72,3 +72,4 @@ format = ' [$indicator]($style)'
 
 [python]
 disabled = false
+format = '[\[($virtualenv) $version\]](green) | '
