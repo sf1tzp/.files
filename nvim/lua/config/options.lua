@@ -112,5 +112,5 @@ return function()
   -- Performance
   vim.opt.updatetime = 250           -- Faster update time (CursorHold)
   vim.opt.timeoutlen = 300           -- Time to wait for a mapped sequence
-  vim.opt.lazyredraw = true          -- Don't redraw screen during macros
+  vim.opt.lazyredraw = false          -- Don't redraw screen during macros
 end
