@@ -126,6 +126,13 @@ return function()
     callback = four_space_indent
   })
 
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = { "just" },
+    callback = function()
+      vim.opt.commentstring = "# %s"
+    end
+  })
+
   -- Performance
   vim.opt.updatetime = 250           -- Faster update time (CursorHold)
   vim.opt.timeoutlen = 300           -- Time to wait for a mapped sequence
