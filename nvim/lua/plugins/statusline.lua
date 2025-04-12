@@ -1,10 +1,7 @@
 return {
     {
-"RRethy/base16-nvim"
-  },
-    {
         "nvim-lualine/lualine.nvim",
-        dependencies = { "nvim-tree/nvim-web-devicons", "RRethy/base16-nvim" },
+        dependencies = { "nvim-tree/nvim-web-devicons" },
         event = "VeryLazy",
         opts = {
             options = {
