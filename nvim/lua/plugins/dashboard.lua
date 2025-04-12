@@ -42,7 +42,7 @@ return {
       }
       -- Configure button styling
       dashboard.section.buttons.val = {
-        dashboard.button("o", "  [ ] Open Oil", "<CMD>Oil --float --preview<CR>"),
+        -- dashboard.button("o", "  [ ] Open Oil", "<CMD>Oil --float --preview<CR>"),
         dashboard.button("f", "  [ ] Find file", ":Telescope find_files <CR>"),
         dashboard.button("r", "  [ ] Recent files", ":Telescope oldfiles <CR>"),
         dashboard.button("g", "  [ ] Find text", ":Telescope live_grep <CR>"),
@@ -84,14 +84,16 @@ return {
       -- Hide tabline and statusline on dashboard
       vim.api.nvim_create_autocmd("User", {
         pattern = "AlphaReady",
-        desc = "Hide status and tab lines when in Alpha",
+        desc = "Hide status, tab, and indent lines when in Alpha",
         callback = function()
+          vim.b.miniindentscope_disable = true
           vim.opt.showtabline = 0
           vim.opt.laststatus = 0
           vim.api.nvim_create_autocmd("BufUnload", {
             buffer = 0,
-            desc = "Restore status and tab lines when leaving Alpha",
+            desc = "Restore status, tab, and indent lines when leaving Alpha",
             callback = function()
+              vim.b.miniindentscope_disable = false
               vim.opt.showtabline = 2
               vim.opt.laststatus = 3
             end,
