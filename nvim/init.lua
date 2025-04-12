@@ -39,6 +39,7 @@ if not vim.g.vscode then -- load other plugins when not running in the vscode ex
   plugins[#plugins + 1] = { import = "plugins/command-line" }
   plugins[#plugins + 1] = { import = "plugins/dashboard" }
   plugins[#plugins + 1] = { import = "plugins/git" }
+  plugins[#plugins + 1] = { import = "plugins/harpoon" }
   plugins[#plugins + 1] = { import = "plugins/lsp" }
   -- plugins[#plugins + 1] = { import = "plugins/oil" }
   plugins[#plugins + 1] = { import = "plugins/statusline" }

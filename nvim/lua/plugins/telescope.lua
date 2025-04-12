@@ -25,7 +25,7 @@ return {
 
       -- Additional helpful searches
       { "<leader>fb", "<cmd>Telescope buffers<CR>", desc = "Find Buffers" },
-      { "<leader>h", "<cmd>Telescope help_tags<CR>", desc = "Neovim Help" },
+      { "<leader>H", "<cmd>Telescope help_tags<CR>", desc = "Neovim Help" },
     },
     opts = {
       defaults = {

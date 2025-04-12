@@ -46,8 +46,9 @@ return {
         dashboard.button("f", "  [ ] Find file", ":Telescope find_files <CR>"),
         dashboard.button("r", "  [ ] Recent files", ":Telescope oldfiles <CR>"),
         dashboard.button("g", "  [ ] Find text", ":Telescope live_grep <CR>"),
-        dashboard.button("c", "  [ ] Configuration", ":e $MYVIMRC <CR>"),
-        dashboard.button("l", "  [ ] Lazy", ":Lazy<CR>"),
+        dashboard.button("h", "  [ ] Harpoon List", ":lua require('harpoon.ui'):toggle_quick_menu(require('harpoon'):list()) <CR>"),
+        dashboard.button("c", "  [ ] Edit init.lua", ":e $MYVIMRC <CR>"),
+        dashboard.button("l", "  [ ] Lazy Plugin Manager", ":Lazy<CR>"),
         dashboard.button("q", "  [ ] Quit", ":qa<CR>"),
       }
       -- Footer
