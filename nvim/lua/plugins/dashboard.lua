@@ -54,7 +54,8 @@ return {
       local function footer()
         local version = vim.version()
         local nvim_version_info = "v" .. version.major .. "." .. version.minor .. "." .. version.patch
-        return string.format("Neovim %s", nvim_version_info)
+        local cwd = vim.fn.getcwd()
+        return string.format("Neovim %s | %s", nvim_version_info, cwd)
       end
       dashboard.section.footer.val = footer()
       -- Layout options

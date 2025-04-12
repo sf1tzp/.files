@@ -41,6 +41,23 @@ return function()
      end,
   })
 
+  -- Disable netrw
+  vim.g.loaded_netrw  = 1
+  vim.g.loaded_netrwPlugin  = 1
+  vim.api.nvim_create_autocmd("VimEnter", {
+    callback = function()
+      local argv = vim.fn.argv()
+      if #argv > 0 then
+        local stat = vim.loop.fs_stat(argv[1])
+        if stat and stat.type == "directory" then
+          vim.cmd("cd " .. argv[1])
+          vim.cmd("bd")
+          require("alpha").start()
+        end
+      end
+    end
+  })
+
   -- Reopen files at their last position
   vim.api.nvim_create_autocmd("BufReadPost", {
     callback = function()
