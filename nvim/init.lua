@@ -46,6 +46,7 @@ if not vim.g.vscode then -- load other plugins when not running in the vscode ex
   plugins[#plugins + 1] = { import = "plugins/tmux-navigator" }
   plugins[#plugins + 1] = { import = "plugins/treesitter" }
   plugins[#plugins + 1] = { import = "plugins/whichkey" }
+  plugins[#plugins + 1] = { import = "plugins/whitespace" }
 end
 
 require("config.options")()
