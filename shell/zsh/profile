@@ -22,12 +22,12 @@ if [[ -d /usr/local/go/bin/ ]]; then
 fi
 
 # Fnm (Nodejs Version Manager)
-if [[ -f "$HOME/.local/bin/fnm" ]]; then
-  eval "$(fnm completions --shell zsh)"
-  eval "$(fnm env --use-on-cd --shell zsh)"
-  if [[ $(fnm list | wc -l) == 1 ]]; then
-    fnm install 23
-  fi
+if which fnm &>/dev/null; then
+    eval "$(fnm completions --shell zsh)"
+    eval "$(fnm env --use-on-cd --shell zsh)"
+    if [[ $(fnm list | wc -l) == 1 ]]; then
+        fnm install 23
+    fi
 fi
 
 # Homebrew env
@@ -40,23 +40,19 @@ if [[ -f /opt/homebrew/bin/brew ]]; then
     fi
 fi
 
+# Just
+if which just &>/dev/null; then
+    eval "$(just --completions=zsh)"
+fi
+
 # Neovim
 if [[ -d /usr/local/nvim/bin ]]; then
     export EDITOR=nvim
     export PATH="${PATH:+${PATH}:}/usr/local/nvim/bin"
 fi
 
-# Check for / install utilities
-"$HOME/.files/shell/scripts/install.py"
-
-# Shell Completions
-autoload -Uz compinit && compinit
-if command -v just &>/dev/null; then
-    eval "$(just --completions=zsh)"
-fi
-
 # Starship
-if command -v starship &>/dev/null; then
+if which starship &>/dev/null; then
     # workaround a starship bug on MacOS https://github.com/starship/starship/issues/3418#issuecomment-2477375663
     if [[ "${widgets[zle - keymap - select]#user:}" == "starship_zle-keymap-select" ||
         "${widgets[zle - keymap - select]#user:}" == "starship_zle-keymap-select-wrapped" ]]; then
@@ -99,6 +95,6 @@ source "$HOME/.files/shell/scripts/download.sh"
 source "$HOME/.files/shell/scripts/worktrees.sh"
 
 # zoxide wants to be at the end
-if command -v zoxide &>/dev/null; then
+if which zoxide &>/dev/null; then
     eval "$(zoxide init zsh)"
 fi

@@ -1,3 +1,5 @@
+# shellcheck disable=SC2148
+
 # git command aliases
 alias repo='git rev-parse --show-toplevel'
 alias branch='git branch --show-current'
@@ -23,7 +25,7 @@ alias get='git'
 alias udo='sudo'
 
 # command specific aliases
-if command -v bat &>/dev/null; then
+if which bat &>/dev/null; then
 	alias cat='bat -p --paging=never'
 	function bat_in_language() {
 		# if a language and file are passed, run bat with the language
@@ -38,11 +40,11 @@ if command -v bat &>/dev/null; then
 	alias b='bat_in_language' # Usage: cat output | b json -
 fi
 
-if command -v cargo &>/dev/null; then
+if which cargo &>/dev/null; then
 	alias cargo-watch='cargo watch -q -c -w src/ -x run'
 fi
 
-if command -v eza &>/dev/null; then
+if which eza &>/dev/null; then
 	alias ls='eza -la --group-directories-last'
 	function tree() {
 		# $1 depth # $2 path
@@ -56,24 +58,24 @@ if command -v eza &>/dev/null; then
 	}
 fi
 
-if command -v fd &>/dev/null; then
+if which fd &>/dev/null; then
 	alias fo='nvim $(fd --type file | fzf)'
 fi
 
-if command -v fzf &>/dev/null; then
+if which fzf &>/dev/null; then
 	alias branches='git checkout $(git branch -a | fzf)'
 fi
 
-if command -v just &>/dev/null; then
+if which just &>/dev/null; then
 	alias j='just'
 	alias jsut='just'
 fi
 
-if command -v nerdctl &>/dev/null; then
+if which nerdctl &>/dev/null; then
 	alias docker='nerdctl'
 fi
 
-if command -v nvim &>/dev/null; then
+if which nvim &>/dev/null; then
 	export EDITOR='nvim'
 	export VISUAL='nvim'
 
@@ -83,23 +85,23 @@ if command -v nvim &>/dev/null; then
 	fi
 fi
 
-if command -v pipes.sh &>/dev/null; then
+if which pipes.sh &>/dev/null; then
 	alias pipes='pipes.sh'
 fi
 
-if command -v pipes-rs &>/dev/null; then
+if which pipes-rs &>/dev/null; then
 	alias pipes='pipes-rs'
 fi
 
-if command -v rg &>/dev/null; then
+if which rg &>/dev/null; then
 	alias grep='rg'
 fi
 
-if command -v zoxide &>/dev/null; then
+if which zoxide &>/dev/null; then
 	alias cd="z"
 fi
 
-if command -v virsh &>/dev/null; then
+if which virsh &>/dev/null; then
 	export LIBVIRT_DEFAULT_URI=qemu:///system
 	alias v='virsh'
 	alias vrsh='virsh'
