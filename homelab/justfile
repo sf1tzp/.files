@@ -7,6 +7,9 @@ base-images:
 create:
     ansible-playbook vms/create.yaml --vault-password-file ~/.ansible-password
 
+update:
+    ansible-playbook vms/update.yaml --inventory ~/.files/homelab/inventory
+
 delete +vms:
     ansible-playbook vms/delete.yaml --extra-vars vm_names="{{ vms }}"
 
