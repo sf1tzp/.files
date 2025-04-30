@@ -88,14 +88,12 @@ return {
         desc = "Hide status, tab, and indent lines when in Alpha",
         callback = function()
           vim.b.miniindentscope_disable = true
-          vim.opt.showtabline = 0
           vim.opt.laststatus = 0
           vim.api.nvim_create_autocmd("BufUnload", {
             buffer = 0,
             desc = "Restore status, tab, and indent lines when leaving Alpha",
             callback = function()
               vim.b.miniindentscope_disable = false
-              vim.opt.showtabline = 2
               vim.opt.laststatus = 3
             end,
           })

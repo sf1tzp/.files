@@ -11,6 +11,7 @@ return function()
   vim.opt.sidescrolloff = 8          -- Minimum screen columns left/right of cursor
   vim.opt.wrap = false               -- Don't wrap long lines
   vim.opt.showbreak = "↪ "           -- String to show at start of wrapped lines
+  vim.opt.showtabline = 0            -- Don't show tab line'
   vim.opt.list = true                -- Show invisible characters
   vim.opt.listchars = {              -- How to show invisible characters
     tab = "→ ",
