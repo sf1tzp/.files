@@ -3,17 +3,17 @@
 
 alias reload="source $HOME/.zshrc"
 
-# Check for / install utilities
-if [[ "$(uname -s)" == "Linux" ]]; then
-    "$HOME/.files/shell/scripts/install.py"
-fi
-
 # Init Shell Completions
 autoload -Uz compinit && compinit
 
 # Local bins
 if [ -d "$HOME/.local/bin" ]; then
     export PATH="$HOME/.local/bin:$PATH"
+fi
+
+# Local bins
+if [ -f "$HOME/.local/bin/env" ]; then
+    source "$HOME/.local/bin/env"
 fi
 
 # Cargo env
@@ -24,6 +24,11 @@ fi
 # Go Path
 if [[ -d /usr/local/go/bin/ ]]; then
     export PATH=$PATH:/usr/local/go/bin
+fi
+
+# Check for / install utilities
+if [[ "$(uname -s)" == "Linux" ]]; then
+    "$HOME/.files/shell/scripts/install.py"
 fi
 
 # Fnm (Nodejs Version Manager)
