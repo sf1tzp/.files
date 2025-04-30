@@ -10,6 +10,7 @@
     name:
       - gcc
       - git
+      - libpq-dev
       - make
       - tmux
       - unzip
