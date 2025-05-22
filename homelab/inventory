@@ -4,6 +4,7 @@ soundship ansible_host=10.0.0.2
 [vms]
 devbox ansible_host=10.0.0.3
 llm-server ansible_host=10.0.0.4
+lab-proxy ansible_host=10.0.0.5
 
 [nvidia]
 llm-server
@@ -12,4 +13,5 @@ llm-server
 soundship
 devbox
 llm-server
+lab-proxy
 

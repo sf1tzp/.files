@@ -1,6 +1,9 @@
 start vm:
     virsh start {{vm}}
 
+stop vm:
+    virsh destroy {{vm}}
+
 base-images:
     ansible-playbook vms/base-images.yaml
 

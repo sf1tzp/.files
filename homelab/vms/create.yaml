@@ -22,6 +22,13 @@
         ip: 10.0.0.4
         disk_size: 150G
         gpu_passthrough: true
+      - hostname: lab-proxy
+        os: ubuntu-server
+        vcpus: 2
+        memory: 2
+        ip: 10.0.0.5
+        disk_size: 50G
+        gpu_passthrough: false
 
   tasks:
     - name: Checking if VMs exist

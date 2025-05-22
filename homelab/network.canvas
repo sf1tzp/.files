@@ -1,0 +1,157 @@
+{
+  "nodes": [
+    {
+      "type": "text",
+      "id": "d8a5749b-d6ad-4449-a0fd-e9f999a78630",
+      "x": 420,
+      "y": 740,
+      "width": 400,
+      "height": 280,
+      "text": "## Hypervisor (Soundship)\n\nhostname: soundship.lofi\n\ninterfaces:\n- eth0: 10.0.0.2\n\n"
+    },
+    {
+      "type": "text",
+      "id": "d7b98f5d-16d5-456d-a7ba-82a5e08f3b0d",
+      "x": -360,
+      "y": -240,
+      "width": 440,
+      "height": 520,
+      "text": "## lab-proxy\n\nhostname: homelab.lofi\n\ninterfaces:\n- eth0: 10.0.0.5\n- wg0: 10.1.0.1\n\nservices:\n- nginx\n- step-ca\n- dnsmasq\n\nnginx proxy pass\n- chat.homelab.lofi: open webui on llm-server\n- symbology.homelab.lofi: symbology-ui on devbox\n- pgadmin.homelab.lofi: pgadmin on devbox"
+    },
+    {
+      "type": "text",
+      "id": "651ac3bf-37b0-494c-80b9-feb6b660fb70",
+      "x": 500,
+      "y": 120,
+      "width": 260,
+      "height": 340,
+      "text": "## devbox\n\nhostname: devbox.lofi\n\ninterfaces:\n- eth0: 10.0.0.3\n\nservices:\n- api port 8000\n- ui port 5173\n- postgres port 5432\n- pgadmin port 8080"
+    },
+    {
+      "type": "text",
+      "id": "ef8fa29a-af5f-4a03-8d9c-4564b5674c34",
+      "x": 1180,
+      "y": -200,
+      "width": 260,
+      "height": 340,
+      "text": "## llm-server\n\nhostname: llm.lofi\n\ninterfaces:\n- eth0: 10.0.0.4\n\nservices:\n- ollama port 11434\n- openwebui port 8080\n"
+    },
+    {
+      "type": "text",
+      "id": "3b50c64c-fa91-4a40-a518-4ba2c74836e5",
+      "x": -860,
+      "y": 300,
+      "width": 340,
+      "height": 140,
+      "text": "## lofi-router\n```\neth0: 10.0.0.1\npublic-dns: ****\n```"
+    },
+    {
+      "type": "text",
+      "id": "fa5eba78-8e4d-456d-a059-9c71eb11f064",
+      "x": -812,
+      "y": 580,
+      "width": 240,
+      "height": 240,
+      "text": "## laptop\n\ninterfaces:\n- wg0: 10.1.0.100"
+    },
+    {
+      "type": "text",
+      "id": "cb8e1f3b-4932-40b9-a1f9-834345d8b12f",
+      "x": 480,
+      "y": -260,
+      "width": 260,
+      "height": 80,
+      "text": "# The lofi Lab"
+    }
+  ],
+  "edges": [
+    {
+      "id": "2907ad8a-8b8a-41e3-81d3-3a1f184d2fef",
+      "fromNode": "3b50c64c-fa91-4a40-a518-4ba2c74836e5",
+      "fromSide": "top",
+      "toNode": "d7b98f5d-16d5-456d-a7ba-82a5e08f3b0d",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "port-forward 24097 (wireguard)",
+      "style": "solid",
+      "shape": "curved"
+    },
+    {
+      "id": "a8ccd92a-6398-44f2-99e1-92e8aa59e125",
+      "fromNode": "fa5eba78-8e4d-456d-a059-9c71eb11f064",
+      "fromSide": "top",
+      "toNode": "3b50c64c-fa91-4a40-a518-4ba2c74836e5",
+      "toSide": "bottom",
+      "toEnd": "arrow",
+      "label": "wireguard on port 24097",
+      "style": "solid",
+      "shape": "curved"
+    },
+    {
+      "id": "eac24cfa-9869-44ce-9924-a7fe3b54fe94",
+      "fromNode": "d7b98f5d-16d5-456d-a7ba-82a5e08f3b0d",
+      "fromSide": "right",
+      "toNode": "ef8fa29a-af5f-4a03-8d9c-4564b5674c34",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "proxy pass to open webui",
+      "style": "solid",
+      "shape": "curved"
+    },
+    {
+      "id": "0937f78b-90a9-4596-be73-ba216138d978",
+      "fromNode": "d8a5749b-d6ad-4449-a0fd-e9f999a78630",
+      "fromSide": "top",
+      "toNode": "d7b98f5d-16d5-456d-a7ba-82a5e08f3b0d",
+      "toSide": "bottom",
+      "toEnd": "arrow",
+      "label": "(kvm)",
+      "style": "dotted",
+      "shape": "curved"
+    },
+    {
+      "id": "2836d2f4-d32c-4fd8-b081-7c45fd386885",
+      "fromNode": "d8a5749b-d6ad-4449-a0fd-e9f999a78630",
+      "fromSide": "top",
+      "toNode": "ef8fa29a-af5f-4a03-8d9c-4564b5674c34",
+      "toSide": "bottom",
+      "toEnd": "arrow",
+      "label": "(kvm)",
+      "style": "dotted",
+      "shape": "curved"
+    },
+    {
+      "id": "d20f690c-53de-4620-b820-a199492d7737",
+      "fromNode": "d8a5749b-d6ad-4449-a0fd-e9f999a78630",
+      "fromSide": "top",
+      "toNode": "651ac3bf-37b0-494c-80b9-feb6b660fb70",
+      "toSide": "bottom",
+      "toEnd": "arrow",
+      "label": "(kvm)",
+      "style": "dotted",
+      "shape": "curved"
+    },
+    {
+      "id": "d654ea69-8b01-422e-9f00-89a2838bb31c",
+      "fromNode": "651ac3bf-37b0-494c-80b9-feb6b660fb70",
+      "fromSide": "right",
+      "toNode": "ef8fa29a-af5f-4a03-8d9c-4564b5674c34",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "api calls to ollama",
+      "style": "dashed",
+      "shape": "curved"
+    },
+    {
+      "id": "1cd09a5e-6a66-424c-b982-4e9b96403c2b",
+      "fromNode": "d7b98f5d-16d5-456d-a7ba-82a5e08f3b0d",
+      "fromSide": "right",
+      "toNode": "651ac3bf-37b0-494c-80b9-feb6b660fb70",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "proxy pass to ui & pgadmin",
+      "style": "solid",
+      "shape": "curved"
+    }
+  ]
+}
