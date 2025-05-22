@@ -1,0 +1,218 @@
+---
+- name: Install and configure Wireguard on homelab hosts
+  hosts: all # Note: This really only needs to be done for lab-proxy and remote clients
+  become: yes
+  vars:
+    vault_password: "{{ lookup('env', 'ANSIBLE_VAULT_PASSWORD') }}"
+    wg_keys_file: "~/.homelab-wireguard-keys.yaml"
+    wg_port: 51820
+    # Router public endpoint for external connections
+    public_endpoint: "{{ lookup('env', 'WIREGUARD_PUBLIC_ENDPOINT') }}"
+  tasks:
+    # Install Wireguard
+    - name: Install Wireguard packages
+      ansible.builtin.package:
+        name:
+          - wireguard-tools
+          - wireguard
+        state: present
+
+    # Manage keys in the vault
+    - name: Check if private keys file exists
+      ansible.builtin.stat:
+        path: "{{ wg_keys_file }}"
+      register: keys_file
+      delegate_to: localhost
+      become: no
+
+    - name: Initialize private keys file with empty structure
+      ansible.builtin.copy:
+        content: "wireguard:\n  private_keys: {}\n  public_keys: {}\n"
+        dest: "{{ wg_keys_file }}"
+        mode: "0600"
+        force: false # Don't overwrite if exists
+      when: not keys_file.stat.exists
+      delegate_to: localhost
+      become: no
+
+    - name: Check for existing private key
+      ansible.builtin.command:
+        cmd: yq -e '.wireguard.private_keys.{{ inventory_hostname }}' {{ wg_keys_file }}
+      register: private_key_check
+      failed_when: false
+      changed_when: false
+      delegate_to: localhost
+      become: no
+
+    - name: Set fact if private key exists
+      ansible.builtin.set_fact:
+        private_key_not_set: "{{ private_key_check.rc != 0 }}" # yq failed, meaning key doesn't exist
+
+    - name: Generate Wireguard private key
+      ansible.builtin.command:
+        cmd: wg genkey
+      register: wg_private_key
+      when: private_key_not_set
+      delegate_to: localhost
+      become: no
+
+    - name: Encrypt private key
+      ansible.builtin.set_fact:
+        encrypted_private_key: "{{ wg_private_key.stdout | vault(vault_password) }}"
+      when: private_key_not_set
+
+    - name: Store encrypted private key in vault
+      ansible.builtin.command:
+        cmd: yq -i '.wireguard.private_keys.{{ inventory_hostname }} = "{{ encrypted_private_key }}"' {{ wg_keys_file }}
+      when: private_key_not_set
+      delegate_to: localhost
+      become: no
+
+    - name: Get private key from vault
+      ansible.builtin.command:
+        cmd: yq -e '.wireguard.private_keys.{{ inventory_hostname }}' {{ wg_keys_file }}
+      register: encrypted_key_result
+      delegate_to: localhost
+      become: no
+
+    - name: Decrypt private key
+      ansible.builtin.set_fact:
+        private_key: "{{ encrypted_key_result.stdout | unvault(vault_password) }}"
+
+    - name: Generate public key from private key
+      ansible.builtin.shell:
+        cmd: echo '{{ private_key }}' | wg pubkey
+      register: wg_public_key
+      delegate_to: localhost
+      become: no
+
+    - name: Store public key (unencrypted) in vault
+      ansible.builtin.command:
+        cmd: yq -i '.wireguard.public_keys.{{ inventory_hostname }} = "{{ wg_public_key.stdout }}"' {{ wg_keys_file }}
+      delegate_to: localhost
+      become: no
+
+    # Create a fact with all public keys for configuring peers
+    - name: Get all public keys
+      ansible.builtin.command:
+        cmd: yq -e '.wireguard.public_keys' {{ wg_keys_file }}
+      register: all_public_keys
+      delegate_to: localhost
+      become: no
+
+    - name: Parse public keys
+      ansible.builtin.set_fact:
+        public_keys: "{{ all_public_keys.stdout | from_yaml }}"
+
+    # Configure Wireguard
+    - name: Create Wireguard configuration directory
+      ansible.builtin.file:
+        path: /etc/wireguard
+        state: directory
+        mode: '0700'
+
+    # Determine IP address based on hostname from network.canvas
+    - name: Set Wireguard IP address based on hostname
+      ansible.builtin.set_fact:
+        wg_ip: >-
+          {% if inventory_hostname == 'soundship' %}10.1.0.2{%
+          elif inventory_hostname == 'devbox' %}10.1.0.3{%
+          elif inventory_hostname == 'llm-server' %}10.1.0.4{%
+          elif inventory_hostname == 'lab-proxy' %}10.1.0.5{%
+          elif inventory_hostname == 'laptop' %}10.1.0.100{%
+          else %}10.1.0.254{% endif %}
+
+    # Check if the host is the lab-proxy (endpoint for external connections)
+    - name: Set endpoint fact
+      ansible.builtin.set_fact:
+        is_endpoint: "{{ inventory_hostname == 'lab-proxy' }}"
+
+    # Create template for wg0.conf
+    - name: Configure Wireguard interface
+      ansible.builtin.template:
+        src: "{{ playbook_dir }}/templates/wg0.conf.j2"
+        dest: /etc/wireguard/wg0.conf
+        mode: '0600'
+      notify: restart wireguard
+
+    # Enable and start Wireguard
+    - name: Enable and start Wireguard
+      ansible.builtin.service:
+        name: wg-quick@wg0
+        enabled: yes
+        state: started
+
+  handlers:
+    - name: restart wireguard
+      ansible.builtin.service:
+        name: wg-quick@wg0
+        state: restarted
+
+# Create a separate play to create client configuration for laptop
+- name: Create client configuration for laptop
+  hosts: localhost
+  become: no
+  vars:
+    wg_keys_file: "~/.homelab-wireguard-keys.yaml"
+    client_config_dir: "~/wireguard-clients"
+  tasks:
+    - name: Ensure client config directory exists
+      ansible.builtin.file:
+        path: "{{ client_config_dir }}"
+        state: directory
+        mode: '0700'
+
+    - name: Get all public keys
+      ansible.builtin.command:
+        cmd: yq -e '.wireguard.public_keys' {{ wg_keys_file }}
+      register: all_public_keys
+
+    - name: Parse public keys
+      ansible.builtin.set_fact:
+        public_keys: "{{ all_public_keys.stdout | from_yaml }}"
+
+    - name: Get laptop private key
+      ansible.builtin.command:
+        cmd: yq -e '.wireguard.private_keys.laptop' {{ wg_keys_file }}
+      register: encrypted_laptop_key_result
+      failed_when: false
+
+    - name: Generate laptop private key if not exists
+      ansible.builtin.command:
+        cmd: wg genkey
+      register: laptop_private_key
+      when: encrypted_laptop_key_result.rc != 0
+
+    - name: Encrypt laptop private key
+      ansible.builtin.set_fact:
+        encrypted_laptop_private_key: "{{ laptop_private_key.stdout | vault(vault_password) }}"
+      when: encrypted_laptop_key_result.rc != 0
+
+    - name: Store encrypted laptop private key in vault
+      ansible.builtin.command:
+        cmd: yq -i '.wireguard.private_keys.laptop = "{{ encrypted_laptop_private_key }}"' {{ wg_keys_file }}
+      when: encrypted_laptop_key_result.rc != 0
+
+    - name: Get updated laptop private key from vault
+      ansible.builtin.command:
+        cmd: yq -e '.wireguard.private_keys.laptop' {{ wg_keys_file }}
+      register: updated_encrypted_key_result
+
+    - name: Decrypt laptop private key
+      ansible.builtin.set_fact:
+        laptop_private_key: "{{ updated_encrypted_key_result.stdout | unvault(vault_password) }}"
+
+    - name: Generate laptop public key
+      ansible.builtin.command:
+        cmd: echo "{{ laptop_private_key }}" | wg pubkey
+      register: laptop_public_key
+
+    - name: Store laptop public key in vault
+      ansible.builtin.command:
+        cmd: yq -i '.wireguard.public_keys.laptop = "{{ laptop_public_key.stdout }}"' {{ wg_keys_file }}
+
+    - name: Create laptop Wireguard config
+      ansible.builtin.template:
+        src: "{{ playbook_dir }}/templates/laptop-wg0.conf.j2"
+        dest: "{{ client_config_dir }}/laptop-wg0.conf"
+        mode: '0600'

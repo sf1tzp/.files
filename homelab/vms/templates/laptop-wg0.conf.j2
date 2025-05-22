@@ -1,0 +1,12 @@
+[Interface]
+Address = 10.1.0.100/24
+PrivateKey = {{ laptop_private_key }}
+DNS = 10.0.0.5
+
+# Peer configuration for lab-proxy (main entry point)
+[Peer]
+# lab-proxy
+PublicKey = {{ public_keys.lab_proxy }}
+Endpoint = {{ router_endpoint }}
+AllowedIPs = 10.0.0.0/24, 10.1.0.0/24
+PersistentKeepalive = 25

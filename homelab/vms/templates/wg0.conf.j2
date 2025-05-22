@@ -1,0 +1,38 @@
+[Interface]
+Address = {{ wg_ip }}/24
+PrivateKey = {{ private_key }}
+ListenPort = {{ wg_port }}
+SaveConfig = false
+
+{% if is_endpoint %}
+# lab-proxy specific configuration
+PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -A FORWARD -o wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -D FORWARD -o wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+{% endif %}
+
+# Peer configurations
+{% for host, pubkey in public_keys.items() %}
+{% if host != inventory_hostname %}
+[Peer]
+# {{ host }}
+PublicKey = {{ pubkey }}
+{% if host == 'laptop' %}
+AllowedIPs = 10.1.0.100/32
+{% elif host == 'soundship' %}
+AllowedIPs = 10.1.0.2/32
+{% elif host == 'devbox' %}
+AllowedIPs = 10.1.0.3/32
+{% elif host == 'llm-server' %}
+AllowedIPs = 10.1.0.4/32
+{% elif host == 'lab-proxy' %}
+AllowedIPs = 10.1.0.5/32
+{% if inventory_hostname != 'soundship' %}
+# Non-hypervisor VMs should connect through lab-proxy
+Endpoint = {{ router_endpoint }}
+PersistentKeepalive = 25
+{% endif %}
+{% else %}
+AllowedIPs = 10.1.0.254/32
+{% endif %}
+{% endif %}
+{% endfor %}
