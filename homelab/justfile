@@ -38,3 +38,7 @@ _base_images_from_iso:
     qemu-img convert -f raw latest-nixos-minimal-x86_64-linux.iso 	-O qcow2 nixos-base.qcow2
     popd
 
+
+x11-tunnel vm:
+  DISPLAY=:0 ssh -X {{ vm }}
+
