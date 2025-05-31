@@ -4,11 +4,20 @@ start vm:
 stop vm:
     virsh destroy {{vm}}
 
+pause vm:
+    virsh suspend {{vm}}
+
+resume vm:
+    virsh resume {{vm}}
+
 base-images:
     ansible-playbook vms/base-images.yaml
 
-create:
-    ansible-playbook vms/create.yaml --vault-password-file ~/.ansible-password
+create-linux:
+    ansible-playbook vms/create-linux.yaml --vault-password-file ~/.ansible-password
+
+create-windows:
+    ansible-playbook vms/create-windows.yaml
 
 update:
     ansible-playbook vms/update.yaml --inventory ~/.files/homelab/inventory

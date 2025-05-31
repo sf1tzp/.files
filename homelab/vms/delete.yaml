@@ -43,6 +43,8 @@
       virt:
         name: "{{ item }}"
         command: undefine
+        flags:
+          - nvram
       register: vm_status
       failed_when: false
       with_items: "{{ vm_names }}"

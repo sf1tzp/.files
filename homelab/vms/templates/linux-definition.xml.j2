@@ -34,12 +34,19 @@
     {% if item.gpu_passthrough | default(false) %}
     <hostdev mode='subsystem' type='pci' managed='yes'>
       <source>
-        <address domain='0x0000' bus='0x01' slot='0x00' function='0x0'/>
+        <address domain='{{ item.gpu_domain }}'
+                bus='{{ item.gpu_bus }}'
+                slot='{{ item.gpu_slot }}'
+                function='0x0'/>
       </source>
     </hostdev>
+    <!-- GPU Audio -->
     <hostdev mode='subsystem' type='pci' managed='yes'>
       <source>
-        <address domain='0x0000' bus='0x01' slot='0x00' function='0x1'/>
+        <address domain='{{ item.gpu_domain }}'
+                bus='{{ item.gpu_bus }}'
+                slot='{{ item.gpu_slot }}'
+                function='0x1'/>
       </source>
     </hostdev>
     {% endif %}

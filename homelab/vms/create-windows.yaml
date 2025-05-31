@@ -1,0 +1,109 @@
+---
+- name: Create Windows Virtual Machines
+  hosts: localhost
+  vars:
+    windows_iso: /var/lib/libvirt/images/bases/Win11_24H2_English_x64.iso
+
+    vm_specs:
+      - hostname: win11
+        os: windows
+        vcpus: 10
+        isol_cpus: 14-23
+        memory: 24
+        disk_size: 150G
+
+        gpu_passthrough: true
+        # My GPU -> PCI: 0000:01:00.0
+        gpu_domain: "0x0000"
+        gpu_bus: "0x01"
+        gpu_slot: "0x00"
+
+        nvme_passthrough: false
+        # nvme1n1 -> PCI: 0000:0c:00.0
+        nvme_domain: "0x0000"
+        nvme_bus: "0x0c"
+        nvme_slot: "0x00"
+        nvme_function: "0x0"
+
+        usb_peripherals: true
+        # Keyboard: Bus 005 Device 002: ID 046d:c545 Logitech, Inc. USB Receiver
+        keyboard_vendor_id: "0x046d"
+        keyboard_product_id: "0xc545"
+        # Mouse: Bus 005 Device 004: ID 3554:f508 pulsar X2H Mini
+        mouse_vendor_id: "0x3554"
+        mouse_product_id: "0xf508"
+        # Controller: Bus 001 Device 017: ID 045e:0b12 Microsoft Corp. Xbox Controller
+        controller_vendor_id: "0x045e"
+        controller_product_id: "0x0b12"
+
+  tasks:
+    - name: Checking if VMs exist
+      virt:
+        name: "{{ item.hostname }}"
+        command: status
+      register: vm_status
+      failed_when: false
+      with_items: "{{ vm_specs }}"
+      loop_control:
+        label: "Checking if {{ item.hostname }} is already defined"
+
+    - set_fact:
+        vms_to_create: "{{ vm_specs | selectattr('hostname', 'in', vm_status.results | selectattr('status', 'undefined') | map(attribute='item.hostname') | list) }}"
+
+    - meta: end_play
+      when: vms_to_create | length == 0
+
+    - debug:
+        msg: "Will create the following VMs: {{ vms_to_create | map(attribute='hostname') | join(', ') }}"
+
+    - name: Create OS disk images
+      become: false
+      shell: |
+        qemu-img create \
+          -f qcow2 \
+          "/var/lib/libvirt/images/{{ item.hostname }}.qcow2" {{ item.disk_size }}
+      with_items: "{{ vms_to_create }}"
+      loop_control:
+        label: "Created {{ item.hostname }} OS Disk Image"
+
+    - name: Create GPU passthrough hook directories
+      become: false
+      file:
+        path: "/etc/libvirt/hooks/qemu.d/{{ item.0.hostname }}/{{ item.1 }}"
+        state: directory
+        mode: "755"
+      with_nested:
+        - "{{ vms_to_create }}"
+        - ["prepare/begin", "release/end"]
+      loop_control:
+        label: "Created {{ item.0.hostname }} {{ item.1 }} hook directory"
+      when: item.0.gpu_passthrough | default(false)
+
+    - name: Render GPU passthrough hook scripts
+      become: false
+      template:
+        src: "templates/{{ template_name }}.j2"
+        dest: "/etc/libvirt/hooks/qemu.d/{{ item.0.hostname }}/{{ item.1 }}/{{ template_name }}"
+        mode: "755"
+      with_nested:
+        - "{{ vms_to_create }}"
+        - ["prepare/begin", "release/end"]
+      loop_control:
+        label: "Wrote {{ item.0.hostname }} hook {{ item.1 }}/{{ template_name }}"
+      vars:
+        template_name: "{{ 'gpu-start-hook.sh' if item.1 == 'prepare/begin' else 'gpu-stop-hook.sh' }}"
+      when: item.0.gpu_passthrough | default(false)
+
+    - name: Define virtual machines
+      become: false
+      virt:
+        name: "{{ item.hostname }}"
+        command: define
+        xml: "{{ lookup('template', 'templates/windows-definition.xml.j2') }}"
+      with_items: "{{ vms_to_create }}"
+      loop_control:
+        label: "Defined {{ item.hostname }} libvirt domain"
+
+    - name: Windows Installation Note
+      debug:
+        msg: "NOTE: Use the virt-manager UI console for the first boot & Windows Installation"

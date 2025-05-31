@@ -22,6 +22,10 @@
         ip: 10.0.0.4
         disk_size: 150G
         gpu_passthrough: true
+        # My GPU -> PCI: 0000:01:00.0
+        gpu_domain: "0x0000"
+        gpu_bus: "0x01"
+        gpu_slot: "0x00"
       - hostname: lab-proxy
         os: ubuntu-server
         vcpus: 2
@@ -107,7 +111,7 @@
       virt:
         name: "{{ item.hostname }}"
         command: define
-        xml: "{{ lookup('template', 'templates/vm_definition.xml.j2') }}"
+        xml: "{{ lookup('template', 'templates/linux-definition.xml.j2') }}"
       with_items: "{{ vms_to_create }}"
       loop_control:
         label: "Defined {{ item.hostname }} libvirt domain"
