@@ -4,7 +4,7 @@
       "type": "text",
       "id": "d8a5749b-d6ad-4449-a0fd-e9f999a78630",
       "x": 420,
-      "y": 740,
+      "y": 760,
       "width": 400,
       "height": 280,
       "text": "## Hypervisor (Soundship)\n\nhostname: soundship.lofi\n\ninterfaces:\n- eth0: 10.0.0.2\n\n"
@@ -62,6 +62,15 @@
       "width": 260,
       "height": 80,
       "text": "# The lofi Lab"
+    },
+    {
+      "type": "text",
+      "id": "85f3aded-c0e4-435d-9749-5772d512681f",
+      "x": 1640,
+      "y": 220,
+      "width": 220,
+      "height": 180,
+      "text": "## win11\n\ninterfaces:\n- eth0: 10.0.0.99\n"
     }
   ],
   "edges": [
@@ -151,6 +160,17 @@
       "toEnd": "arrow",
       "label": "proxy pass to ui & pgadmin",
       "style": "solid",
+      "shape": "curved"
+    },
+    {
+      "id": "795622b9-57eb-41f4-92bf-cccf8ec3f01d",
+      "fromNode": "d8a5749b-d6ad-4449-a0fd-e9f999a78630",
+      "fromSide": "top",
+      "toNode": "85f3aded-c0e4-435d-9749-5772d512681f",
+      "toSide": "bottom",
+      "toEnd": "arrow",
+      "label": "kvm",
+      "style": "dotted",
       "shape": "curved"
     }
   ]
