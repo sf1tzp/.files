@@ -73,6 +73,7 @@ fi
 
 if which nerdctl &>/dev/null; then
 	alias docker='nerdctl'
+  alias n='nerdctl'
 fi
 
 if which nvim &>/dev/null; then
