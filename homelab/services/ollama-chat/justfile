@@ -1,8 +1,8 @@
 up:
-    nerdctl compose -f ~/.files/homelab/services/ollama-chat/ollama.yaml up -d
+    nerdctl compose -f ollama.yaml up -d
 
 down:
-    nerdctl compose -f ~/.files/homelab/services/ollama-chat/ollama.yaml down
+    nerdctl compose -f ollama.yaml down
 
-logs:
-    nerdctl compose -f ollama.yaml logs -f
+logs *ARGS:
+    nerdctl compose -f ollama.yaml logs {{ARGS}}
