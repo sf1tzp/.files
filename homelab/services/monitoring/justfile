@@ -1,0 +1,8 @@
+up:
+    nerdctl compose -f monitoring.yaml up -d
+
+down:
+    nerdctl compose -f monitoring.yaml down
+
+logs *ARGS:
+    nerdctl compose -f monitoring.yaml logs {{ARGS}}

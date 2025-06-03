@@ -1,0 +1,73 @@
+global:
+  scrape_interval: 5s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: "prometheus"
+    static_configs:
+      - targets:
+          - 10.0.0.2:9090
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: 10.0.0.2:9090
+        replacement: soundship
+        target_label: instance
+
+  - job_name: "node_exporter"
+    static_configs:
+      - targets:
+          - 10.0.0.1:9100
+          - 10.0.0.2:9100
+          - 10.0.0.3:9100
+          - 10.0.0.4:9100
+          - 10.0.0.5:9100
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: 10.0.0.1:9100
+        replacement: router
+        target_label: instance
+      - source_labels: [__address__]
+        regex: 10.0.0.2:9100
+        replacement: soundship
+        target_label: instance
+      - source_labels: [__address__]
+        regex: 10.0.0.3:9100
+        replacement: devbox
+        target_label: instance
+      - source_labels: [__address__]
+        regex: 10.0.0.4:9100
+        replacement: llm-server
+        target_label: instance
+      - source_labels: [__address__]
+        regex: 10.0.0.5:9100
+        replacement: lab-proxy
+        target_label: instance
+
+  - job_name: "windows_exporter"
+    static_configs:
+      - targets:
+          - 10.0.0.99:9182
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: 10.0.0.99:9182
+        replacement: win11
+        target_label: instance
+      - source_labels: [core]
+        regex: ".*,([0-9]+)"
+        target_label: foo
+        action: replace
+
+  - job_name: "nvidia_gpu_exporter"
+    static_configs:
+      - targets:
+          - 10.0.0.4:9835
+          - 10.0.0.99:9835
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: 10.0.0.4:9835
+        replacement: llm-server
+        target_label: instance
+      - source_labels: [__address__]
+        regex: 10.0.0.99:9835
+        replacement: win11
+        target_label: instance
