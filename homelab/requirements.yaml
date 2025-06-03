@@ -1,0 +1,5 @@
+---
+roles:
+  - name: ansible-auditd-laurel
+    src: https://code.europa.eu/certeu/ansible-auditd-laurel.git
+    scm: git

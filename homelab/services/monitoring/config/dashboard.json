@@ -907,7 +907,7 @@
                         "h": 8,
                         "w": 8,
                         "x": 0,
-                        "y": 21
+                        "y": 71
                     },
                     "id": 22,
                     "options": {
@@ -1006,7 +1006,7 @@
                         "h": 8,
                         "w": 8,
                         "x": 8,
-                        "y": 21
+                        "y": 71
                     },
                     "id": 4,
                     "options": {
@@ -1136,7 +1136,7 @@
                         "h": 8,
                         "w": 8,
                         "x": 16,
-                        "y": 21
+                        "y": 71
                     },
                     "id": 20,
                     "options": {
@@ -1269,7 +1269,7 @@
                         "h": 8,
                         "w": 6,
                         "x": 0,
-                        "y": 22
+                        "y": 128
                     },
                     "id": 7,
                     "options": {
@@ -1368,7 +1368,7 @@
                         "h": 8,
                         "w": 6,
                         "x": 6,
-                        "y": 22
+                        "y": 128
                     },
                     "id": 9,
                     "options": {
@@ -1498,7 +1498,7 @@
                         "h": 8,
                         "w": 6,
                         "x": 12,
-                        "y": 22
+                        "y": 128
                     },
                     "id": 26,
                     "options": {
@@ -1617,7 +1617,7 @@
                         "h": 8,
                         "w": 6,
                         "x": 18,
-                        "y": 22
+                        "y": 128
                     },
                     "id": 18,
                     "options": {
@@ -1721,9 +1721,9 @@
                     },
                     "gridPos": {
                         "h": 8,
-                        "w": 8,
+                        "w": 6,
                         "x": 0,
-                        "y": 23
+                        "y": 137
                     },
                     "id": 1,
                     "options": {
@@ -1820,9 +1820,9 @@
                     },
                     "gridPos": {
                         "h": 8,
-                        "w": 8,
-                        "x": 8,
-                        "y": 23
+                        "w": 6,
+                        "x": 6,
+                        "y": 137
                     },
                     "id": 25,
                     "options": {
@@ -1875,6 +1875,135 @@
                         }
                     ],
                     "title": "Memory Usage",
+                    "type": "timeseries"
+                },
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "fenqsyb8rfke8c"
+                    },
+                    "description": "",
+                    "fieldConfig": {
+                        "defaults": {
+                            "color": {
+                                "mode": "palette-classic"
+                            },
+                            "custom": {
+                                "axisBorderShow": false,
+                                "axisCenteredZero": false,
+                                "axisColorMode": "text",
+                                "axisLabel": "",
+                                "axisPlacement": "auto",
+                                "barAlignment": 0,
+                                "barWidthFactor": 0.9,
+                                "drawStyle": "line",
+                                "fillOpacity": 16,
+                                "gradientMode": "none",
+                                "hideFrom": {
+                                    "legend": false,
+                                    "tooltip": false,
+                                    "viz": false
+                                },
+                                "insertNulls": false,
+                                "lineInterpolation": "smooth",
+                                "lineWidth": 1,
+                                "pointSize": 5,
+                                "scaleDistribution": {
+                                    "type": "linear"
+                                },
+                                "showPoints": "never",
+                                "spanNulls": false,
+                                "stacking": {
+                                    "group": "A",
+                                    "mode": "none"
+                                },
+                                "thresholdsStyle": {
+                                    "mode": "off"
+                                }
+                            },
+                            "links": [],
+                            "mappings": [],
+                            "thresholds": {
+                                "mode": "absolute",
+                                "steps": [
+                                    {
+                                        "color": "green"
+                                    }
+                                ]
+                            },
+                            "unit": "bps"
+                        },
+                        "overrides": [
+                            {
+                                "matcher": {
+                                    "id": "byRegexp",
+                                    "options": "/.*Rx.*/"
+                                },
+                                "properties": [
+                                    {
+                                        "id": "custom.transform",
+                                        "value": "negative-Y"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "gridPos": {
+                        "h": 8,
+                        "w": 6,
+                        "x": 12,
+                        "y": 137
+                    },
+                    "id": 30,
+                    "options": {
+                        "legend": {
+                            "calcs": [],
+                            "displayMode": "list",
+                            "placement": "bottom",
+                            "showLegend": true
+                        },
+                        "tooltip": {
+                            "hideZeros": false,
+                            "mode": "multi",
+                            "sort": "none"
+                        }
+                    },
+                    "pluginVersion": "12.0.1",
+                    "targets": [
+                        {
+                            "datasource": {
+                                "type": "prometheus",
+                                "uid": "fenqsyb8rfke8c"
+                            },
+                            "editorMode": "code",
+                            "expr": "rate(node_network_transmit_bytes_total{instance=\"$linux_vm\",device=\"ens3\"}[$__rate_interval]) * 8",
+                            "format": "time_series",
+                            "intervalFactor": 1,
+                            "legendFormat": "Tx",
+                            "range": true,
+                            "refId": "A",
+                            "step": 240
+                        },
+                        {
+                            "datasource": {
+                                "type": "prometheus",
+                                "uid": "fenqsyb8rfke8c"
+                            },
+                            "disableTextWrap": false,
+                            "editorMode": "code",
+                            "expr": "rate(node_network_receive_bytes_total{instance=\"$linux_vm\",device=\"ens3\"}[$__rate_interval]) * 8",
+                            "format": "time_series",
+                            "fullMetaSearch": false,
+                            "includeNullMetadata": true,
+                            "intervalFactor": 1,
+                            "legendFormat": "Rx",
+                            "range": true,
+                            "refId": "B",
+                            "step": 240,
+                            "useBackend": false
+                        }
+                    ],
+                    "title": "Network Usage",
                     "type": "timeseries"
                 },
                 {
@@ -1944,9 +2073,9 @@
                     },
                     "gridPos": {
                         "h": 8,
-                        "w": 8,
-                        "x": 16,
-                        "y": 23
+                        "w": 6,
+                        "x": 18,
+                        "y": 137
                     },
                     "id": 29,
                     "options": {
@@ -2005,10 +2134,71 @@
             "repeat": "linux_vm",
             "title": "$linux_vm",
             "type": "row"
+        },
+        {
+            "collapsed": true,
+            "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 25
+            },
+            "id": 32,
+            "panels": [
+                {
+                    "datasource": {
+                        "type": "loki",
+                        "uid": "cenug0ko9f4zkd"
+                    },
+                    "fieldConfig": {
+                        "defaults": {},
+                        "overrides": []
+                    },
+                    "gridPos": {
+                        "h": 7,
+                        "w": 7,
+                        "x": 0,
+                        "y": 26
+                    },
+                    "id": 31,
+                    "options": {
+                        "dedupStrategy": "none",
+                        "enableInfiniteScrolling": false,
+                        "enableLogDetails": true,
+                        "prettifyLogMessage": false,
+                        "showCommonLabels": false,
+                        "showLabels": false,
+                        "showTime": true,
+                        "sortOrder": "Descending",
+                        "wrapLogMessage": false
+                    },
+                    "pluginVersion": "12.0.1",
+                    "targets": [
+                        {
+                            "datasource": {
+                                "type": "loki",
+                                "uid": "cenug0ko9f4zkd"
+                            },
+                            "direction": "backward",
+                            "editorMode": "code",
+                            "expr": "{filename=\"/var/log/laurel/audit.log\"} |= `sshd` | json | USER_ERR_msg_res = `failed` | line_format \"{{.host}} {{.USER_ERR_msg_res}} {{.USER_ERR_msg_op}} {{.USER_ERR_msg_addr}}\"",
+                            "hide": false,
+                            "key": "Q-884e2783-edc0-4fbf-9579-b0f731eaabee-0",
+                            "legendFormat": "{{hostname}}",
+                            "queryType": "range",
+                            "refId": "B"
+                        }
+                    ],
+                    "title": "Failed SSH Authentications",
+                    "type": "logs"
+                }
+            ],
+            "title": "Audit Logs",
+            "type": "row"
         }
     ],
     "preload": false,
-    "refresh": "10s",
+    "refresh": "5s",
     "schemaVersion": 41,
     "tags": [],
     "templating": {
@@ -2058,10 +2248,14 @@
             {
                 "allowCustomValue": false,
                 "current": {
-                    "text": [],
-                    "value": []
+                    "text": [
+                        "win11"
+                    ],
+                    "value": [
+                        "win11"
+                    ]
                 },
-                "definition": "query_result(up{job=\"windows_exporter\"} == 1)",
+                "definition": "query_result(up{job=\"windows_exporter\"})",
                 "hide": 2,
                 "includeAll": false,
                 "multi": true,
@@ -2069,7 +2263,7 @@
                 "options": [],
                 "query": {
                     "qryType": 3,
-                    "query": "query_result(up{job=\"windows_exporter\"} == 1)",
+                    "query": "query_result(up{job=\"windows_exporter\"})",
                     "refId": "PrometheusVariableQueryEditor-VariableQuery"
                 },
                 "refresh": 1,
@@ -2079,12 +2273,12 @@
         ]
     },
     "time": {
-        "from": "now-5m",
+        "from": "now-30m",
         "to": "now"
     },
     "timepicker": {},
     "timezone": "browser",
     "title": "lofi lab",
     "uid": "02967d42-11cc-4a3e-aad3-f86a79ac9556",
-    "version": 30
+    "version": 34
 }
