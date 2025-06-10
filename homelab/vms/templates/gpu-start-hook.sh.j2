@@ -1,11 +1,6 @@
 #!/bin/bash
 set -x
 
-# Stop Ollama
-# systemctl stop ollama
-
-sleep 5
-
 # Load NVIDIA kernel modules (no effect if already loaded, consider removing)
 modprobe -r nvidia
 modprobe -r nvidia_uvm
