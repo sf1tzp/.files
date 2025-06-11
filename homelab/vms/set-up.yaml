@@ -8,6 +8,8 @@
 
     - name: Nvidia Driver Set Up
       include_tasks: tasks/nvidia.yaml
+      vars:
+        nvidia_gpu_exporter_version: "1.3.2"  # Override default version if needed
       when: inventory_hostname in groups["nvidia"]
 
     - name: Containerd (nerdctl) Set Up
