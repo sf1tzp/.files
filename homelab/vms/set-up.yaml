@@ -18,37 +18,6 @@
         nerdctl_version: 2.0.3
       when: inventory_hostname in groups["containerd"]
 
-    - name: Install node_exporter
-      ansible.builtin.import_role:
-        name: prometheus.prometheus.node_exporter
-
-    - name: Install promtail
-      ansible.builtin.import_role:
-        name: patrickjahns.promtail
-      vars:
-        promtail_config_server:
-          http_listen_port: 9080
-          grpc_listen_port: 9081
-        promtail_config_clients:
-          - url: "http://10.0.0.2:3100/loki/api/v1/push"
-            external_labels:
-              host: "{{ ansible_hostname }}"
-        promtail_config_positions:
-          filename: "{{ promtail_positions_directory }}/positions.yaml"
-          sync_period: "60s"
-
-        promtail_config_scrape_configs:
-          - job_name: system_auth_logs
-            static_configs:
-              - targets:
-                  - localhost
-                labels:
-                  job: system_auth
-                  __path__: /var/log/laurel/audit.log
-
-    - name: Install laurel (audit log parser)
-      ansible.builtin.import_role:
-        name: ansible-auditd-laurel
-      vars:
-        laurel_user_allowed_read: promtail
-      become: true
+    - name: Monitoring tools setup
+      include_tasks: tasks/monitoring.yaml
+      when: inventory_hostname in groups["monitoring"]
