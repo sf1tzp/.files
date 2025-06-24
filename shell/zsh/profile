@@ -100,7 +100,8 @@ export FZF_CTRL_T_COMMAND=""
 source ~/.files/shell/zsh/zplug
 
 # aliases and command specific stuff
-source ~/.files/shell/aliases
+source "$HOME/.files/shell/aliases"
+source "$HOME/.files/shell/zsh/history"
 source "$HOME/.files/shell/scripts/download.sh"
 source "$HOME/.files/shell/scripts/worktrees.sh"
 
