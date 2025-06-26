@@ -39,7 +39,10 @@ services:
       - LISTEN_ADDR=0.0.0.0
     restart: unless-stopped
     volumes:
-      - loki_data:/data/loki
+      - loki_data:/loki
+      - ./config:/etc/loki
+    command:
+      - "--config.file=/etc/loki/loki-config.yaml"
 
   blackbox-exporter:
     image: prom/blackbox-exporter:latest
