@@ -115,3 +115,17 @@
   environment:
     PATH: "{{ ansible_env.HOME }}/.local/bin:{{ ansible_env.PATH }}"
     XDG_RUNTIME_DIR: "/run/user/{{ ansible_user_uid }}"
+
+- name: Get maximum UID from passwd
+  shell: "getent passwd | awk -F: '{print $3}' | sort -n | tail -1"
+  register: max_uid
+  become: false
+
+- name: Enable ping for rootless containers
+  sysctl:
+    name: net.ipv4.ping_group_range
+    value: "0 {{ max_uid.stdout }}"
+    state: present
+    sysctl_set: yes
+    reload: yes
+  become: true
