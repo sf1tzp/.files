@@ -1,0 +1,11 @@
+modules:
+  http:
+    prober: http
+    timeout: 5s
+    http:
+      preferred_ip_protocol: "ip4" # defaults to "ip6"
+  icmp:
+    prober: icmp
+    timeout: 5s
+    icmp:
+      preferred_ip_protocol: "ip4"

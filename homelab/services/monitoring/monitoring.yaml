@@ -41,6 +41,18 @@ services:
     volumes:
       - loki_data:/data/loki
 
+  blackbox-exporter:
+    image: prom/blackbox-exporter:latest
+    container_name: blackbox-exporter
+    ports:
+      - "${BLACKBOX_EXPORTER_PORT:-9115}:9115"
+    volumes:
+      - ./config:/etc/blackbox-exporter
+    command:
+      - "--config.file=/etc/blackbox-exporter/blackbox-config.yaml"
+      - "--web.listen-address=0.0.0.0:9115"
+      - "--web.external-url=http://0.0.0.0:9115"
+
 volumes:
   prometheus_data:
   grafana_data:

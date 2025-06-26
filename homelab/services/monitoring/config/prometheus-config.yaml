@@ -99,3 +99,22 @@ scrape_configs:
         regex: 10.0.0.99:9835
         replacement: win11
         target_label: instance
+
+  - job_name: "blackbox_ping"
+    scrape_interval: 30s
+    metrics_path: /probe
+    params:
+      module: [icmp]
+    static_configs:
+      - targets:
+          - 10.0.0.1
+          - google.com
+    relabel_configs:
+      # relabel instance to target
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      # then scrape the exporter endpoint
+      - target_label: __address__
+        replacement: 10.0.0.2:9115
