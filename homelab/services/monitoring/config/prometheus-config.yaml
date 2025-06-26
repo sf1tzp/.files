@@ -51,7 +51,7 @@ scrape_configs:
         replacement: en0
         target_label: ethernet_device
 
-  - job_name: "linux-vms"
+  - job_name: "linux_vms"
     static_configs:
       - targets:
           - 10.0.0.3:9100

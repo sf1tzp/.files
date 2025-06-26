@@ -2901,7 +2901,7 @@
                         "$__all"
                     ]
                 },
-                "definition": "query_result(up{job=\"linux-vms\"} == 1)",
+                "definition": "query_result(up{job=\"linux_vms\"} == 1)",
                 "hide": 2,
                 "includeAll": true,
                 "multi": true,
@@ -2909,7 +2909,7 @@
                 "options": [],
                 "query": {
                     "qryType": 3,
-                    "query": "query_result(up{job=\"linux-vms\"} == 1)",
+                    "query": "query_result(up{job=\"linux_vms\"} == 1)",
                     "refId": "PrometheusVariableQueryEditor-VariableQuery"
                 },
                 "refresh": 1,
