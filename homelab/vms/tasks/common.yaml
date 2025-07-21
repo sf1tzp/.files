@@ -120,5 +120,5 @@
   args:
     creates: /usr/local/nvim/bin/nvim
   vars:
-    nvim_version: "0.10.4"
+    nvim_version: "0.11.3"
   become: true

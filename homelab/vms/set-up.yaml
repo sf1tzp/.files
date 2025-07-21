@@ -15,7 +15,7 @@
     - name: Containerd (nerdctl) Set Up
       include_tasks: tasks/containerd.yaml
       vars:
-        nerdctl_version: 2.0.3
+        nerdctl_version: 2.1.3
       when: inventory_hostname in groups["containerd"]
 
     - name: Monitoring tools setup
