@@ -9,14 +9,14 @@
     libvirt_images: /var/lib/libvirt/images/
     vm_specs:
       - hostname: devbox
-        os: ubuntu-server
+        os: ubuntu-server-24.04
         vcpus: 8
         memory: 24
         ip: 10.0.0.3
         disk_size: 150G
         gpu_passthrough: false
       - hostname: llm-server
-        os: ubuntu-server
+        os: ubuntu-server-24.04
         vcpus: 4
         memory: 8
         ip: 10.0.0.4
@@ -27,12 +27,19 @@
         gpu_bus: "0x01"
         gpu_slot: "0x00"
       - hostname: lab-proxy
-        os: ubuntu-server
+        os: ubuntu-server-24.04
         vcpus: 2
         memory: 2
         ip: 10.0.0.5
         disk_size: 50G
         gpu_passthrough: false
+      - hostname: capm3-dev
+        os: ubuntu-server-22.04
+        vcpus: 8
+        memory: 24
+        ip: 10.0.0.6
+        disk_size: 150G
+        gpu_passthrugh: false
 
   tasks:
     - name: Checking if VMs exist
