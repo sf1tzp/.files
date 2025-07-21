@@ -27,6 +27,9 @@ vim.keymap.set('n', 'Q', '<Nop>', { noremap = true })
 vim.keymap.set('n', '<leader>R', 'q', { noremap = true, desc = 'Record macro' })
 vim.keymap.set('n', '<leader>P', 'Q', { noremap = true, desc = 'Play macro' })
 
+-- Don't yank when deleting
+vim.keymap.set("x", "p", function() return 'pgv"' .. vim.v.register .. "y" end, { remap = false, expr = true })
+
 -- Initialize Lazy Plugin Manager
 require("config.lazy")
 
