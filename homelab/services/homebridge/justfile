@@ -1,5 +1,5 @@
-start:
+up:
   nerdctl compose -f homebridge.yaml up  -d
 
-stop:
+down:
   nerdctl compose -f homebridge.yaml down
