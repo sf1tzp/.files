@@ -1,0 +1,9 @@
+up:
+  nerdctl compose -f penpot.yaml up -d
+
+down:
+  nerdctl compose -f penpot.yaml down
+
+logs *ARGS:
+  nerdctl compose -f penpot.yaml logs {{ARGS}}
+
