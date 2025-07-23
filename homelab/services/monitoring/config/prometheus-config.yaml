@@ -58,6 +58,10 @@ scrape_configs:
           - 10.0.0.4:9100
           - 10.0.0.5:9100
           - 10.0.0.6:9100
+          - 10.0.0.7:9100
+          # staging
+          - 10.0.0.21:9100
+          - 10.0.0.22:9100
     relabel_configs:
       - source_labels: [__address__]
         regex: 10.0.0.3:9100
@@ -74,6 +78,20 @@ scrape_configs:
       - source_labels: [__address__]
         regex: 10.0.0.6:9100
         replacement: capm3-dev
+        target_label: instance
+      - source_labels: [__address__]
+        regex: 10.0.0.7:9100
+        replacement: custom-image-builder
+        target_label: instance
+
+      # staging
+      - source_labels: [__address__]
+        regex: 10.0.0.21:9100
+        replacement: staging-1g
+        target_label: instance
+      - source_labels: [__address__]
+        regex: 10.0.0.22:9100
+        replacement: staging-2g
         target_label: instance
 
   - job_name: "windows_exporter"
@@ -112,7 +130,7 @@ scrape_configs:
       module: [icmp]
     static_configs:
       - targets:
-          - 10.0.0.1
+          - 10.0.0.2
           - google.com
     relabel_configs:
       # relabel instance to target
@@ -123,6 +141,33 @@ scrape_configs:
       # then scrape the exporter endpoint
       - target_label: __address__
         replacement: 10.0.0.1:9115
+
+  - job_name: "blackbox_http"
+    scrape_interval: 60s
+    metrics_path: /probe
+    params:
+      module: [http]
+    static_configs:
+      - targets:
+          - 10.0.0.21:5173
+          - 10.0.0.22:5173
+    relabel_configs:
+      # relabel instance to target
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      # then scrape the exporter endpoint
+      - target_label: __address__
+        replacement: 10.0.0.2:9115
+      - source_labels: [__param_target]
+        regex: 10.0.0.21:5173
+        replacement: staging-1g
+        target_label: instance
+      - source_labels: [__param_target]
+        regex: 10.0.0.22:5173
+        replacement: staging-2g
+        target_label: instance
 
   - job_name: "ollama_exporter"
     scrape_interval: 60s

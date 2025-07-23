@@ -13,8 +13,8 @@ resume vm:
 base-images:
     ansible-playbook vms/base-images.yaml
 
-create-linux:
-    ansible-playbook vms/create-linux.yaml --vault-password-file ~/.ansible-password
+create-linux +hosts:
+    ansible-playbook vms/create-linux.yaml --inventory ~/.files/homelab/inventory --vault-password-file ~/.ansible-password --extra-vars "target_vms={{ hosts }}"
 
 create-windows:
     ansible-playbook vms/create-windows.yaml

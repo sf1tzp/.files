@@ -5,7 +5,7 @@
   become: true
   tags: apt
 
-- name: Install required packages
+- name: Install apt packages
   apt:
     name:
       - gcc
@@ -15,6 +15,7 @@
       - tmux
       - unzip
       - zsh
+      - postgresql-client
     state: present
   become: true
   tags: apt
@@ -25,8 +26,6 @@
     dest: ~/.files
     version: main
   tags: dotfiles
-  args:
-    creates: ~/.files
   failed_when: false
 
 - name: Create directories in ~

@@ -1,0 +1,227 @@
+---
+# Custom Base Image Builder Playbook
+#
+# This playbook creates a custom base image with pre-installed homelab setup.
+# Tasks are organized into two main phases using Ansible tags:
+#
+# 'setup' tag: Installation and configuration tasks
+#   - Update package cache
+#   - Install common tools, containerd, NVIDIA drivers, monitoring tools
+#   - User configuration and environment setup
+#
+# 'finalize' tag: Cleanup and image preparation tasks
+#   - Clean package caches and temporary files
+#   - Clear logs, history, and system identifiers
+#   - Shutdown VM and convert to base image
+#
+# Usage with build-custom-image.sh:
+#   --setup      : Run only setup tasks (allows manual intervention)
+#   --finalize   : Run only finalization tasks (after manual changes)
+#   (default)    : Run both setup and finalize tags
+
+- name: Configure Custom Base Image with Pre-installed Setup
+  hosts: custom-base-builder
+  remote_user: "{{ target_username | default('steven') }}"
+  become: false
+  vars:
+    ansible_ssh_common_args: '-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+    user_home: /home/steven
+    base_image: "{{ base_image_name | default('ubuntu-server-24.04') }}"
+    custom_image_name: "{{ custom_image_name | default(base_image + '-custom') }}"
+    base_images: /var/lib/libvirt/images/bases
+
+    # Configuration for what to include in the custom image (can be overridden)
+    include_common: "{{ include_common | default(true) }}"
+    include_psql: "{{ include_psql | default(true) }}"
+    include_containerd: "{{ include_containerd | default(true) }}"
+    include_nvidia: "{{ include_nvidia | default(false) }}"
+    include_monitoring: "{{ include_monitoring | default(true) }}"
+
+    # Version variables
+    nerdctl_version: 2.1.3
+    nvidia_gpu_exporter_version: "1.3.2"
+    go_version: 1.24.2
+    nvim_version: "0.11.3"
+
+  tasks:
+    - name: Wait for system to be ready
+      wait_for_connection:
+        timeout: 300
+      tags:
+        - setup
+
+    - name: Update package cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+      become: true
+      tags:
+        - setup
+
+    - name: Common Setup Tasks
+      import_tasks: tasks/common.yaml
+      when: include_common | bool
+      tags:
+        - setup
+
+    - name: Postgres Tools Setup Tasks
+      import_tasks: tasks/postgres-tools.yaml
+      when: include_psql | bool
+      tags:
+        - setup
+
+    - name: Containerd Setup Tasks
+      import_tasks: tasks/containerd.yaml
+      when: include_containerd | bool
+      tags:
+        - setup
+
+    - name: NVIDIA Setup Tasks
+      import_tasks: tasks/nvidia.yaml
+      when: include_nvidia | bool
+      tags:
+        - setup
+
+    - name: Monitoring Setup Tasks
+      import_tasks: tasks/monitoring.yaml
+      when: include_monitoring | bool
+      tags:
+        - setup    # Implementation note: Tasks are now tagged with 'setup' and 'finalize' tags.
+    # Use build-custom-image.sh with --setup to run only setup tasks (allowing manual intervention)
+    # Use build-custom-image.sh with --finalize to run only finalization/packaging tasks
+    # By default, both setup and finalize tags are run
+
+- name: Finalize Custom Base Image
+  hosts: custom-base-builder
+  remote_user: "{{ target_username | default('steven') }}"
+  become: false
+  vars:
+    ansible_ssh_common_args: '-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+  tasks:
+    - name: Clean up package cache
+      apt:
+        autoclean: yes
+        autoremove: yes
+      become: true
+      tags:
+        - finalize
+
+    - name: Clear bash history
+      file:
+        path: "{{ item }}"
+        state: absent
+      with_items:
+        - "/home/{{ target_username | default('steven') }}/.bash_history"
+        - /root/.bash_history
+      become: true
+      tags:
+        - finalize
+
+    - name: Clear cloud-init logs and data
+      file:
+        path: "{{ item }}"
+        state: absent
+      with_items:
+        - /var/log/cloud-init.log
+        - /var/log/cloud-init-output.log
+        - /var/lib/cloud/instances
+        - /var/lib/cloud/instance
+      become: true
+      tags:
+        - finalize
+
+    - name: Clear SSH host keys (will be regenerated on first boot)
+      file:
+        path: "/etc/ssh/ssh_host_*"
+        state: absent
+      become: true
+      tags:
+        - finalize
+
+    - name: Clear machine-id (will be regenerated on first boot)
+      copy:
+        content: ""
+        dest: /etc/machine-id
+      become: true
+      tags:
+        - finalize
+
+    - name: Clear systemd journal logs
+      command: journalctl --vacuum-time=1s
+      become: true
+      tags:
+        - finalize
+
+    - name: Clean temporary files
+      shell: |
+        rm -rf /tmp/*
+        rm -rf /var/tmp/*
+        find /var/log -type f -exec truncate -s 0 {} \;
+      become: true
+      tags:
+        - finalize
+
+- name: Convert VM to Base Image
+  hosts: localhost
+  vars:
+    base_images: /var/lib/libvirt/images/bases
+    custom_image_name: "{{ custom_image_name | default('sf1tzp-24.04') }}"
+  tasks:
+    - name: Shutdown the VM
+      command: virsh shutdown custom-base-builder
+      tags:
+        - finalize
+
+    - name: Wait for VM to shutdown
+      command: virsh domstate custom-base-builder
+      register: vm_state
+      until: vm_state.stdout.strip() == "shut off"
+      retries: 30
+      delay: 10
+      tags:
+        - finalize
+
+    - name: Convert VM disk to custom base image
+      command: >
+        qemu-img convert -f qcow2 -O qcow2 -c
+        {{ base_images }}/custom-base-builder.qcow2
+        {{ base_images }}/{{ custom_image_name }}.qcow2
+      tags:
+        - finalize
+      become: true
+
+    - name: Display custom image information
+      command: qemu-img info {{ base_images }}/{{ custom_image_name }}.qcow2
+      register: image_info
+      tags:
+        - finalize
+
+    - name: Show completion message
+      debug:
+        msg: |
+          Custom base image created successfully!
+
+          Image location: {{ base_images }}/{{ custom_image_name }}.qcow2
+          Username: {{ target_username | default('steven') }}
+
+          Image details:
+          {{ image_info.stdout }}
+
+          This image includes:
+          {% if include_common -%}
+          - Common tools (git, tmux, zsh, rust, go, neovim, etc.)
+          {% endif -%}
+          {% if include_containerd -%}
+          - Containerd with nerdctl (rootless containers ready)
+          {% endif -%}
+          {% if include_nvidia -%}
+          - NVIDIA drivers and container toolkit
+          {% endif -%}
+          {% if include_monitoring -%}
+          - Monitoring tools (node_exporter, fluent-bit, laurel)
+          {% endif %}
+
+          To use this image in create-linux.yaml, set:
+          os: {{ custom_image_name }}
+      tags:
+        - finalize

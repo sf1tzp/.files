@@ -4,44 +4,112 @@
   vars:
     vault_password: "{{ lookup('env', 'ANSIBLE_VAULT_PASSWORD') }}"
     vm_passwords_file: "~/.homelab-passwords.yaml"
-    username: steven
     github_username: sf1tzp # used to import ssh authorized_keys
-    libvirt_images: /var/lib/libvirt/images/
-    vm_specs:
-      - hostname: devbox
+    libvirt_images: /var/lib/libvirt/images
+
+    # Default VM configuration for VMs not explicitly defined
+    default_vm_spec:
+      os: ubuntu-server-24.04
+      vcpus: 2
+      memory: 4
+      disk_size: 50G
+      gpu_passthrough: false
+
+    # Explicit VM specifications (override defaults)
+    vm_overrides:
+      devbox:
         os: ubuntu-server-24.04
         vcpus: 8
         memory: 24
-        ip: 10.0.0.3
         disk_size: 150G
         gpu_passthrough: false
-      - hostname: llm-server
+      llm-server:
         os: ubuntu-server-24.04
         vcpus: 4
         memory: 8
-        ip: 10.0.0.4
         disk_size: 150G
         gpu_passthrough: true
         # My GPU -> PCI: 0000:01:00.0
         gpu_domain: "0x0000"
         gpu_bus: "0x01"
         gpu_slot: "0x00"
-      - hostname: lab-proxy
+      lab-proxy:
         os: ubuntu-server-24.04
         vcpus: 2
         memory: 2
-        ip: 10.0.0.5
         disk_size: 50G
         gpu_passthrough: false
-      - hostname: capm3-dev
+      capm3-dev:
         os: ubuntu-server-22.04
         vcpus: 8
         memory: 24
-        ip: 10.0.0.6
         disk_size: 150G
-        gpu_passthrugh: false
+      custom-image-builder:
+        vcpus: 4
+        memory: 8
+        disk_size: 25G
+        os: ubuntu-server-24.04
+      staging-1g:
+        vcpus: 1
+        memory: 1
+        disk_size: 25G
+        username: steven
+        os: sf1tzp-24.04 # sf1tzp-24.04  # Custom image with pre-installed setup
+      staging-2g:
+        vcpus: 2
+        memory: 4
+        disk_size: 80G
+        username: steven
+        os: sf1tzp-24.04 # Custom staging image with symbology-staging user
 
   tasks:
+    - name: Parse target VMs from command line
+      set_fact:
+        target_vm_list: "{{ target_vms.split() if target_vms is defined else [] }}"
+
+    - name: Update custom-image-builder username if specified
+      set_fact:
+        vm_overrides: "{{ vm_overrides | combine({'custom-image-builder': vm_overrides['custom-image-builder'] | combine({'username': vm_username})}) }}"
+      when: vm_username is defined and 'custom-image-builder' in target_vm_list
+
+    - name: Build VM specs from inventory
+      set_fact:
+        vm_specs: >-
+          {{
+            vm_specs | default([]) + [{
+              'hostname': item,
+              'ip': hostvars[item]['ansible_host'],
+            } | combine(default_vm_spec) | combine(vm_overrides.get(item, {}))
+            ]
+          }}
+      loop: "{{ groups['vms'] }}"
+      loop_control:
+        label: "Building spec for {{ item }}"
+      when: target_vm_list | length == 0 or item in target_vm_list
+
+    - name: Add VMs defined in overrides but not in inventory
+      set_fact:
+        vm_specs: >-
+          {{
+            vm_specs + [{
+              'hostname': item.key,
+            } | combine(default_vm_spec) | combine(item.value)
+            ]
+          }}
+      loop: "{{ vm_overrides | dict2items }}"
+      loop_control:
+        label: "Adding {{ item.key }} from overrides"
+      when:
+        - item.key not in (groups['vms'] | default([]))
+        - target_vm_list | length == 0 or item.key in target_vm_list
+
+    - name: Display final VM specifications
+      debug:
+        msg: "VM {{ item.hostname }}: {{ item.vcpus }}vCPU, {{ item.memory }}GB RAM, {{ item.disk_size }} disk, OS: {{item.os}}, IP: {{ item.ip }}"
+      loop: "{{ vm_specs }}"
+      loop_control:
+        label: "{{ item.hostname }}"
+
     - name: Checking if VMs exist
       virt:
         name: "{{ item.hostname }}"
@@ -122,3 +190,12 @@
       with_items: "{{ vms_to_create }}"
       loop_control:
         label: "Defined {{ item.hostname }} libvirt domain"
+
+    - name: Start virtual machines
+      become: false
+      virt:
+        name: "{{ item.hostname }}"
+        state: running
+      with_items: "{{ vms_to_create }}"
+      loop_control:
+        label: "Started {{ item.hostname }}"

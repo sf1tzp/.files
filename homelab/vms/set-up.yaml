@@ -3,8 +3,9 @@
   hosts: all
 
   tasks:
-    - name: Dotfiles etc
+    - name: Common Set Up
       include_tasks: tasks/common.yaml
+      when: not inventory_hostname in groups["staging"]
 
     - name: Nvidia Driver Set Up
       include_tasks: tasks/nvidia.yaml

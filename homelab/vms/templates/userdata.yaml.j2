@@ -2,7 +2,7 @@
 hostname: {{ item.hostname }}
 
 users:
-  - name: {{ username | default("steven") }}
+  - name: {{ item.username | default("steven") }}
     groups: sudo
     sudo: ALL=(ALL) NOPASSWD:ALL
     shell: /bin/bash
@@ -11,5 +11,5 @@ users:
 
 chpasswd:
   list: |
-    {{ username | default("steven") }}:{{ user_password | mandatory }}
+    {{ item.username | default("steven") }}:{{ user_password | mandatory }}
   expire: false
