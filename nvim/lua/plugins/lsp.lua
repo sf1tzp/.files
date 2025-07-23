@@ -125,7 +125,6 @@ return {
           "prettier",
           "eslint_d",
           "goimports",
-          "ruff",
           "shellcheck",
           "shfmt",
         },
