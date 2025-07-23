@@ -109,3 +109,6 @@ if which virsh &>/dev/null; then
 	alias libvirt-hooks='cd /etc/libvirt/hooks/qemu.d'
 	alias libvirt-images='cd /var/lib/libvirt/images'
 fi
+
+# ex activates a weird vim mode which takes over normal editing in the terminal
+alias ex=''
