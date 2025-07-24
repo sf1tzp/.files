@@ -103,6 +103,14 @@ PROGRAMS = {
             mv just {install_dir}
             """,
     },
+    "k6": {
+        "version": "1.1.0",
+        "url_template": "https://github.com/grafana/k6/releases/download/v{version}/k6-v{version}-linux-amd64.tar.gz",
+        "setup_script": """#!/usr/bin/env bash
+            tar xzvf k6-v{version}-linux-amd64.tar.gz
+            mv k6-v{version}-linux-amd64 {install_dir}
+        """,
+    },
     "nerdctl": {
         "version": "2.0.3",
         "url_template": "https://github.com/containerd/nerdctl/releases/download/v{version}/nerdctl-full-{version}-linux-{arch}.tar.gz",
