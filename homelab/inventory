@@ -8,8 +8,8 @@ lab-proxy ansible_host=10.0.0.5
 capm3-dev ansible_host=10.0.0.6
 
 custom-image-builder ansible_host=10.0.0.7
-staging-1g ansible_host=10.0.0.21 ansible_user=symbology-staging
-staging-2g ansible_host=10.0.0.22 ansible_user=symbology-staging
+staging-1g ansible_host=10.0.0.21 ansible_user=steven
+staging-2g ansible_host=10.0.0.22 ansible_user=steven
 
 [nvidia]
 llm-server
@@ -27,6 +27,8 @@ devbox
 llm-server
 lab-proxy
 capm3-dev
+staging-1g
+staging-2g
 
 [staging]
 staging-1g

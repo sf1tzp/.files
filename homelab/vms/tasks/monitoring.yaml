@@ -18,6 +18,7 @@
       - ca-certificates
       - curl
       - gnupg
+      - lua-cjson
     state: present
   become: true
 
@@ -41,14 +42,18 @@
     update_cache: yes
   become: true
 
-- name: Ensure Fluent Bit configuration directory exists
+- name: Ensure Fluent Bit configuration directories exist
   file:
-    path: /etc/fluent-bit
+    path: "{{ item }}"
     state: directory
     mode: "0755"
   become: true
+  loop:
+    - /etc/fluent-bit
+    - /etc/fluent-bit/conf.d
+    - /etc/fluent-bit/parsers.d
 
-- name: Copy Fluent Bit YAML configuration
+- name: Copy main Fluent Bit YAML configuration
   template:
     src: fluent-bit.yaml.j2
     dest: /etc/fluent-bit/fluent-bit.yaml
@@ -56,13 +61,48 @@
   become: true
   register: fluent_bit_config
 
-- name: Copy Fluent Bit parsers YAML configuration
+- name: Copy main parsers configuration
   template:
-    src: parsers.yaml.j2
+    src: parsers-main.yaml.j2
     dest: /etc/fluent-bit/parsers.yaml
     mode: "0644"
   become: true
+  register: main_parsers_config
+
+- name: Copy base parsers YAML configuration
+  template:
+    src: parsers.yaml.j2
+    dest: /etc/fluent-bit/parsers.d/base.yaml
+    mode: "0644"
+  become: true
   register: parsers_config
+
+- name: Copy container logging configuration
+  template:
+    src: system-logs.yaml.j2
+    dest: /etc/fluent-bit/conf.d/containers.yaml
+    mode: "0644"
+  become: true
+  register: container_config
+
+- name: Copy Lua scripts for container log processing
+  template:
+    src: "{{ item }}"
+    dest: "/etc/fluent-bit/{{ item }}"
+    mode: "0644"
+  become: true
+  loop:
+    - process-container-logs.lua
+  register: lua_scripts
+
+- name: Deploy Fluent Bit service configuration helper script
+  copy:
+    src: fluent-bit-service-config.sh
+    dest: /usr/local/bin/fluent-bit-service-config
+    mode: "0755"
+    owner: root
+    group: root
+  become: true
 
 - name: Create Fluent Bit state directory
   file:
@@ -76,7 +116,7 @@
     name: fluent-bit
     state: restarted
   become: true
-  when: fluent_bit_config.changed or parsers_config.changed
+  when: fluent_bit_config.changed or main_parsers_config.changed or parsers_config.changed or container_config.changed or lua_scripts.changed
 
 - name: Enable and start Fluent Bit service
   systemd:

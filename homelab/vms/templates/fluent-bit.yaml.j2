@@ -1,35 +1,10 @@
+# Include service-specific configurations
+includes:
+  - /etc/fluent-bit/conf.d/*.yaml
+
 service:
   flush: 5
   daemon: off
   log_level: info
   parsers_file: /etc/fluent-bit/parsers.yaml
 
-pipeline:
-  inputs:
-    - name: tail
-      path: /var/log/laurel/audit.log
-      tag: audit.*
-      db: /var/lib/fluent-bit/audit.db
-      processors:
-        logs:
-          - name: content_modifier
-            action: extract
-            key: log
-            pattern: ^{"ID":"[\d.:]+","(?<action>\w+)":.*$
-
-  filters:
-    - name: parser
-      match: audit.*
-      key_name: log
-      parser: audit_json_parser
-      reserve_data: on
-
-  # Output to Loki
-  outputs:
-    - name: loki
-      match: audit.*
-      host: 10.0.0.2
-      port: 3100
-      labels: job=audit, host={{ inventory_hostname }}, action=$action
-      line_format: json
-      workers: 2

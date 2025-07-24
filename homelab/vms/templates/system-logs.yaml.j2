@@ -1,0 +1,58 @@
+---
+pipeline:
+  inputs:
+    # Container logs from rootless nerdctl
+    - name: tail
+      path: /home/*/.local/share/nerdctl/*/containers/default/*/*-json.log
+      tag: container.*
+      db: /var/lib/fluent-bit/container.db
+      parser: json
+      path_key: filepath
+      refresh_interval: 5
+
+  filters:
+    # Process container logs: extract info and add container name
+    - name: lua
+      match: container.*
+      script: /etc/fluent-bit/process-container-logs.lua
+      call: process_container_logs
+
+  outputs:
+    - name: loki
+      match: container.*
+      host: 10.0.0.2
+      port: 3100
+      # Parse log and add labels here
+      labels: job=container, host={{ inventory_hostname }}, container_name=$container_name, container_id=$container_id
+      line_format: json
+      workers: 2
+
+---
+pipeline:
+  inputs:
+    - name: tail
+      path: /var/log/laurel/audit.log
+      tag: audit.*
+      db: /var/lib/fluent-bit/audit.db
+      processors:
+        logs:
+          - name: content_modifier
+            action: extract
+            key: log
+            pattern: ^{"ID":"[\d.:]+","(?<action>\w+)":.*$
+
+  filters:
+    - name: parser
+      match: audit.*
+      key_name: log
+      parser: audit_json_parser
+      reserve_data: on
+
+  outputs:
+    - name: loki
+      match: audit.*
+      host: 10.0.0.2
+      port: 3100
+      labels: job=audit, host={{ inventory_hostname }}, action=$action
+      line_format: json
+      workers: 2
