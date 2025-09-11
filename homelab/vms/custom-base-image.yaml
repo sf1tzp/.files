@@ -20,7 +20,7 @@
 #   (default)    : Run both setup and finalize tags
 
 - name: Configure Custom Base Image with Pre-installed Setup
-  hosts: custom-base-builder
+  hosts: custom-image-builder
   remote_user: "{{ target_username | default('steven') }}"
   become: false
   vars:
@@ -32,7 +32,6 @@
 
     # Configuration for what to include in the custom image (can be overridden)
     include_common: "{{ include_common | default(true) }}"
-    include_psql: "{{ include_psql | default(true) }}"
     include_containerd: "{{ include_containerd | default(true) }}"
     include_nvidia: "{{ include_nvidia | default(false) }}"
     include_monitoring: "{{ include_monitoring | default(true) }}"
@@ -64,12 +63,6 @@
       tags:
         - setup
 
-    - name: Postgres Tools Setup Tasks
-      import_tasks: tasks/postgres-tools.yaml
-      when: include_psql | bool
-      tags:
-        - setup
-
     - name: Containerd Setup Tasks
       import_tasks: tasks/containerd.yaml
       when: include_containerd | bool
@@ -86,13 +79,23 @@
       import_tasks: tasks/monitoring.yaml
       when: include_monitoring | bool
       tags:
-        - setup    # Implementation note: Tasks are now tagged with 'setup' and 'finalize' tags.
-    # Use build-custom-image.sh with --setup to run only setup tasks (allowing manual intervention)
-    # Use build-custom-image.sh with --finalize to run only finalization/packaging tasks
-    # By default, both setup and finalize tags are run
+        - setup
+
+    - name: Place flag file in user home directory
+      template:
+        src: templates/flag.txt.j2
+        dest: "{{ user_home }}/flag.txt"
+        mode: '0644'
+        owner: "{{ target_username | default('steven') }}"
+        group: "{{ target_username | default('steven') }}"
+      become: true
+      vars:
+        reward_passphrase: "{{custom_image_name }}" # {{image-name}} {{built-on}} | base64 --encode
+      tags:
+        - setup
 
 - name: Finalize Custom Base Image
-  hosts: custom-base-builder
+  hosts: custom-image-builder
   remote_user: "{{ target_username | default('steven') }}"
   become: false
   vars:
@@ -164,16 +167,17 @@
 - name: Convert VM to Base Image
   hosts: localhost
   vars:
+    live_images: /var/lib/libvirt/images/
     base_images: /var/lib/libvirt/images/bases
     custom_image_name: "{{ custom_image_name | default('sf1tzp-24.04') }}"
   tasks:
     - name: Shutdown the VM
-      command: virsh shutdown custom-base-builder
+      command: virsh shutdown custom-image-builder
       tags:
         - finalize
 
     - name: Wait for VM to shutdown
-      command: virsh domstate custom-base-builder
+      command: virsh domstate custom-image-builder
       register: vm_state
       until: vm_state.stdout.strip() == "shut off"
       retries: 30
@@ -184,11 +188,11 @@
     - name: Convert VM disk to custom base image
       command: >
         qemu-img convert -f qcow2 -O qcow2 -c
-        {{ base_images }}/custom-base-builder.qcow2
+        {{ live_images }}/custom-image-builder.qcow2
         {{ base_images }}/{{ custom_image_name }}.qcow2
       tags:
         - finalize
-      become: true
+      become: false
 
     - name: Display custom image information
       command: qemu-img info {{ base_images }}/{{ custom_image_name }}.qcow2

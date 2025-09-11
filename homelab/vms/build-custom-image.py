@@ -23,7 +23,6 @@ class CustomImageBuilder:
         self.custom_name = ""
         self.username = "steven"
         self.include_common = True
-        self.include_psql = True
         self.include_containerd = True
         self.include_nvidia = False
         self.include_monitoring = True
@@ -87,13 +86,6 @@ You can then reference it in create-linux.yaml vm_specs as:
         )
 
         parser.add_argument(
-            "-p",
-            "--no-psql",
-            action="store_true",
-            help="Skip PostgreSQL tools installation",
-        )
-
-        parser.add_argument(
             "-c",
             "--no-containerd",
             action="store_true",
@@ -135,7 +127,6 @@ You can then reference it in create-linux.yaml vm_specs as:
         self.custom_name = args.name
         self.username = args.username
         self.include_common = not args.no_common
-        self.include_psql = not args.no_psql
         self.include_containerd = not args.no_containerd
         self.include_nvidia = args.nvidia
         self.include_monitoring = not args.no_monitoring
@@ -158,7 +149,6 @@ You can then reference it in create-linux.yaml vm_specs as:
         print(f"   Username: {self.username}")
         print(f"   Run tags: {','.join(self.run_tags)}")
         print(f"   Common tools: {self.include_common}")
-        print(f"   PostgreSQL tools: {self.include_psql}")
         print(f"   Containerd: {self.include_containerd}")
         print(f"   NVIDIA: {self.include_nvidia}")
         print(f"   Monitoring: {self.include_monitoring}")
@@ -293,8 +283,6 @@ You can then reference it in create-linux.yaml vm_specs as:
             f"target_username={self.username}",
             "-e",
             f"include_common={str(self.include_common).lower()}",
-            "-e",
-            f"include_psql={str(self.include_psql).lower()}",
             "-e",
             f"include_containerd={str(self.include_containerd).lower()}",
             "-e",
