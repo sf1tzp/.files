@@ -1,13 +1,11 @@
 ---
-# TODO: This could use a review & clean up
 - name: Install and configure Wireguard on homelab hosts
-  hosts: all # Note: This really only needs to be done for lab-proxy and remote clients
+  hosts: wireguard
   become: yes
   vars:
     vault_password: "{{ lookup('env', 'ANSIBLE_VAULT_PASSWORD') }}"
     wg_keys_file: "~/.homelab-wireguard-keys.yaml"
     wg_port: 51820
-    # Router public endpoint for external connections
     public_endpoint: "{{ lookup('env', 'WIREGUARD_PUBLIC_ENDPOINT') }}"
   tasks:
     # Install Wireguard
@@ -69,9 +67,36 @@
       delegate_to: localhost
       become: no
 
+    - name: Retrieve existing private key from vault
+      ansible.builtin.command:
+        cmd: yq -e '.wireguard.private_keys.{{ inventory_hostname }}' {{ wg_keys_file }}
+      register: existing_private_key
+      when: not private_key_not_set
+      delegate_to: localhost
+      become: no
+
+    - name: Decrypt existing private key
+      ansible.builtin.set_fact:
+        decrypted_private_key: "{{ existing_private_key.stdout | unvault(vault_password) }}"
+      when: not private_key_not_set
+
+    - name: Set private key fact for new key
+      ansible.builtin.set_fact:
+        current_private_key: "{{ wg_private_key.stdout }}"
+      when: private_key_not_set
+
+    - name: Set private key fact for existing key
+      ansible.builtin.set_fact:
+        current_private_key: "{{ decrypted_private_key }}"
+      when: not private_key_not_set
+
+    - name: Set private key for template
+      ansible.builtin.set_fact:
+        private_key: "{{ current_private_key }}"
+
     - name: Generate public key from private key
       ansible.builtin.shell:
-        cmd: echo '{{ wg_private_key }}' | wg pubkey
+        cmd: echo '{{ current_private_key }}' | wg pubkey
       register: wg_public_key
       delegate_to: localhost
       become: no
@@ -101,19 +126,13 @@
         state: directory
         mode: '0700'
 
-    # Determine IP address based on hostname from network.canvas
-    - name: Set Wireguard IP address based on hostname
+    # Set Wireguard interface address from inventory
+    - name: Set Wireguard interface address from inventory
       ansible.builtin.set_fact:
-        wg_ip: >-
-          {% if inventory_hostname == 'soundship' %}10.1.0.2{%
-          elif inventory_hostname == 'devbox' %}10.1.0.3{%
-          elif inventory_hostname == 'llm-server' %}10.1.0.4{%
-          elif inventory_hostname == 'lab-proxy' %}10.1.0.5{%
-          elif inventory_hostname == 'laptop' %}10.1.0.100{%
-          else %}10.1.0.254{% endif %}
+        wg_interface_addr: "{{ wg_addr | default('10.1.0.254') }}"
 
-    # Check if the host is the lab-proxy (endpoint for external connections)
-    - name: Set endpoint fact
+    # Determine if this host should act as an endpoint (lab-proxy only)
+    - name: Set endpoint configuration
       ansible.builtin.set_fact:
         is_endpoint: "{{ inventory_hostname == 'lab-proxy' }}"
 
