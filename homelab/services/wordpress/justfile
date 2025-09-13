@@ -1,0 +1,8 @@
+up:
+    nerdctl compose -f wordpress.yaml up -d
+
+down:
+    nerdctl compose -f wordpress.yaml down
+
+logs *ARGS:
+    nerdctl compose -f wordpress.yaml logs {{ARGS}}
