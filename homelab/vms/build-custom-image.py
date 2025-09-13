@@ -223,7 +223,7 @@ You can then reference it in create-linux.yaml vm_specs as:
                 "ansible-playbook",
                 "vms/create-linux.yaml",
                 "--inventory",
-                str(Path.home() / ".files/homelab/inventory"),
+                str(Path.home() / ".files/homelab/inventory.yaml"),
                 "--vault-password-file",
                 str(Path.home() / ".ansible-password"),
                 "--extra-vars",

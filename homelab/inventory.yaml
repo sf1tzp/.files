@@ -1,0 +1,116 @@
+---
+all:
+  children:
+    hypervisor:
+      hosts:
+        soundship:
+          ansible_host: 10.0.0.2
+
+    vms:
+      children:
+        devbox:
+          hosts:
+            devbox:
+              ansible_host: 10.0.0.3
+              os: "ubuntu-server-24.04"
+              vcpus: 8
+              memory: 24
+              disk_size: "150G"
+              gpu_passthrough: false
+              wg_addr: 10.1.0.3
+
+        llm-server:
+          hosts:
+            llm-server:
+              ansible_host: 10.0.0.4
+              os: "ubuntu-server-24.04"
+              vcpus: 4
+              memory: 8
+              disk_size: "150G"
+              gpu_passthrough: true
+              gpu_domain: "0x0000"
+              gpu_bus: "0x01"
+              gpu_slot: "0x00"
+
+        lab-proxy:
+          hosts:
+            lab-proxy:
+              ansible_host: 10.0.0.5
+              os: "ubuntu-server-24.04"
+              vcpus: 2
+              memory: 2
+              disk_size: "50G"
+              gpu_passthrough: false
+              wg_addr: 10.1.0.5
+
+        custom-image-builder:
+          hosts:
+            custom-image-builder:
+              ansible_host: 10.0.0.7
+              os: "ubuntu-server-24.04"
+              vcpus: 4
+              memory: 8
+              disk_size: "25G"
+              gpu_passthrough: false
+
+        staging-1g:
+          hosts:
+            staging-1g:
+              ansible_host: 10.0.0.21
+              os: "sf1tzp-24.04"
+              vcpus: 1
+              memory: 1
+              disk_size: "25G"
+              gpu_passthrough: false
+
+        staging-v2:
+          hosts:
+            staging-v2:
+              ansible_host: 10.0.0.22
+              ansible_user: steven
+              os: "sf1tzp-24.04"
+              vcpus: 1
+              memory: 1
+              disk_size: "25G"
+              gpu_passthrough: false
+
+        symbology-production:
+          hosts:
+            symbology-production:
+              ansible_host: symbology.online
+              ansible_user: deployer
+
+    nvidia:
+      children:
+        llm-server: {}
+
+    containerd:
+      children:
+        hypervisor: {}
+        devbox: {}
+        llm-server: {}
+        lab-proxy: {}
+        staging-1g: {}
+        staging-v2: {}
+        symbology-production: {}
+
+    monitoring:
+      children:
+        hypervisor: {}
+        devbox: {}
+        llm-server: {}
+        lab-proxy: {}
+        capm3-dev: {}
+        staging-1g: {}
+        staging-v2: {}
+        symbology-production: {}
+
+    wireguard:
+      children:
+        devbox: {}
+        lab-proxy: {}
+
+    staging:
+      children:
+        staging-1g: {}
+        staging-v2: {}
