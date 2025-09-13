@@ -3,74 +3,116 @@
     {
       "type": "text",
       "id": "d8a5749b-d6ad-4449-a0fd-e9f999a78630",
-      "x": 420,
-      "y": 760,
-      "width": 400,
-      "height": 280,
-      "text": "## Hypervisor (Soundship)\n\nhostname: soundship.lofi\n\ninterfaces:\n- eth0: 10.0.0.2\n\n"
+      "x": -460,
+      "y": 420,
+      "width": 580,
+      "height": 940,
+      "color": "3",
+      "text": "# Hypervisor\n\nhostname: soundship.lofi\n\ninterfaces:\n- eth0: 10.0.0.2"
     },
     {
       "type": "text",
       "id": "d7b98f5d-16d5-456d-a7ba-82a5e08f3b0d",
-      "x": -360,
-      "y": -240,
-      "width": 440,
-      "height": 520,
-      "text": "## lab-proxy\n\nhostname: homelab.lofi\n\ninterfaces:\n- eth0: 10.0.0.5\n- wg0: 10.1.0.1\n\nservices:\n- nginx\n- step-ca\n- dnsmasq\n\nnginx proxy pass\n- chat.homelab.lofi: open webui on llm-server\n- symbology.homelab.lofi: symbology-ui on devbox\n- pgadmin.homelab.lofi: pgadmin on devbox"
+      "x": -1080,
+      "y": 420,
+      "width": 560,
+      "height": 580,
+      "text": "# lab-proxy\n\nhostname: homelab.lofi\n\ninterfaces:\n- eth0: 10.0.0.5\n- wg0: 10.1.0.1\n\n> Note: Configure external devices wg AllowedIPs with the 10.0.0.0/24 subnet as needed\n\nservices:\n- nginx\n- step-ca\n- dnsmasq\n\nnginx proxy pass\n- chat.lofi: open webui on llm-server\n- symbology.lofi: staging-1g\n- grafana.lofi: grafana\n- prometheus.lofi: prometheus"
     },
     {
       "type": "text",
       "id": "651ac3bf-37b0-494c-80b9-feb6b660fb70",
-      "x": 500,
-      "y": 120,
+      "x": -1060,
+      "y": -20,
       "width": 260,
       "height": 340,
-      "text": "## devbox\n\nhostname: devbox.lofi\n\ninterfaces:\n- eth0: 10.0.0.3\n\nservices:\n- api port 8000\n- ui port 5173\n- postgres port 5432\n- pgadmin port 8080"
+      "text": "# devbox\n\nhostname: devbox.lofi\n\ninterfaces:\n- eth0: 10.0.0.3\n- wg0 10.1.0.3\n"
     },
     {
       "type": "text",
       "id": "ef8fa29a-af5f-4a03-8d9c-4564b5674c34",
-      "x": 1180,
-      "y": -200,
+      "x": -740,
+      "y": -20,
       "width": 260,
       "height": 340,
-      "text": "## llm-server\n\nhostname: llm.lofi\n\ninterfaces:\n- eth0: 10.0.0.4\n\nservices:\n- ollama port 11434\n- openwebui port 8080\n"
+      "text": "# llm-server\n\nhostname: llm.lofi\n\ninterfaces:\n- eth0: 10.0.0.4\n\nservices:\n- ollama port 11434\n- openwebui port 8080"
     },
     {
       "type": "text",
       "id": "3b50c64c-fa91-4a40-a518-4ba2c74836e5",
-      "x": -860,
-      "y": 300,
-      "width": 340,
-      "height": 140,
-      "text": "## lofi-router\n```\neth0: 10.0.0.1\npublic-dns: ****\n```"
+      "x": -2280,
+      "y": 980,
+      "width": 420,
+      "height": 380,
+      "color": "3",
+      "text": "# lofi-router\n```\neth0: 10.0.0.1\npublic-dns: ****\n```\n\n## Port forwarding\n- wireguard public *** -> 51280 on lab-proxy\n- logs *** -> 3100 on monitoring"
     },
     {
       "type": "text",
       "id": "fa5eba78-8e4d-456d-a059-9c71eb11f064",
-      "x": -812,
-      "y": 580,
-      "width": 240,
-      "height": 240,
-      "text": "## laptop\n\ninterfaces:\n- wg0: 10.1.0.100"
+      "x": -3440,
+      "y": 980,
+      "width": 400,
+      "height": 400,
+      "color": "3",
+      "text": "## macbook-air\n\ninterfaces:\n- wg0: 10.1.0.100"
     },
     {
       "type": "text",
       "id": "cb8e1f3b-4932-40b9-a1f9-834345d8b12f",
-      "x": 480,
-      "y": -260,
-      "width": 260,
-      "height": 80,
-      "text": "# The lofi Lab"
+      "x": -1980,
+      "y": -200,
+      "width": 480,
+      "height": 140,
+      "color": "4",
+      "text": "---\ntext-align: center\n---\n# The lofi Lab\n\n## Remote Access and Cloud Servers"
+    },
+    {
+      "type": "text",
+      "id": "24a84269-bee3-48f8-bce9-a330ab846469",
+      "x": -440,
+      "y": -20,
+      "width": 280,
+      "height": 340,
+      "text": "# staging-1g\n\nhostname: symbology.lofi\n\ninterfaces:\n- eth0: 10.0.0.21\n\nservices:\n- SSH\n-  API 8000\n-  UI 80/443\n-  DB 5432 (not exposed)"
+    },
+    {
+      "type": "text",
+      "id": "af59f2b9-68dc-4cc8-bd23-1afdabc2d95e",
+      "x": -3440,
+      "y": 360,
+      "width": 600,
+      "height": 360,
+      "color": "5",
+      "text": "# linode-llm-server\n\nwg: 10.1.0.20"
+    },
+    {
+      "type": "text",
+      "id": "10adab42-fb42-489e-9a10-2ce43bc646ec",
+      "x": -3440,
+      "y": 60,
+      "width": 600,
+      "height": 200,
+      "color": "5",
+      "text": "# symbology-production\n\nsymbology.online"
+    },
+    {
+      "type": "text",
+      "id": "e686504c-0f3f-4065-8d0c-0ade8a1898db",
+      "x": -1080,
+      "y": 1040,
+      "width": 560,
+      "height": 320,
+      "text": "# Monitoring \n\n- loki: 3100\n- grafana: 3000\n- prometheus: 9090"
     },
     {
       "type": "text",
       "id": "85f3aded-c0e4-435d-9749-5772d512681f",
-      "x": 1640,
-      "y": 220,
-      "width": 220,
-      "height": 180,
-      "text": "## win11\n\ninterfaces:\n- eth0: 10.0.0.99\n"
+      "x": -120,
+      "y": -20,
+      "width": 260,
+      "height": 340,
+      "text": "# win11\n\ninterfaces:\n- eth0: 10.0.0.99"
     }
   ],
   "edges": [
@@ -81,97 +123,93 @@
       "toNode": "d7b98f5d-16d5-456d-a7ba-82a5e08f3b0d",
       "toSide": "left",
       "toEnd": "arrow",
-      "label": "port-forward 24097 (wireguard)",
+      "color": "6",
+      "label": "port forward (wireguard)",
       "style": "solid",
-      "shape": "curved"
+      "shape": "stepped"
     },
     {
-      "id": "a8ccd92a-6398-44f2-99e1-92e8aa59e125",
+      "id": "a03c70da-12a3-4d81-b672-02e68a3c65ee",
       "fromNode": "fa5eba78-8e4d-456d-a059-9c71eb11f064",
       "fromSide": "top",
+      "toNode": "af59f2b9-68dc-4cc8-bd23-1afdabc2d95e",
+      "toSide": "bottom",
+      "toEnd": "arrow",
+      "color": "6",
+      "style": "solid",
+      "shape": "stepped"
+    },
+    {
+      "id": "5b73c577-acba-4260-b054-79a4d39a5b58",
+      "fromNode": "10adab42-fb42-489e-9a10-2ce43bc646ec",
+      "fromSide": "right",
       "toNode": "3b50c64c-fa91-4a40-a518-4ba2c74836e5",
-      "toSide": "bottom",
-      "toEnd": "arrow",
-      "label": "wireguard on port 24097",
-      "style": "solid",
-      "shape": "curved"
-    },
-    {
-      "id": "eac24cfa-9869-44ce-9924-a7fe3b54fe94",
-      "fromNode": "d7b98f5d-16d5-456d-a7ba-82a5e08f3b0d",
-      "fromSide": "right",
-      "toNode": "ef8fa29a-af5f-4a03-8d9c-4564b5674c34",
       "toSide": "left",
       "toEnd": "arrow",
-      "label": "proxy pass to open webui",
-      "style": "solid",
-      "shape": "curved"
-    },
-    {
-      "id": "0937f78b-90a9-4596-be73-ba216138d978",
-      "fromNode": "d8a5749b-d6ad-4449-a0fd-e9f999a78630",
-      "fromSide": "top",
-      "toNode": "d7b98f5d-16d5-456d-a7ba-82a5e08f3b0d",
-      "toSide": "bottom",
-      "toEnd": "arrow",
-      "label": "(kvm)",
-      "style": "dotted",
-      "shape": "curved"
-    },
-    {
-      "id": "2836d2f4-d32c-4fd8-b081-7c45fd386885",
-      "fromNode": "d8a5749b-d6ad-4449-a0fd-e9f999a78630",
-      "fromSide": "top",
-      "toNode": "ef8fa29a-af5f-4a03-8d9c-4564b5674c34",
-      "toSide": "bottom",
-      "toEnd": "arrow",
-      "label": "(kvm)",
-      "style": "dotted",
-      "shape": "curved"
-    },
-    {
-      "id": "d20f690c-53de-4620-b820-a199492d7737",
-      "fromNode": "d8a5749b-d6ad-4449-a0fd-e9f999a78630",
-      "fromSide": "top",
-      "toNode": "651ac3bf-37b0-494c-80b9-feb6b660fb70",
-      "toSide": "bottom",
-      "toEnd": "arrow",
-      "label": "(kvm)",
-      "style": "dotted",
-      "shape": "curved"
-    },
-    {
-      "id": "d654ea69-8b01-422e-9f00-89a2838bb31c",
-      "fromNode": "651ac3bf-37b0-494c-80b9-feb6b660fb70",
-      "fromSide": "right",
-      "toNode": "ef8fa29a-af5f-4a03-8d9c-4564b5674c34",
-      "toSide": "left",
-      "toEnd": "arrow",
-      "label": "api calls to ollama",
+      "color": "2",
+      "label": "logging on port 3100",
       "style": "dashed",
       "shape": "curved"
     },
     {
-      "id": "1cd09a5e-6a66-424c-b982-4e9b96403c2b",
-      "fromNode": "d7b98f5d-16d5-456d-a7ba-82a5e08f3b0d",
-      "fromSide": "right",
-      "toNode": "651ac3bf-37b0-494c-80b9-feb6b660fb70",
+      "id": "fe5b3576-b1e5-4cbf-9514-215fbe90f011",
+      "fromNode": "651ac3bf-37b0-494c-80b9-feb6b660fb70",
+      "fromSide": "left",
+      "toNode": "af59f2b9-68dc-4cc8-bd23-1afdabc2d95e",
+      "toSide": "right",
+      "toEnd": "arrow",
+      "color": "6",
+      "label": "Ollama API (wireguard)",
+      "style": "solid",
+      "shape": "stepped"
+    },
+    {
+      "id": "78038303-df98-4241-8478-2376a11a715b",
+      "fromNode": "fa5eba78-8e4d-456d-a059-9c71eb11f064",
+      "fromSide": "top",
+      "toNode": "3b50c64c-fa91-4a40-a518-4ba2c74836e5",
       "toSide": "left",
       "toEnd": "arrow",
-      "label": "proxy pass to ui & pgadmin",
+      "color": "6",
+      "label": "wireguard on port 24097",
       "style": "solid",
+      "shape": "stepped"
+    },
+    {
+      "id": "3aa6b4e9-02a0-47d6-854f-920c976557c3",
+      "fromNode": "af59f2b9-68dc-4cc8-bd23-1afdabc2d95e",
+      "fromSide": "right",
+      "toNode": "3b50c64c-fa91-4a40-a518-4ba2c74836e5",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "color": "2",
+      "label": "External Logging",
+      "style": "dashed",
       "shape": "curved"
     },
     {
-      "id": "795622b9-57eb-41f4-92bf-cccf8ec3f01d",
-      "fromNode": "d8a5749b-d6ad-4449-a0fd-e9f999a78630",
-      "fromSide": "top",
-      "toNode": "85f3aded-c0e4-435d-9749-5772d512681f",
-      "toSide": "bottom",
+      "id": "3f49b1e0-455e-4ef0-b259-1ae0ea5fd72a",
+      "fromNode": "3b50c64c-fa91-4a40-a518-4ba2c74836e5",
+      "fromSide": "right",
+      "toNode": "e686504c-0f3f-4065-8d0c-0ade8a1898db",
+      "toSide": "left",
       "toEnd": "arrow",
-      "label": "kvm",
-      "style": "dotted",
+      "color": "2",
+      "label": "port forward Logging",
+      "style": "dashed",
       "shape": "curved"
+    },
+    {
+      "id": "8de1d02e-419e-439b-9e00-2f4c0edf2157",
+      "fromNode": "651ac3bf-37b0-494c-80b9-feb6b660fb70",
+      "fromSide": "left",
+      "toNode": "10adab42-fb42-489e-9a10-2ce43bc646ec",
+      "toSide": "right",
+      "toEnd": "arrow",
+      "color": "4",
+      "label": "SSH",
+      "style": "dashed",
+      "shape": "stepped"
     }
   ]
 }
