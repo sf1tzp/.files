@@ -6,6 +6,8 @@ Software Engineer in Seattle, WA
 *[linkedin](https://www.linkedin.com/in/sf1tzp/)
 [github](https://www.github.com/sf1tzp/)*
 
+Hello!
+
 ## Symbology Online - Open Source, LLM Generated Insights from SEC Filings
 ### From: March 2025 - Present
 ### Description
@@ -37,7 +39,7 @@ Along the way, I:
 - Was frequently assigned feature ownership and led development efforts up & down the stack.
 - Mentored and encouraged knowledge sharing with at least 5 scheduled 'lunch-and-learn' style deep-dives into various domain specific topics.
 - Helped establish service level indicators and objectives for server & cluster lifecycle actions.
-  - Target logging enhancements drove time-to-identify down immensely during lifecycle actions.
+  - Targeted logging enhancements drove time-to-identify down immensely during lifecycle actions.
   - Developed state-transition dashboard widgets to illustrate lifecycle action progress / status.
   - Worked with cross-team contacts to correlate logging between various management API services and the platform.
 
