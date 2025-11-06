@@ -1,11 +1,20 @@
 modules:
-  http:
+  https_2xx:
     prober: http
     timeout: 5s
     http:
-      preferred_ip_protocol: "ip4" # defaults to "ip6"
+      headers:
+        User-Agent: Blackbox-Exporter
+      tls_config:
+        insecure_skip_verify: false
+      fail_if_not_ssl: true
+  http_2xx:
+    prober: http
+    timeout: 5s
+    http:
+      headers:
+        User-Agent: Blackbox-Exporter
   icmp:
     prober: icmp
     timeout: 5s
     icmp:
-      preferred_ip_protocol: "ip4"

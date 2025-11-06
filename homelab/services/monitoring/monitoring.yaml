@@ -4,6 +4,7 @@ services:
     container_name: prometheus
     ports:
       - "${PROMETHEUS_PORT:-9090}:9090"
+    restart: unless-stopped
     volumes:
       - ./config:/etc/prometheus
       - prometheus_data:/prometheus
@@ -13,7 +14,6 @@ services:
       - "--web.listen-address=0.0.0.0:9090"
       - "--web.external-url=http://0.0.0.0:9090"
 
-    restart: unless-stopped
 
   grafana:
     image: grafana/grafana:latest
@@ -49,6 +49,7 @@ services:
     container_name: blackbox-exporter
     ports:
       - "${BLACKBOX_EXPORTER_PORT:-9115}:9115"
+    restart: unless-stopped
     volumes:
       - ./config:/etc/blackbox-exporter
     command:
