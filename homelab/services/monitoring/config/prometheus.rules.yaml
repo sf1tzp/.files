@@ -1,0 +1,6 @@
+groups:
+  - name: symbology
+    rules:
+      - alert: https_status
+        expr: probe_success{job="https_from_soundship", instance="https://symbology.online"} == 0
+        for: 5m

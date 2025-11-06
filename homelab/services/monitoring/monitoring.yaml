@@ -9,11 +9,21 @@ services:
       - ./config:/etc/prometheus
       - prometheus_data:/prometheus
     command:
-      - "--config.file=/etc/prometheus/prometheus-config.yaml"
+      - "--config.file=/etc/prometheus/prometheus.yaml"
       - "--storage.tsdb.path=/prometheus"
       - "--web.listen-address=0.0.0.0:9090"
-      - "--web.external-url=http://0.0.0.0:9090"
+      - "--web.external-url=http://10.0.0.2:9090"
 
+  alertmanager:
+    image: prom/alertmanager
+    container_name: alertmanager
+    ports:
+      - "9093:9093"
+    restart: unless-stopped
+    volumes:
+      - ./config:/etc/alertmanager
+    command:
+      - "--config.file=/etc/alertmanager/alertmanager.yaml"
 
   grafana:
     image: grafana/grafana:latest
@@ -55,7 +65,6 @@ services:
     command:
       - "--config.file=/etc/blackbox-exporter/blackbox-config.yaml"
       - "--web.listen-address=0.0.0.0:9115"
-      - "--web.external-url=http://0.0.0.0:9115"
 
 volumes:
   prometheus_data:
