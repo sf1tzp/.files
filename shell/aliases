@@ -23,6 +23,7 @@ alias cim=vim
 alias clera="clear"
 alias get='git'
 alias udo='sudo'
+alias mc='mv'
 
 # command specific aliases
 if which bat &>/dev/null; then
