@@ -111,5 +111,9 @@ if which virsh &>/dev/null; then
 	alias libvirt-images='cd /var/lib/libvirt/images'
 fi
 
+if which buildctl &>/dev/null; then
+  alias buildctl='buildctl --addr unix:///run/user/1000/buildkit/buildkitd.sock'
+fi
+
 # ex activates a weird vim mode which takes over normal editing in the terminal
 alias ex=''
