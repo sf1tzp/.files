@@ -1,3 +1,5 @@
 **/.DS_Store
 
 .vscode
+
+homelab/services/monitoring/config/discord_webhook_url

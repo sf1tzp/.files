@@ -67,6 +67,7 @@ scrape_configs:
           - 10.0.0.22:9100
           - 10.0.0.24:9100
           - symbology.online:9100
+          - fitz.gg:9100
     relabel_configs:
       - source_labels: [__address__]
         regex: 10.0.0.3:9100
@@ -91,6 +92,10 @@ scrape_configs:
       - source_labels: [__address__]
         regex: symbology.online:9100
         replacement: symbology-production
+        target_label: instance
+      - source_labels: [__address__]
+        regex: fitz.gg:9100
+        replacement: fitz.gg-production
         target_label: instance
 
       # staging
@@ -165,6 +170,9 @@ scrape_configs:
     static_configs:
       - targets:
           - https://symbology.online
+          - https://fitz.gg
+          - https://dial-in.fitz.gg
+          - https://sketches.fitz.gg
 
     relabel_configs:
       # relabel instance to target
