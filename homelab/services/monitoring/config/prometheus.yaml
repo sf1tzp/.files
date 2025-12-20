@@ -78,14 +78,6 @@ scrape_configs:
         replacement: llm-server
         target_label: instance
       - source_labels: [__address__]
-        regex: 10.0.0.5:9100
-        replacement: lab-proxy
-        target_label: instance
-      - source_labels: [__address__]
-        regex: 10.0.0.6:9100
-        replacement: capm3-dev
-        target_label: instance
-      - source_labels: [__address__]
         regex: 10.0.0.7:9100
         replacement: custom-image-builder
         target_label: instance
