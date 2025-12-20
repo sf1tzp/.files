@@ -1,8 +1,0 @@
-up:
-    nerdctl compose -f lab-proxy.yaml up -d
-
-down:
-    nerdctl compose -f lab-proxy.yaml down
-
-logs *ARGS:
-    nerdctl compose -f lab-proxy.yaml logs {{ARGS}}

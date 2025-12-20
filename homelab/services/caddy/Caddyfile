@@ -1,0 +1,143 @@
+{
+    email tech@stev.lol
+
+    acme_ca https://step-ca.lofi:9000/acme/acme/directory
+    # acme_ca_root /step-ca-data/certs/root_ca.crt
+}
+
+grafana.lofi {
+    header {
+        # Prevent clickjacking
+        X-Frame-Options "SAMEORIGIN"
+        # XSS protection
+        X-Content-Type-Options "nosniff"
+        # Referrer policy
+        Referrer-Policy "strict-origin-when-cross-origin"
+        # Remove server header for security
+        -Server
+    }
+    encode gzip zstd
+
+    log {
+        output file /var/log/caddy/grafana.log {
+            roll_size 100mb
+            roll_keep 5
+            roll_keep_for 720h
+        }
+        format json
+    }
+
+    reverse_proxy 10.0.0.2:3000 {
+        # Timeouts
+        transport http {
+            dial_timeout 5s
+            response_header_timeout 10s
+        }
+
+        # Pass real client IP
+        header_up X-Real-IP {remote_host}
+    }
+}
+
+prometheus.lofi {
+    header {
+        # Prevent clickjacking
+        X-Frame-Options "SAMEORIGIN"
+        # XSS protection
+        X-Content-Type-Options "nosniff"
+        # Referrer policy
+        Referrer-Policy "strict-origin-when-cross-origin"
+        # Remove server header for security
+        -Server
+    }
+    encode gzip zstd
+
+    log {
+        output file /var/log/caddy/prometheus.log {
+            roll_size 100mb
+            roll_keep 5
+            roll_keep_for 720h
+        }
+        format json
+    }
+
+    reverse_proxy 10.0.0.2:9090 {
+        # Timeouts
+        transport http {
+            dial_timeout 5s
+            response_header_timeout 10s
+        }
+
+        # Pass real client IP
+        header_up X-Real-IP {remote_host}
+    }
+}
+
+llm.lofi {
+    header {
+        # Prevent clickjacking
+        X-Frame-Options "SAMEORIGIN"
+        # XSS protection
+        X-Content-Type-Options "nosniff"
+        # Referrer policy
+        Referrer-Policy "strict-origin-when-cross-origin"
+        # Remove server header for security
+        -Server
+    }
+    encode gzip zstd
+
+    log {
+        output file /var/log/caddy/ollama.lofi.log {
+            roll_size 100mb
+            roll_keep 5
+            roll_keep_for 720h
+        }
+        format json
+    }
+
+    reverse_proxy 10.0.0.4:11434 {
+        # Timeouts
+        transport http {
+            dial_timeout 5s
+            response_header_timeout 10s
+        }
+
+        # Pass real client IP
+        header_up X-Real-IP {remote_host}
+    }
+}
+
+
+chat.lofi {
+    header {
+        # Prevent clickjacking
+        X-Frame-Options "SAMEORIGIN"
+        # XSS protection
+        X-Content-Type-Options "nosniff"
+        # Referrer policy
+        Referrer-Policy "strict-origin-when-cross-origin"
+        # Remove server header for security
+        -Server
+    }
+    encode gzip zstd
+
+    log {
+        output file /var/log/caddy/open-web-ui.log {
+            roll_size 100mb
+            roll_keep 5
+            roll_keep_for 720h
+        }
+        format json
+    }
+
+    reverse_proxy 10.0.0.4:3000 {
+        # Timeouts
+        transport http {
+            dial_timeout 5s
+            response_header_timeout 10s
+        }
+
+        # Pass real client IP
+        header_up X-Real-IP {remote_host}
+    }
+}

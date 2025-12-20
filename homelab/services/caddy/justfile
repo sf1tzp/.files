@@ -1,0 +1,11 @@
+up:
+    nerdctl compose -f caddy-compose.yaml up -d
+
+down:
+    nerdctl compose -f caddy-compose.yaml down
+
+logs *ARGS:
+    nerdctl compose -f caddy-compose.yaml logs {{ARGS}}
+
+reload:
+    nerdctl exec -it caddy-server -- caddy reload --config /etc/caddy/Caddyfile

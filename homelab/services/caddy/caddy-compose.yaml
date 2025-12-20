@@ -1,0 +1,68 @@
+services:
+  caddy:
+    container_name: caddy-server
+    image: caddy:2.10-alpine
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+
+      # Certificate storage (IMPORTANT - preserves SSL certs across restarts)
+      - caddy-data:/data # Certificates stored here
+
+      # Config cache (optional but recommended)
+      - caddy-config:/config
+      - step-ca-data:/step-ca-data:ro
+    environment:
+      - SSL_CERT_DIR=/step-ca-data/certs
+
+      # Optional: If serving static files
+      # - ./site:/srv
+    networks:
+      - lofi-lab-network
+    depends_on:
+      - step-ca
+
+  step-ca:
+    container_name: step-ca-server
+    image: smallstep/step-ca:0.29.0
+    ports:
+      - 9000:9000
+    volumes:
+      - step-ca-data:/home/step
+    environment:
+      - DOCKER_STEPCA_INIT_NAME=lofi lab CA
+      - DOCKER_STEPCA_INIT_DNS_NAMES=step-ca,localhost,127.0.0.1,step-ca.lofi,step-ca-server
+      - DOCKER_STEPCA_INIT_PROVISIONER_NAME=admin
+      - DOCKER_STEPCA_INIT_PASSWORD=your-secure-password-here
+      - DOCKER_STEPCA_INIT_ACME=true
+    networks:
+      lofi-lab-network:
+        aliases:
+          - step-ca.lofi
+
+  # dnsmasq:
+  #   container_name: dnsmasq-server
+  #   image: openeuler/dnsmasq:2.91-oe2403sp1
+  #   command: ["dnsmasq", "--no-daemon", "--log-queries", "--log-facility=-"]
+  #   network_mode: host
+  #   ports:
+  #     - 53:53/udp
+  #     - 53:53/tcp
+  #   volumes:
+  #     - ./dnsmasq.conf:/etc/dnsmasq.conf
+  #   cap_add:
+  #     - NET_ADMIN
+
+volumes:
+  # Persists SSL certificates - DO NOT DELETE
+  caddy-data:
+  # Persists Caddy configuration cache
+  caddy-config:
+  step-ca-data:
+
+networks:
+  lofi-lab-network:
+    driver: bridge
