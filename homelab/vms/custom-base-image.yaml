@@ -19,13 +19,32 @@
 #   --finalize   : Run only finalization tasks (after manual changes)
 #   (default)    : Run both setup and finalize tags
 
-- name: Configure Custom Base Image with Pre-installed Setup
+- name: Create target user
+  hosts: custom-image-builder
+  remote_user: "{{ default_os_username  | default('ubuntu') }}"
+  become: false
+  vars:
+    ansible_ssh_common_args: '-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+
+  tasks:
+    - name: Wait for system to be ready
+      wait_for_connection:
+        timeout: 300
+      tags:
+        - setup
+
+    - name: Set up users
+      become: true
+      import_tasks: tasks/users.yaml
+      tags:
+        - setup
+
+- name: Set up for {{target_username}}
   hosts: custom-image-builder
   remote_user: "{{ target_username | default('steven') }}"
   become: false
   vars:
     ansible_ssh_common_args: '-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
-    user_home: /home/steven
     base_image: "{{ base_image_name | default('ubuntu-server-24.04') }}"
     custom_image_name: "{{ custom_image_name | default(base_image + '-custom') }}"
     base_images: /var/lib/libvirt/images/bases
@@ -43,48 +62,34 @@
     nvim_version: "0.11.3"
 
   tasks:
-    - name: Wait for system to be ready
-      wait_for_connection:
-        timeout: 300
-      tags:
-        - setup
-
-    - name: Update package cache
-      apt:
-        update_cache: yes
-        cache_valid_time: 3600
-      become: true
-      tags:
-        - setup
-
     - name: Common Setup Tasks
       import_tasks: tasks/common.yaml
       when: include_common | bool
       tags:
         - setup
 
-    - name: Containerd Setup Tasks
-      import_tasks: tasks/containerd.yaml
-      when: include_containerd | bool
-      tags:
-        - setup
+    # - name: Containerd Setup Tasks
+    #   import_tasks: tasks/containerd.yaml
+    #   when: include_containerd | bool
+    #   tags:
+    #     - setup
 
-    - name: NVIDIA Setup Tasks
-      import_tasks: tasks/nvidia.yaml
-      when: include_nvidia | bool
-      tags:
-        - setup
+    # - name: NVIDIA Setup Tasks
+    #   import_tasks: tasks/nvidia.yaml
+    #   when: include_nvidia | bool
+    #   tags:
+    #     - setup
 
-    - name: Monitoring Setup Tasks
-      import_tasks: tasks/monitoring.yaml
-      when: include_monitoring | bool
-      tags:
-        - setup
+    # - name: Monitoring Setup Tasks
+    #   import_tasks: tasks/monitoring.yaml
+    #   when: include_monitoring | bool
+    #   tags:
+    #     - setup
 
     - name: Place flag file in user home directory
       template:
         src: templates/flag.txt.j2
-        dest: "{{ user_home }}/flag.txt"
+        dest: "/home/{{ target_username }}/flag.txt"
         mode: '0644'
         owner: "{{ target_username | default('steven') }}"
         group: "{{ target_username | default('steven') }}"
@@ -93,6 +98,12 @@
         reward_passphrase: "{{custom_image_name }}" # {{image-name}} {{built-on}} | base64 --encode
       tags:
         - setup
+
+    # - name: Install NGINX
+    #   ansible.builtin.include_role:
+    #     name: nginxinc.nginx
+    #   tags:
+    #     - setup
 
 - name: Finalize Custom Base Image
   hosts: custom-image-builder
@@ -161,6 +172,33 @@
         rm -rf /var/tmp/*
         find /var/log -type f -exec truncate -s 0 {} \;
       become: true
+      tags:
+        - finalize
+
+    - name: Remove passwordless sudo
+      become: true
+      lineinfile:
+        path: /etc/sudoers.d/{{ target_username }}
+        line: "{{ target_username }} ALL=(ALL) NOPASSWD:ALL"
+        state: absent
+        mode: "0440"
+        create: true
+        validate: "visudo -cf %s"
+      tags:
+        - finalize
+
+    - name: Get group data from target user
+      user:
+        name: "{{ target_username  }}"
+        state: present
+      register: user_data
+      tags:
+        - finalize
+
+    - name: remove target user from sudo group
+      become: true
+      command: "gpasswd -d {{ target_username }} sudo"
+      # when: user_data.groups is defined and 'sudo' in user_data.groups
       tags:
         - finalize
 
