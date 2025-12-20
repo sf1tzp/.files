@@ -116,6 +116,16 @@
     PATH: "{{ ansible_env.HOME }}/.local/bin:{{ ansible_env.PATH }}"
     XDG_RUNTIME_DIR: "/run/user/{{ ansible_user_uid }}"
 
+- name: Setup rootless containers bypass4netnsd
+  # containers annotated with "nerdctl/bypass4netns=true" will use this feature
+  command: ~/.local/bin/containerd-rootless-setuptool.sh install-bypass4netnsd
+  args:
+    creates: "{{ ansible_env.HOME }}/.config/systemd/user/bypass4netnsd.service"
+  become: false
+  environment:
+    PATH: "{{ ansible_env.HOME }}/.local/bin:{{ ansible_env.PATH }}"
+    XDG_RUNTIME_DIR: "/run/user/{{ ansible_user_uid }}"
+
 - name: Get maximum UID from passwd
   shell: "getent passwd | awk -F: '{print $3}' | sort -n | tail -1"
   register: max_uid
@@ -125,6 +135,15 @@
   sysctl:
     name: net.ipv4.ping_group_range
     value: "0 {{ max_uid.stdout }}"
+    state: present
+    sysctl_set: yes
+    reload: yes
+  become: true
+
+- name: Enable rootless containers to use system ports
+  sysctl:
+    name: net.ipv4.ip_unprivileged_port_start
+    value: "80"
     state: present
     sysctl_set: yes
     reload: yes
