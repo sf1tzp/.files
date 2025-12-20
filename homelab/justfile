@@ -31,6 +31,9 @@ decrypt-vm-password:
 set-up +hosts:
     ansible-playbook vms/set-up.yaml --inventory ~/.files/homelab/inventory.yaml --limit "{{ hosts }}"
 
+bootstrap +hosts:
+    ansible-playbook vms/bootstrap-deployer.yaml --inventory ~/.files/homelab/inventory.yaml --limit "{{ hosts }}"
+
 wireguard +hosts="all":
     ansible-playbook vms/wireguard.yaml --inventory ~/.files/homelab/inventory.yaml --limit "{{ hosts }}" --vault-password-file ~/.ansible-password
 

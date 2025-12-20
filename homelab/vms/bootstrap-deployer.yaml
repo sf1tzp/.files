@@ -1,0 +1,45 @@
+---
+- name: Create a non-root deployer user
+  hosts: fitz.gg-production
+  remote_user: root
+  become: true
+  gather_facts: true
+
+  tasks:
+    - name: Create deployer user
+      user:
+        name: deployer
+        comment: "Deployment user for Symbology application"
+        shell: /bin/bash
+        create_home: true
+        groups: sudo
+        append: true
+
+    - name: Set up SSH authorized keys for deployer user
+      authorized_key:
+        user: deployer
+        state: present
+        key: "https://github.com/sf1tzp.keys"
+
+    - name: Allow deployer user to sudo without password
+      lineinfile:
+        path: /etc/sudoers.d/deployer
+        line: "deployer ALL=(ALL) NOPASSWD:ALL"
+        state: present
+        mode: "0440"
+        create: true
+        validate: "visudo -cf %s"
+
+    - name: Run set-up playbook
+      delegate_to: localhost
+      become: false
+      shell: ansible-playbook ~/.files/homelab/vms/set-up.yaml --inventory ~/.files/homelab/inventory.yaml --limit fitz.gg-production
+
+    - name: Allow deployer user to sudo without password
+      lineinfile:
+        path: /etc/sudoers.d/deployer
+        line: "deployer ALL=(ALL) NOPASSWD:ALL"
+        state: present
+        mode: "0440"
+        create: true
+        validate: "visudo -cf %s"

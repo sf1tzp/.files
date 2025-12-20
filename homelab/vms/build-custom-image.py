@@ -290,7 +290,7 @@ You can then reference it in create-linux.yaml vm_specs as:
             "-e",
             f"include_monitoring={str(self.include_monitoring).lower()}",
             "--inventory",
-            "../inventory",
+            str(Path.home() / ".files/homelab/inventory.yaml"),
         ]
 
         # Only limit to custom-image-builder for setup tasks

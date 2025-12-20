@@ -32,17 +32,6 @@ all:
               gpu_bus: "0x01"
               gpu_slot: "0x00"
 
-        lab-proxy:
-          hosts:
-            lab-proxy:
-              ansible_host: 10.0.0.5
-              os: "ubuntu-server-24.04"
-              vcpus: 2
-              memory: 2
-              disk_size: "50G"
-              gpu_passthrough: false
-              wg_addr: 10.1.0.5
-
         custom-image-builder:
           hosts:
             custom-image-builder:
@@ -50,8 +39,19 @@ all:
               os: "ubuntu-server-24.04"
               vcpus: 4
               memory: 8
-              disk_size: "25G"
               gpu_passthrough: false
+              disk_size: "25G"
+
+        image-test:
+          hosts:
+            image-test:
+              ansible_host: 10.0.0.30
+              ansible_user: deployer
+              os: sudoless-test2
+              vcpus: 2
+              memory: 2
+              gpu_passthrough: false
+              disk_size: "25G"
 
         staging-1g:
           hosts:
@@ -80,6 +80,12 @@ all:
               ansible_host: symbology.online
               ansible_user: deployer
 
+        fitz.gg-production:
+          hosts:
+            fitz.gg-production:
+              ansible_host: fitz.gg
+              ansible_user: deployer
+
     nvidia:
       children:
         llm-server: {}
@@ -89,26 +95,24 @@ all:
         hypervisor: {}
         devbox: {}
         llm-server: {}
-        lab-proxy: {}
         staging-1g: {}
         staging-v2: {}
         symbology-production: {}
+        fitz.gg-production: {}
 
     monitoring:
       children:
         hypervisor: {}
         devbox: {}
         llm-server: {}
-        lab-proxy: {}
-        capm3-dev: {}
         staging-1g: {}
         staging-v2: {}
         symbology-production: {}
+        fitz.gg-production: {}
 
     wireguard:
       children:
         devbox: {}
-        lab-proxy: {}
 
     staging:
       children:
