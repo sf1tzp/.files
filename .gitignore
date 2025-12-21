@@ -3,3 +3,5 @@
 .vscode
 
 homelab/services/monitoring/config/discord_webhook_url
+
+homelab/services/woodpecker/.env

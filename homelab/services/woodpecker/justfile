@@ -1,0 +1,9 @@
+up:
+  nerdctl compose -f woodpecker-compose.yaml up -d
+
+down:
+  nerdctl compose -f woodpecker-compose.yaml down
+
+logs *ARGS:
+  nerdctl compose -f woodpecker-compose.yaml logs {{ARGS}}
+

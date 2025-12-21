@@ -1,0 +1,45 @@
+
+services:
+  woodpecker-server:
+    image: woodpeckerci/woodpecker-server:v3
+    ports:
+      - 8000:8000
+    volumes:
+      - woodpecker-server-data:/var/lib/woodpecker/
+    environment:
+      - WOODPECKER_OPEN=true
+      - WOODPECKER_HOST=${WOODPECKER_HOST}
+      - WOODPECKER_GITHUB=true
+      - WOODPECKER_GITHUB_CLIENT=${WOODPECKER_GITHUB_CLIENT}
+      - WOODPECKER_GITHUB_SECRET=${WOODPECKER_GITHUB_SECRET}
+      - WOODPECKER_AGENT_SECRET=${WOODPECKER_AGENT_SECRET}
+    networks:
+      - lofi-lab-network
+
+  woodpecker-agent:
+    image: woodpeckerci/woodpecker-agent:v3
+    command: agent
+    restart: always
+    ports:
+      - 8001:3000
+    depends_on:
+      - woodpecker-server
+    volumes:
+      - woodpecker-agent-config:/etc/woodpecker
+      # NOTE: this isn't working correctly, and the agent crashes
+      - /proc/3884931/root/run/containerd/containerd.sock:/run/containerd/containerd.sock
+    environment:
+      - WOODPECKER_SERVER=${WOODPECKER_SERVER}
+      - WOODPECKER_AGENT_SECRET=${WOODPECKER_AGENT_SECRET}
+
+      - DOCKER_HOST=unix:///containerd/containerd.sock
+    networks:
+      - lofi-lab-network
+
+volumes:
+  woodpecker-server-data:
+  woodpecker-agent-config:
+
+networks:
+  lofi-lab-network:
+    driver: bridge
