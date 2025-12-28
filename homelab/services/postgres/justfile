@@ -1,0 +1,50 @@
+# shellcheck shell=bash
+# shellcheck disable=SC2148,SC2035,SC1083
+# set dot-env load
+
+up: _generate-pgadmin-config
+    nerdctl compose -f postgres-compose.yaml up --env-file ~/.files/homelab/services/postgres/.env --detach
+
+down:
+    nerdctl compose -f postgres-compose.yaml down
+
+logs *ARGS: # just logs-db -f
+    nerdctl compose -f postgres-compose.yaml logs {{ARGS}}
+
+_generate-pgadmin-config:
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    mkdir -p pgadmin-data
+
+    source ~/.files/homelab/services/postgres/.env
+
+    # Generate pgadmin servers.json
+    jq -n \
+      --arg host "${POSTGRES_HOST:-postgres-server}" \
+      --arg port "${POSTGRES_PORT:-5432}" \
+      --arg user "${POSTGRES_USER:-postgres}" \
+      '{
+        "Servers": {
+          "1": {
+            "Name": "Postgres",
+            "Group": "Servers",
+            "Host": $host,
+            "Port": $port | tonumber ,
+            "MaintenanceDB": "postgres",
+            "Username": $user,
+            "SSLMode": "prefer",
+            "PassFile": "/pgpass",
+          }
+        }
+      }' > pgadmin-data/servers.json
+
+    # Generate pgpass file from environment variables
+    echo \
+      "${POSTGRES_HOST:-postgres-server}:${POSTGRES_PORT:-5432}:*:${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}" \
+      > pgadmin-data/pgpass
+
+    # Set correct permissions for pgpass file
+    chmod 600 pgadmin-data/pgpass
+
+    echo "PGAdmin configuration files created successfully"

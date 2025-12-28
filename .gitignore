@@ -2,6 +2,9 @@
 
 .vscode
 
+homelab/services/*/.env
+
 homelab/services/monitoring/config/discord_webhook_url
 
-homelab/services/woodpecker/.env
+homelab/services/postgres/postgres-data/
+homelab/services/postgres/pgadmin-data/

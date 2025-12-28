@@ -9,3 +9,8 @@ logs *ARGS:
 
 reload:
     nerdctl exec -it caddy-server -- caddy reload --config /etc/caddy/Caddyfile
+
+dns:
+    #!/usr/bin/env bash
+    sudo cp dnsmasq.conf /etc/dnsmasq.conf
+    sudo systemctl restart dnsmasq.service
