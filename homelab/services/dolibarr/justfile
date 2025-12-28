@@ -1,0 +1,16 @@
+# shellcheck shell=bash
+# shellcheck disable=SC2148,SC2035,SC1083
+# set dot-env load
+
+# Note: when using postgresql, manual first-time setup and upgrade steps are required
+# visit /install to run setup and upgrade commands
+# you can lock this page by adding file 'dolibarr-data/documents/install.lock'
+
+up:
+    nerdctl compose -f dolibarr-compose.yaml up --env-file ~/.files/homelab/services/dolibarr/.env --detach
+
+down:
+    nerdctl compose -f dolibarr-compose.yaml down
+
+logs *ARGS: # just logs-db -f
+    nerdctl compose -f dolibarr-compose.yaml logs {{ARGS}}
