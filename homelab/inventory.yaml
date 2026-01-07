@@ -86,6 +86,22 @@ all:
               ansible_host: fitz.gg
               ansible_user: deployer
 
+        db-streetfortress-cloud:
+          hosts:
+            db-streetfortress-cloud:
+              ansible_host: db.streetfortress.cloud
+              ansible_user: deployer
+              wg_vpn_ip: 10.1.0.51
+              wg_endpoint_ip: db.streetfortress.cloud
+
+        web-streetfortress-cloud:
+          hosts:
+            web-streetfortress-cloud:
+              ansible_host: web.streetfortress.cloud
+              ansible_user: deployer
+              wg_vpn_ip: 10.1.0.53
+              wg_endpoint_ip: web.streetfortress.cloud
+
     nvidia:
       children:
         llm-server: {}
