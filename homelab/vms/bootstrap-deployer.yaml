@@ -1,6 +1,6 @@
 ---
 - name: Create a non-root deployer user
-  hosts: fitz.gg-production
+  hosts: all
   remote_user: root
   become: true
   gather_facts: true
@@ -33,7 +33,7 @@
     - name: Run set-up playbook
       delegate_to: localhost
       become: false
-      shell: ansible-playbook ~/.files/homelab/vms/set-up.yaml --inventory ~/.files/homelab/inventory.yaml --limit fitz.gg-production
+      shell: ansible-playbook ~/.files/homelab/vms/set-up.yaml --inventory ~/.files/homelab/inventory.yaml --limit {{ inventory_hostname }}
 
     - name: Allow deployer user to sudo without password
       lineinfile:
