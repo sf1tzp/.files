@@ -9,7 +9,7 @@
     - name: Create deployer user
       user:
         name: deployer
-        comment: "Deployment user for Symbology application"
+        comment: "Deployment user for Operations"
         shell: /bin/bash
         create_home: true
         groups: sudo
@@ -30,11 +30,6 @@
         create: true
         validate: "visudo -cf %s"
 
-    - name: Run set-up playbook
-      delegate_to: localhost
-      become: false
-      shell: ansible-playbook ~/.files/homelab/vms/set-up.yaml --inventory ~/.files/homelab/inventory.yaml --limit {{ inventory_hostname }}
-
     - name: Allow deployer user to sudo without password
       lineinfile:
         path: /etc/sudoers.d/deployer
@@ -43,3 +38,7 @@
         mode: "0440"
         create: true
         validate: "visudo -cf %s"
+
+    - name: Set Hostname
+      hostname:
+        name: "{{ ansible_host }}"

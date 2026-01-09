@@ -5,6 +5,7 @@ all:
       hosts:
         soundship:
           ansible_host: 10.0.0.2
+          wg_vpn_ip: 10.1.0.1
 
     vms:
       children:
@@ -17,7 +18,7 @@ all:
               memory: 24
               disk_size: "150G"
               gpu_passthrough: false
-              wg_addr: 10.1.0.3
+              wg_vpn_ip: 10.1.0.3
 
         llm-server:
           hosts:
@@ -74,33 +75,65 @@ all:
               disk_size: "25G"
               gpu_passthrough: false
 
+        staging-web:
+          hosts:
+            staging-web:
+              ansible_host: 10.0.0.31
+              ansible_user: deployer
+              os: "ubuntu-server-24.04"
+              vcpus: 2
+              memory: 4
+              disk_size: "25G"
+              gpu_passthrough: false
+              username: deployer
+              wg_vpn_ip: 10.1.0.11
+              wg_endpoint_ip: 10.0.0.31
+
+        staging-db:
+          hosts:
+            staging-db:
+              ansible_host: 10.0.0.32
+              ansible_user: deployer
+              os: "ubuntu-server-24.04"
+              vcpus: 2
+              memory: 4
+              disk_size: "25G"
+              gpu_passthrough: false
+              username: deployer
+              wg_vpn_ip: 10.1.0.12
+              wg_endpoint_ip: 10.0.0.32
+
         symbology-production:
           hosts:
             symbology-production:
               ansible_host: symbology.online
               ansible_user: deployer
+              wg_vpn_ip: 10.1.0.41
+              wg_endpoint_ip: symbology.online
 
-        fitz.gg-production:
+        fitz-gg-production:
           hosts:
-            fitz.gg-production:
+            fitz-gg-production:
               ansible_host: fitz.gg
               ansible_user: deployer
+              wg_vpn_ip: 10.1.0.42
+              wg_endpoint_ip: fitz.gg
 
-        db-streetfortress-cloud:
+        db2-streetfortress-cloud:
           hosts:
-            db-streetfortress-cloud:
-              ansible_host: db.streetfortress.cloud
+            db2-streetfortress-cloud:
+              ansible_host: db2.streetfortress.cloud
               ansible_user: deployer
               wg_vpn_ip: 10.1.0.51
-              wg_endpoint_ip: db.streetfortress.cloud
+              wg_endpoint_ip: db2.streetfortress.cloud
 
-        web-streetfortress-cloud:
+        web2-streetfortress-cloud:
           hosts:
-            web-streetfortress-cloud:
-              ansible_host: web.streetfortress.cloud
+            web2-streetfortress-cloud:
+              ansible_host: web2.streetfortress.cloud
               ansible_user: deployer
-              wg_vpn_ip: 10.1.0.53
-              wg_endpoint_ip: web.streetfortress.cloud
+              wg_vpn_ip: 10.1.0.52
+              wg_endpoint_ip: web2.streetfortress.cloud
 
     nvidia:
       children:
@@ -113,8 +146,12 @@ all:
         llm-server: {}
         staging-1g: {}
         staging-v2: {}
+        staging-web: {}
+        staging-db: {}
         symbology-production: {}
-        fitz.gg-production: {}
+        fitz-gg-production: {}
+        db2-streetfortress-cloud: {}
+        web2-streetfortress-cloud: {}
 
     monitoring:
       children:
@@ -124,11 +161,18 @@ all:
         staging-1g: {}
         staging-v2: {}
         symbology-production: {}
-        fitz.gg-production: {}
+        fitz-gg-production: {}
 
     wireguard:
       children:
         devbox: {}
+        staging-web: {}
+        staging-db: {}
+        hypervisor: {}
+        symbology-production: {}
+        fitz-gg-production: {}
+        db2-streetfortress-cloud: {}
+        web2-streetfortress-cloud: {}
 
     staging:
       children:

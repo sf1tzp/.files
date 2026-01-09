@@ -148,3 +148,7 @@
     sysctl_set: yes
     reload: yes
   become: true
+
+- name: Enable Linger
+  command: loginctl enable-linger {{ ansible_user }}
+  become: true

@@ -124,24 +124,14 @@
       ansible.builtin.file:
         path: /etc/wireguard
         state: directory
-        mode: '0700'
-
-    # Set Wireguard interface address from inventory
-    - name: Set Wireguard interface address from inventory
-      ansible.builtin.set_fact:
-        wg_interface_addr: "{{ wg_addr | default('10.1.0.254') }}"
-
-    # Determine if this host should act as an endpoint (lab-proxy only)
-    - name: Set endpoint configuration
-      ansible.builtin.set_fact:
-        is_endpoint: "{{ inventory_hostname == 'lab-proxy' }}"
+        mode: "0700"
 
     # Create template for wg0.conf
     - name: Configure Wireguard interface
       ansible.builtin.template:
         src: "{{ playbook_dir }}/templates/wg0.conf.j2"
         dest: /etc/wireguard/wg0.conf
-        mode: '0600'
+        mode: "0600"
       notify: restart wireguard
 
     # Enable and start Wireguard
