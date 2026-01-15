@@ -1,0 +1,9 @@
+up:
+    nerdctl compose -f traggo-compose.yaml up -d
+
+down:
+    nerdctl compose -f traggo-compose.yaml down
+
+logs *ARGS:
+    nerdctl compose -f traggo-compose.yaml logs {{ARGS}}
+

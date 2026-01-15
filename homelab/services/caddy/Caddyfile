@@ -177,7 +177,7 @@ pgadmin.lofi {
 
 }
 
-dolibarr.lofi {
+traggo.lofi {
     header {
         # Prevent clickjacking
         X-Frame-Options "SAMEORIGIN"
@@ -191,7 +191,7 @@ dolibarr.lofi {
     encode gzip zstd
 
     log {
-        output file /var/log/caddy/pgadmin.log {
+        output file /var/log/caddy/traggo.log {
             roll_size 100mb
             roll_keep 5
             roll_keep_for 720h
@@ -199,7 +199,7 @@ dolibarr.lofi {
         format json
     }
 
-    reverse_proxy dolibarr-server:11020 {
+    reverse_proxy 10.0.0.2:3030 {
         # Timeouts
         transport http {
             dial_timeout 5s
