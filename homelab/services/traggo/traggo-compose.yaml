@@ -13,6 +13,7 @@ services:
       - .traggodata:/opt/traggo/data
     networks:
       - lofi-lab-network
+    restart: unless-stopped
 
 networks:
   lofi-lab-network:
