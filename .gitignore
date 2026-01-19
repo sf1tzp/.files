@@ -10,3 +10,5 @@ homelab/services/monitoring/config/discord_webhook_url
 
 homelab/services/postgres/postgres-data/
 homelab/services/postgres/pgadmin-data/
+homelab/services/traggo/.traggodata
+
