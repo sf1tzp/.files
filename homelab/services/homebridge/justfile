@@ -3,3 +3,6 @@ up:
 
 down:
   nerdctl compose -f homebridge.yaml down
+
+logs:
+  nerdctl compose -f homebridge.yaml logs homebridge -f
