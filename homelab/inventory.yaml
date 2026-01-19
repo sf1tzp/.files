@@ -103,22 +103,6 @@ all:
               wg_vpn_ip: 10.1.0.12
               wg_endpoint_ip: 10.0.0.32
 
-        symbology-production:
-          hosts:
-            symbology-production:
-              ansible_host: symbology.online
-              ansible_user: deployer
-              wg_vpn_ip: 10.1.0.41
-              wg_endpoint_ip: symbology.online
-
-        fitz-gg-production:
-          hosts:
-            fitz-gg-production:
-              ansible_host: fitz.gg
-              ansible_user: deployer
-              wg_vpn_ip: 10.1.0.42
-              wg_endpoint_ip: fitz.gg
-
         db2-streetfortress-cloud:
           hosts:
             db2-streetfortress-cloud:
@@ -158,10 +142,10 @@ all:
         hypervisor: {}
         devbox: {}
         llm-server: {}
-        staging-1g: {}
-        staging-v2: {}
-        symbology-production: {}
-        fitz-gg-production: {}
+        staging-web: {}
+        staging-db: {}
+        db2-streetfortress-cloud: {}
+        web2-streetfortress-cloud: {}
 
     wireguard:
       children:
