@@ -54,20 +54,40 @@ scrape_configs:
         replacement: en0
         target_label: ethernet_device
 
+  - job_name: "staging"
+    static_configs:
+      - targets:
+          - 10.0.0.31:9100
+          - 10.0.0.32:9100
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: 10.0.0.31:9100
+        replacement: staging-web
+        target_label: instance
+      - regex: 10.0.0.32:9100
+        replacement: staging-db
+        target_label: instance
+
+  - job_name: "production"
+    static_configs:
+      - targets:
+          - 10.1.0.51:9100
+          - 10.1.0.52:9100
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: 10.1.0.51:9100
+        replacement: db2.streetfortress.cloud
+        target_label: instance
+      - regex: 10.1.0.52:9100
+        replacement: web2.streetfortress.cloud
+        target_label: instance
+
   - job_name: "linux_vms"
     static_configs:
       - targets:
           - 10.0.0.3:9100
           - 10.0.0.4:9100
-          - 10.0.0.5:9100
-          - 10.0.0.6:9100
           - 10.0.0.7:9100
-          # staging
-          - 10.0.0.21:9100
-          - 10.0.0.22:9100
-          - 10.0.0.24:9100
-          - symbology.online:9100
-          - fitz.gg:9100
     relabel_configs:
       - source_labels: [__address__]
         regex: 10.0.0.3:9100
@@ -80,28 +100,6 @@ scrape_configs:
       - source_labels: [__address__]
         regex: 10.0.0.7:9100
         replacement: custom-image-builder
-        target_label: instance
-      - source_labels: [__address__]
-        regex: symbology.online:9100
-        replacement: symbology-production
-        target_label: instance
-      - source_labels: [__address__]
-        regex: fitz.gg:9100
-        replacement: fitz.gg-production
-        target_label: instance
-
-      # staging
-      - source_labels: [__address__]
-        regex: 10.0.0.21:9100
-        replacement: staging-1g
-        target_label: instance
-      - source_labels: [__address__]
-        regex: 10.0.0.22:9100
-        replacement: staging-2g
-        target_label: instance
-      - source_labels: [__address__]
-        regex: 10.0.0.24:9100
-        replacement: staging-4g
         target_label: instance
 
   - job_name: "windows_exporter"
