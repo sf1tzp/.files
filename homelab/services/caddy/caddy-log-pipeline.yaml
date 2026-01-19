@@ -1,0 +1,25 @@
+# WIP Fluent Bit configuration for caddy
+
+pipeline:
+  inputs:
+    - name: tail
+      path: /var/log/caddy/*.log
+      tag: caddy
+      db: /var/lib/fluent-bit/.db
+
+  filters:
+    - name: modify
+      match: caddy.*
+      add:
+        service: caddy
+        host: ${HOSTNAME}
+
+  outputs:
+    - name: loki
+      match: caddy.*
+      host: 10.0.0.2
+      port: 3100
+      labels: job=caddy, host=${HOSTNAME}
+      line_format: json
+      workers: 1
+
