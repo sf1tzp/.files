@@ -24,6 +24,15 @@ fi
 # Go Path
 if [[ -d /usr/local/go/bin/ ]]; then
     export PATH=$PATH:/usr/local/go/bin
+    export PATH="$PATH:$HOME/go/bin"
+fi
+
+if [[ -d ~/go/bin/ ]]; then
+    export PATH=$PATH:/go/bin
+fi
+
+if [[ -d .venv ]]; then
+    source .venv/bin/activate
 fi
 
 # Check for / install utilities
