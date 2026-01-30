@@ -1,4 +1,7 @@
-up:
+_rebuild:
+    nerdctl compose -f traggo-compose.yaml build
+
+up: _rebuild
     nerdctl compose -f traggo-compose.yaml up -d
 
 down:
