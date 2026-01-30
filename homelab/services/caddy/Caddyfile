@@ -250,10 +250,13 @@ pgadmin.staging.lofi {
 
 auth.staging.lofi {
     @cors_preflight method OPTIONS
-    @cors_origin header Origin https://sketches.staging.lofi
+    @cors_origin {
+        header Origin https://sketches.staging.lofi
+        header Origin https://dial-in.staging.lofi
+      }
 
     handle @cors_preflight {
-        header Access-Control-Allow-Origin "https://sketches.staging.lofi"
+        header Access-Control-Allow-Origin {http.request.header.Origin}
         header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
         header Access-Control-Allow-Headers "Authorization, Content-Type, Origin, Accept"
         header Access-Control-Allow-Credentials "true"
@@ -261,7 +264,7 @@ auth.staging.lofi {
         respond "" 204
     }
 
-    header @cors_origin Access-Control-Allow-Origin "https://sketches.staging.lofi"
+    header @cors_origin Access-Control-Allow-Origin {http.request.header.Origin}
     header @cors_origin Access-Control-Allow-Credentials "true"
     header {
         X-Content-Type-Options "nosniff"
@@ -316,6 +319,41 @@ sketches.staging.lofi {
 
     # staging-web
     reverse_proxy 10.0.0.31:3001 {
+        # Timeouts
+        transport http {
+            dial_timeout 5s
+            response_header_timeout 10s
+        }
+
+        # Pass real client IP
+        header_up X-Real-IP {remote_host}
+    }
+  }
+
+dial-in.staging.lofi {
+    header {
+        # Prevent clickjacking
+        X-Frame-Options "SAMEORIGIN"
+        # XSS protection
+        X-Content-Type-Options "nosniff"
+        # Referrer policy
+        Referrer-Policy "strict-origin-when-cross-origin"
+        # Remove server header for security
+        -server
+    }
+    encode gzip zstd
+
+    log {
+        output file /var/log/caddy/dial-in.log {
+            roll_size 100mb
+            roll_keep 5
+            roll_keep_for 720h
+        }
+        format json
+    }
+
+    # staging-web
+    reverse_proxy 10.0.0.31:3002 {
         # Timeouts
         transport http {
             dial_timeout 5s
