@@ -1,0 +1,15 @@
+parsers:
+  # Parser for audit logs
+  - name: audit_json_parser
+    format: json
+    time_key: time
+    time_format: '%Y-%m-%dT%H:%M:%S.%L'
+
+  # Parser for Docker/nerdctl JSON logs
+  # Format: {"log":"message\n","stream":"stdout","time":"2024-01-31T12:00:00.123456789Z"}
+  - name: docker
+    format: json
+    time_key: time
+    time_format: '%Y-%m-%dT%H:%M:%S.%L%z'
+    time_keep: false
+    decode_field_as: json log

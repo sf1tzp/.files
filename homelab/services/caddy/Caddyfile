@@ -3,6 +3,11 @@
 
     acme_ca https://step-ca.lofi:9000/acme/acme/directory
     # acme_ca_root /step-ca-data/certs/root_ca.crt
+
+	metrics {
+		per_host
+	}
+
 }
 
 grafana.lofi {
@@ -19,11 +24,7 @@ grafana.lofi {
     encode gzip zstd
 
     log {
-        output file /var/log/caddy/grafana.log {
-            roll_size 100mb
-            roll_keep 5
-            roll_keep_for 720h
-        }
+        output stdout
         format json
     }
 
@@ -53,11 +54,7 @@ prometheus.lofi {
     encode gzip zstd
 
     log {
-        output file /var/log/caddy/prometheus.log {
-            roll_size 100mb
-            roll_keep 5
-            roll_keep_for 720h
-        }
+        output stdout
         format json
     }
 
@@ -87,11 +84,7 @@ llm.lofi {
     encode gzip zstd
 
     log {
-        output file /var/log/caddy/ollama.lofi.log {
-            roll_size 100mb
-            roll_keep 5
-            roll_keep_for 720h
-        }
+        output stdout
         format json
     }
 
@@ -122,11 +115,7 @@ chat.lofi {
     encode gzip zstd
 
     log {
-        output file /var/log/caddy/open-web-ui.log {
-            roll_size 100mb
-            roll_keep 5
-            roll_keep_for 720h
-        }
+        output stdout
         format json
     }
 
@@ -156,11 +145,7 @@ pgadmin.lofi {
     encode gzip zstd
 
     log {
-        output file /var/log/caddy/pgadmin.log {
-            roll_size 100mb
-            roll_keep 5
-            roll_keep_for 720h
-        }
+        output stdout
         format json
     }
 
@@ -191,11 +176,7 @@ traggo.lofi {
     encode gzip zstd
 
     log {
-        output file /var/log/caddy/traggo.log {
-            roll_size 100mb
-            roll_keep 5
-            roll_keep_for 720h
-        }
+        output stdout
         format json
     }
 
@@ -227,11 +208,7 @@ pgadmin.staging.lofi {
     encode gzip zstd
 
     log {
-        output file /var/log/caddy/pgadmin.log {
-            roll_size 100mb
-            roll_keep 5
-            roll_keep_for 720h
-        }
+        output stdout
         format json
     }
 
@@ -274,11 +251,7 @@ auth.staging.lofi {
     encode gzip zstd
 
     log {
-        output file /var/log/caddy/staging.log {
-            roll_size 100mb
-            roll_keep 5
-            roll_keep_for 720h
-        }
+        output stdout
         format json
     }
 
@@ -309,11 +282,7 @@ sketches.staging.lofi {
     encode gzip zstd
 
     log {
-        output file /var/log/caddy/staging.log {
-            roll_size 100mb
-            roll_keep 5
-            roll_keep_for 720h
-        }
+        output stdout
         format json
     }
 
@@ -344,11 +313,7 @@ dial-in.staging.lofi {
     encode gzip zstd
 
     log {
-        output file /var/log/caddy/dial-in.log {
-            roll_size 100mb
-            roll_keep 5
-            roll_keep_for 720h
-        }
+        output stdout
         format json
     }
 
@@ -379,11 +344,7 @@ streetfortress.staging.lofi {
     encode gzip zstd
 
     log {
-        output file /var/log/caddy/dial-in.log {
-            roll_size 100mb
-            roll_keep 5
-            roll_keep_for 720h
-        }
+        output stdout
         format json
     }
 

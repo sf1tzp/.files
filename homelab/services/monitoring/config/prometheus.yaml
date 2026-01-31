@@ -78,7 +78,18 @@ scrape_configs:
         regex: 10.1.0.51:9100
         replacement: db2.streetfortress.cloud
         target_label: instance
-      - regex: 10.1.0.52:9100
+      - source_labels: [__address__]
+        regex: 10.1.0.52:9100
+        replacement: web2.streetfortress.cloud
+        target_label: instance
+
+  - job_name: "caddy"
+    static_configs:
+      - targets:
+          - 10.1.0.52:2020
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: 10.1.0.52:2020
         replacement: web2.streetfortress.cloud
         target_label: instance
 

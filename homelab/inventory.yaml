@@ -6,6 +6,7 @@ all:
         soundship:
           ansible_host: 10.0.0.2
           wg_vpn_ip: 10.1.0.1
+          logging_endpoint_ip: 10.0.0.2 # Self-hosted logging
 
     vms:
       children:
@@ -19,6 +20,7 @@ all:
               disk_size: "150G"
               gpu_passthrough: false
               wg_vpn_ip: 10.1.0.3
+              logging_endpoint_ip: 10.0.0.2
 
         llm-server:
           hosts:
@@ -32,6 +34,7 @@ all:
               gpu_domain: "0x0000"
               gpu_bus: "0x01"
               gpu_slot: "0x00"
+              logging_endpoint_ip: 10.0.0.2
 
         custom-image-builder:
           hosts:
@@ -88,6 +91,7 @@ all:
               username: deployer
               wg_vpn_ip: 10.1.0.11
               wg_endpoint_ip: 10.0.0.31
+              logging_endpoint_ip: 10.0.0.2
 
         staging-db:
           hosts:
@@ -102,6 +106,7 @@ all:
               username: deployer
               wg_vpn_ip: 10.1.0.12
               wg_endpoint_ip: 10.0.0.32
+              logging_endpoint_ip: 10.0.0.2
 
         db2-streetfortress-cloud:
           hosts:
@@ -110,6 +115,7 @@ all:
               ansible_user: deployer
               wg_vpn_ip: 10.1.0.51
               wg_endpoint_ip: db2.streetfortress.cloud
+              logging_endpoint_ip: 10.1.0.1
 
         web2-streetfortress-cloud:
           hosts:
@@ -118,6 +124,7 @@ all:
               ansible_user: deployer
               wg_vpn_ip: 10.1.0.52
               wg_endpoint_ip: web2.streetfortress.cloud
+              logging_endpoint_ip: 10.1.0.1
 
     nvidia:
       children:

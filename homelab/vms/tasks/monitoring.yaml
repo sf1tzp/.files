@@ -55,7 +55,7 @@
 
 - name: Copy main Fluent Bit YAML configuration
   template:
-    src: fluent-bit.yaml.j2
+    src: fluent-bit/fluent-bit.yaml.j2
     dest: /etc/fluent-bit/fluent-bit.yaml
     mode: "0644"
   become: true
@@ -63,7 +63,7 @@
 
 - name: Copy main parsers configuration
   template:
-    src: parsers-main.yaml.j2
+    src: fluent-bit/parsers-main.yaml.j2
     dest: /etc/fluent-bit/parsers.yaml
     mode: "0644"
   become: true
@@ -71,7 +71,7 @@
 
 - name: Copy base parsers YAML configuration
   template:
-    src: parsers.yaml.j2
+    src: fluent-bit/parsers.yaml.j2
     dest: /etc/fluent-bit/parsers.d/base.yaml
     mode: "0644"
   become: true
@@ -79,30 +79,21 @@
 
 - name: Copy container logging configuration
   template:
-    src: system-logs.yaml.j2
-    dest: /etc/fluent-bit/conf.d/containers.yaml
+    src: fluent-bit/system-logs.yaml.j2
+    dest: /etc/fluent-bit/conf.d/system-logs.yaml
     mode: "0644"
   become: true
   register: container_config
 
 - name: Copy Lua scripts for container log processing
   template:
-    src: "{{ item }}"
+    src: "fluent-bit/{{ item }}"
     dest: "/etc/fluent-bit/{{ item }}"
     mode: "0644"
   become: true
   loop:
     - process-container-logs.lua
   register: lua_scripts
-
-- name: Deploy Fluent Bit service configuration helper script
-  copy:
-    src: fluent-bit-service-config.sh
-    dest: /usr/local/bin/fluent-bit-service-config
-    mode: "0755"
-    owner: root
-    group: root
-  become: true
 
 - name: Create Fluent Bit state directory
   file:

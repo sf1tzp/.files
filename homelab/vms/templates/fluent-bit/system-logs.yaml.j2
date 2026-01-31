@@ -2,16 +2,18 @@
 pipeline:
   inputs:
     # Container logs from rootless nerdctl
+    # Path pattern: /home/<user>/.local/share/nerdctl/<namespace_id>/containers/default/<container_id>/<container_id>-json.log
     - name: tail
       path: /home/*/.local/share/nerdctl/*/containers/default/*/*-json.log
       tag: container.*
       db: /var/lib/fluent-bit/container.db
-      parser: json
+      parser: docker
       path_key: filepath
       refresh_interval: 5
+      read_from_head: false
 
   filters:
-    # Process container logs: extract info and add container name
+    # Process container logs: extract container info and resolve names
     - name: lua
       match: container.*
       script: /etc/fluent-bit/process-container-logs.lua
@@ -20,10 +22,9 @@ pipeline:
   outputs:
     - name: loki
       match: container.*
-      host: 10.0.0.2
-      port: 3100
-      # Parse log and add labels here
-      labels: job=container, host={{ inventory_hostname }}, container_name=$container_name, container_id=$container_id
+      host: {{ logging_endpoint_ip | default('10.0.0.2') }}
+      port: {{ logging_endpoint_port | default(3100) }}
+      labels: job=container, host={{ inventory_hostname }}, container_name=$container_name, container_id=$container_id, user=$container_user
       line_format: json
       workers: 2
 
@@ -51,8 +52,8 @@ pipeline:
   outputs:
     - name: loki
       match: audit.*
-      host: 10.0.0.2
-      port: 3100
+      host: {{ logging_endpoint_ip | default('10.0.0.2') }}
+      port: {{ logging_endpoint_port | default(3100) }}
       labels: job=audit, host={{ inventory_hostname }}, action=$action
       line_format: json
       workers: 2
