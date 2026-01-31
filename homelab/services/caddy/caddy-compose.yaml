@@ -3,6 +3,8 @@ services:
     container_name: caddy-server
     image: caddy:2.10-alpine
     restart: always
+    # annotations: # note: not working on soundship atm...
+    # - nerdctl/bypass4netns=true
     ports:
       - 80:80
       - 443:443
