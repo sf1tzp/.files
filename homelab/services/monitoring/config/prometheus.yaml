@@ -170,10 +170,12 @@ scrape_configs:
       module: [https_2xx]
     static_configs:
       - targets:
-          - https://symbology.online
           - https://fitz.gg
+          - https://auth.fitz.gg
           - https://dial-in.fitz.gg
           - https://sketches.fitz.gg
+          - https://streetfortress.com
+          - https://symbology.online
 
     relabel_configs:
       # relabel instance to target

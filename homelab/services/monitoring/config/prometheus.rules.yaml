@@ -8,5 +8,11 @@ groups:
   - name: fitz.gg
     rules:
       - alert: https_status
-        expr: probe_success{job="https_from_soundship", instance=~"https://.*.fitz.gg"} == 0
+        expr: probe_success{job="https_from_soundship", instance=~"https://.*fitz.gg"} == 0
+        for: 5m
+
+  - name: streetfortress.com
+    rules:
+      - alert: https_status
+        expr: probe_success{job="https_from_soundship", instance=~"https://streetfortress.com"} == 0
         for: 5m

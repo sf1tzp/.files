@@ -1,0 +1,25 @@
+# Sample Queries
+# 🔗
+# Once you have Prometheus scraping Caddy's metrics, you can start to see some interesting metrics about how Caddy's performing.
+# If you've started up a Prometheus server to scrape Caddy with the config above, try pasting these queries into the Prometheus UI at http://localhost:9090/graph
+# For example, to see the per-second request rate, as averaged over 5 minutes:
+#
+# rate(caddy_http_requests_total{handler="file_server"}[5m])
+#
+# To see the rate at which your latency threshold of 100ms is being exceeded:
+
+# sum(rate(caddy_http_request_duration_seconds_count{server="srv0"}[5m])) by (handler)
+# -
+# sum(rate(caddy_http_request_duration_seconds_bucket{le="0.100", server="srv0"}[5m])) by (handler)
+
+# To find the 95th percentile request duration on the file_server handler, you can use a query like this:
+
+# histogram_quantile(0.95, sum(caddy_http_request_duration_seconds_bucket{handler="file_server"}) by (le))
+
+# Or to see the median response size in bytes for successful GET requests on the file_server handler:
+
+# histogram_quantile(0.5, caddy_http_response_size_bytes_bucket{method="GET", handler="file_server", code="200"})
+
+# groups:
+#   - name: caddy
+#     rules:
