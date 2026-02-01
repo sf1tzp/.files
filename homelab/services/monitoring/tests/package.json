@@ -1,0 +1,11 @@
+{
+    "name": "monitoring-tests",
+    "version": "1.0.0",
+    "description": "k6 smoke tests for monitoring",
+    "scripts": {
+        "test:smoke": "k6 run smoke.ts"
+    },
+    "devDependencies": {
+        "@types/k6": "^0.52.0"
+    }
+}

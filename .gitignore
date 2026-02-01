@@ -7,8 +7,10 @@ homelab/services/*/.env
 homelab/services/dolibarr/dolibarr-data/
 
 homelab/services/monitoring/config/discord_webhook_url
+homelab/services/monitoring/tests/node_modules
 
 homelab/services/postgres/postgres-data/
 homelab/services/postgres/pgadmin-data/
 homelab/services/traggo/.traggodata
+
 
