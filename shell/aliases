@@ -22,6 +22,7 @@ alias gtfo='git-out'
 alias cim=vim
 alias clera="clear"
 alias get='git'
+alias gti='git'
 alias udo='sudo'
 alias mc='mv'
 
@@ -100,7 +101,7 @@ if which rg &>/dev/null; then
 fi
 
 if which zoxide &>/dev/null; then
-	alias cd="z"
+	# alias cd="z" # note: agents don't handle zoxide very well
 fi
 
 if which virsh &>/dev/null; then
