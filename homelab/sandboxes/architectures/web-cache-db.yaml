@@ -1,0 +1,40 @@
+name: web-cache-db
+description: >
+  Three-tier architecture: Nginx reverse proxy, Redis cache layer, and Postgres
+  database on separate hosts. Tests cache-aside patterns and measures the
+  performance impact of an intermediate caching layer.
+
+defaults:
+  os: sf1tzp-24.04
+  disk_size: 25G
+  username: deployer
+
+nodes:
+  web:
+    ip: 10.0.0.42
+    vcpus: 2
+    memory: 4
+    containers:
+      - nginx
+    expose:
+      - "80:80"
+
+  cache:
+    ip: 10.0.0.43
+    vcpus: 2
+    memory: 4
+    containers:
+      - redis
+    expose:
+      - "6379:6379"
+
+  db:
+    ip: 10.0.0.44
+    vcpus: 2
+    memory: 4
+    containers:
+      - postgres
+    expose:
+      - "5432:5432"
+
+test: web-cache-db

@@ -1,0 +1,31 @@
+name: web-db
+description: >
+  Two-tier architecture: Nginx reverse proxy fronting a Postgres database.
+  Simulates a typical web application deployment where the app server and
+  database live on separate hosts.
+
+defaults:
+  os: sf1tzp-24.04
+  disk_size: 25G
+  username: deployer
+
+nodes:
+  web:
+    ip: 10.0.0.40
+    vcpus: 2
+    memory: 4
+    containers:
+      - nginx
+    expose:
+      - "80:80"
+
+  db:
+    ip: 10.0.0.41
+    vcpus: 2
+    memory: 4
+    containers:
+      - postgres
+    expose:
+      - "5432:5432"
+
+test: web-db
