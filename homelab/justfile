@@ -37,6 +37,9 @@ bootstrap +hosts:
 wireguard +hosts="all":
     ansible-playbook vms/wireguard.yaml --inventory ~/.files/homelab/inventory.yaml --limit "{{ hosts }}" --vault-password-file ~/.ansible-password
 
+resize-disk vm new_disk_size:
+    ansible-playbook vms/resize-disk.yaml --inventory ~/.files/homelab/inventory.yaml --extra-vars "target_vm={{ vm }} new_disk_size={{ new_disk_size }}"
+
 eject-cloud-init-io vm:
     virsh detach-disk {{ vm }} hda --live --config
     rm /var/lib/libvirt/images/{{ vm }}-cloud-init.iso
