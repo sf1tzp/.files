@@ -112,6 +112,24 @@
   vars:
     ansible_ssh_common_args: '-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
   tasks:
+    - name: Remove cloud-init default user
+      user:
+        name: "{{ default_os_username | default('ubuntu') }}"
+        state: absent
+        remove: true
+      become: true
+      when: (default_os_username | default('ubuntu')) != target_username
+      tags:
+        - finalize
+
+    - name: Remove cloud-init default user sudoers file
+      file:
+        path: "/etc/sudoers.d/90-cloud-init-users"
+        state: absent
+      become: true
+      tags:
+        - finalize
+
     - name: Clean up package cache
       apt:
         autoclean: yes
@@ -145,8 +163,14 @@
         - finalize
 
     - name: Clear SSH host keys (will be regenerated on first boot)
+      shell: rm -f /etc/ssh/ssh_host_*
+      become: true
+      tags:
+        - finalize
+
+    - name: Clear target user SSH authorized keys (will be re-imported on deployment)
       file:
-        path: "/etc/ssh/ssh_host_*"
+        path: "/home/{{ target_username | default('steven') }}/.ssh/authorized_keys"
         state: absent
       become: true
       tags:
