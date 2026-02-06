@@ -1,0 +1,149 @@
+---
+# Deploy a sandbox architecture
+#
+# Usage:
+#   ansible-playbook deploy.yaml -e "architecture=web-db"
+#
+# Reads an architecture definition from architectures/<name>.yaml,
+# creates VMs on the hypervisor, and waits for them to become reachable.
+#
+- name: Deploy Sandbox
+  hosts: localhost
+  vars:
+    vault_password: "{{ lookup('env', 'ANSIBLE_VAULT_PASSWORD') }}"
+    vm_passwords_file: "~/.homelab-passwords.yaml"
+    github_username: sf1tzp
+    libvirt_images: /var/lib/libvirt/images
+
+    arch: "{{ lookup('file', 'architectures/' + architecture + '.yaml') | from_yaml }}"
+    sandbox_prefix: "sandbox-{{ arch.name }}"
+
+    default_vm_spec:
+      os: "{{ arch.defaults.os | default('sf1tzp-24.04') }}"
+      disk_size: "{{ arch.defaults.disk_size | default('25G') }}"
+      username: "{{ arch.defaults.username | default('deployer') }}"
+      vcpus: 2
+      memory: 4
+      gpu_passthrough: false
+
+  tasks:
+    - name: Build VM specs from architecture definition
+      set_fact:
+        vm_specs: >-
+          {{
+            vm_specs | default([]) + [{
+              'hostname': sandbox_prefix + '-' + item.key,
+              'role': item.key,
+              'ip': item.value.ip,
+              'os': item.value.os | default(default_vm_spec.os),
+              'vcpus': item.value.vcpus | default(default_vm_spec.vcpus),
+              'memory': item.value.memory | default(default_vm_spec.memory),
+              'disk_size': item.value.disk_size | default(default_vm_spec.disk_size),
+              'gpu_passthrough': false,
+              'username': item.value.username | default(default_vm_spec.username),
+              'containers': item.value.containers | default([]),
+              'expose': item.value.expose | default([])
+            }]
+          }}
+      loop: "{{ arch.nodes | dict2items }}"
+      loop_control:
+        label: "{{ item.key }}"
+
+    - name: Display sandbox VM specifications
+      debug:
+        msg: >-
+          {{ item.hostname }} ({{ item.role }}): {{ item.vcpus }}vCPU,
+          {{ item.memory }}GB RAM, {{ item.disk_size }} disk,
+          IP: {{ item.ip }}, containers: {{ item.containers | join(', ') }}
+      loop: "{{ vm_specs }}"
+      loop_control:
+        label: "{{ item.hostname }}"
+
+    - name: Check if VMs already exist
+      virt:
+        name: "{{ item.hostname }}"
+        command: status
+      register: vm_status
+      failed_when: false
+      loop: "{{ vm_specs }}"
+      loop_control:
+        label: "Checking {{ item.hostname }}"
+
+    - name: Filter to VMs that need creation
+      set_fact:
+        vms_to_create: >-
+          {{
+            vm_specs | selectattr(
+              'hostname', 'in',
+              vm_status.results
+                | selectattr('status', 'undefined')
+                | map(attribute='item.hostname')
+                | list
+            )
+          }}
+
+    - name: End if all VMs exist
+      meta: end_play
+      when: vms_to_create | length == 0
+
+    - name: Display VMs to create
+      debug:
+        msg: "Creating: {{ vms_to_create | map(attribute='hostname') | join(', ') }}"
+
+    - name: Generate user passwords
+      include_tasks: ../vms/tasks/passwords.yaml
+      with_items: "{{ vms_to_create }}"
+      loop_control:
+        label: "Password for {{ item.hostname }}"
+
+    - name: Create cloud-init images
+      include_tasks: ../vms/tasks/cloud-init.yaml
+      with_items: "{{ vms_to_create }}"
+      loop_control:
+        label: "Cloud-init for {{ item.hostname }}"
+
+    - name: Create OS disk images
+      become: false
+      shell: |
+        qemu-img create \
+          -F qcow2 \
+          -b {{ libvirt_images }}/bases/{{ item.os }}.qcow2 \
+          -f qcow2 \
+          "{{ libvirt_images }}/{{ item.hostname }}.qcow2" {{ item.disk_size }}
+      loop: "{{ vms_to_create }}"
+      loop_control:
+        label: "Disk for {{ item.hostname }}"
+
+    - name: Define virtual machines
+      become: false
+      virt:
+        name: "{{ item.hostname }}"
+        command: define
+        xml: "{{ lookup('template', '../vms/templates/linux-definition.xml.j2') }}"
+      loop: "{{ vms_to_create }}"
+      loop_control:
+        label: "Defined {{ item.hostname }}"
+
+    - name: Start virtual machines
+      become: false
+      virt:
+        name: "{{ item.hostname }}"
+        state: running
+      loop: "{{ vms_to_create }}"
+      loop_control:
+        label: "Started {{ item.hostname }}"
+
+    - name: Wait for VMs to become reachable
+      wait_for:
+        host: "{{ item.ip }}"
+        port: 22
+        delay: 10
+        timeout: 300
+      loop: "{{ vms_to_create }}"
+      loop_control:
+        label: "Waiting for {{ item.hostname }} ({{ item.ip }})"
+
+    - name: Write sandbox state file
+      copy:
+        content: "{{ {'architecture': arch.name, 'vms': vm_specs} | to_nice_yaml }}"
+        dest: "/tmp/sandbox-{{ arch.name }}.state.yaml"

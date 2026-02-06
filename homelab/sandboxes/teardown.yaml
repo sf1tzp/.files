@@ -1,0 +1,83 @@
+---
+# Tear down a sandbox architecture
+#
+# Usage:
+#   ansible-playbook teardown.yaml -e "architecture=web-db"
+#
+# Reads the architecture definition, derives VM names, and destroys them
+# along with their disk images and cloud-init ISOs.
+#
+- name: Teardown Sandbox
+  hosts: localhost
+  vars:
+    libvirt_images: /var/lib/libvirt/images
+    arch: "{{ lookup('file', 'architectures/' + architecture + '.yaml') | from_yaml }}"
+    sandbox_prefix: "sandbox-{{ arch.name }}"
+
+  tasks:
+    - name: Build VM name list from architecture
+      set_fact:
+        vm_names: "{{ arch.nodes | dict2items | map(attribute='key') | map('regex_replace', '^(.*)$', sandbox_prefix + '-\\1') | list }}"
+
+    - name: Display VMs to tear down
+      debug:
+        msg: "Tearing down: {{ vm_names | join(', ') }}"
+
+    - name: Check which VMs exist
+      virt:
+        name: "{{ item }}"
+        command: status
+      register: vm_status
+      failed_when: false
+      loop: "{{ vm_names }}"
+      loop_control:
+        label: "Checking {{ item }}"
+
+    - name: Filter to existing VMs
+      set_fact:
+        vms_to_delete: "{{ vm_status.results | selectattr('status', 'defined') | map(attribute='item') | list }}"
+
+    - name: End if no VMs to delete
+      meta: end_play
+      when: vms_to_delete | length == 0
+
+    - name: Destroy running VMs
+      virt:
+        name: "{{ item }}"
+        command: destroy
+      failed_when: false
+      loop: "{{ vms_to_delete }}"
+      loop_control:
+        label: "Destroyed {{ item }}"
+
+    - name: Undefine VMs
+      virt:
+        name: "{{ item }}"
+        command: undefine
+        flags:
+          - nvram
+      failed_when: false
+      loop: "{{ vms_to_delete }}"
+      loop_control:
+        label: "Undefined {{ item }}"
+
+    - name: Remove OS disks
+      file:
+        path: "{{ libvirt_images }}/{{ item }}.qcow2"
+        state: absent
+      loop: "{{ vms_to_delete }}"
+      loop_control:
+        label: "Removed {{ item }} disk"
+
+    - name: Remove cloud-init ISOs
+      file:
+        path: "{{ libvirt_images }}/{{ item }}-cloud-init.iso"
+        state: absent
+      loop: "{{ vms_to_delete }}"
+      loop_control:
+        label: "Removed {{ item }} cloud-init"
+
+    - name: Remove sandbox state file
+      file:
+        path: "/tmp/sandbox-{{ arch.name }}.state.yaml"
+        state: absent
