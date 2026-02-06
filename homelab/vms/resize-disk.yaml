@@ -34,7 +34,7 @@
         msg: "{{ target_vm }} is {{ vm_status.status }}"
 
     - name: Get current disk size
-      command: qemu-img info --output=json {{ libvirt_images }}/{{ target_vm }}.qcow2
+      command: qemu-img info -U --output=json {{ libvirt_images }}/{{ target_vm }}.qcow2
       register: disk_info
       changed_when: false
 
