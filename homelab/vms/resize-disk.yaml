@@ -1,0 +1,118 @@
+---
+# Resize a VM's disk image and grow the guest partition/filesystem to match.
+#
+# Usage:
+#   ansible-playbook resize-disk.yaml -e "target_vm=staging-db new_disk_size=50G"
+#
+# The new_disk_size can be an absolute size (e.g. "50G") or a relative increment (e.g. "+25G").
+#
+# Optional variables:
+#   partition_number  - partition to grow (default: 1)
+#   disk_device       - block device inside the guest (default: /dev/vda)
+
+- name: Resize VM Disk Image
+  hosts: localhost
+  vars:
+    libvirt_images: /var/lib/libvirt/images
+
+  tasks:
+    - name: Validate required variables
+      assert:
+        that:
+          - target_vm is defined
+          - new_disk_size is defined
+        fail_msg: "Usage: ansible-playbook resize-disk.yaml -e 'target_vm=<name> new_disk_size=<size>'"
+
+    - name: Check VM exists
+      virt:
+        name: "{{ target_vm }}"
+        command: status
+      register: vm_status
+
+    - name: Display current VM status
+      debug:
+        msg: "{{ target_vm }} is {{ vm_status.status }}"
+
+    - name: Get current disk size
+      command: qemu-img info --output=json {{ libvirt_images }}/{{ target_vm }}.qcow2
+      register: disk_info
+      changed_when: false
+
+    - name: Display current disk size
+      debug:
+        msg: "Current virtual size: {{ (disk_info.stdout | from_json)['virtual-size'] | int // (1024*1024*1024) }}G"
+
+    - name: Shut down VM gracefully
+      virt:
+        name: "{{ target_vm }}"
+        state: shutdown
+      when: vm_status.status == "running"
+
+    - name: Wait for VM to shut down
+      virt:
+        name: "{{ target_vm }}"
+        command: status
+      register: shutdown_status
+      until: shutdown_status.status == "shutdown"
+      retries: 30
+      delay: 5
+      when: vm_status.status == "running"
+
+    - name: Resize qcow2 disk image
+      command: qemu-img resize {{ libvirt_images }}/{{ target_vm }}.qcow2 {{ new_disk_size }}
+
+    - name: Verify new disk size
+      command: qemu-img info --output=json {{ libvirt_images }}/{{ target_vm }}.qcow2
+      register: new_disk_info
+      changed_when: false
+
+    - name: Display new disk size
+      debug:
+        msg: "New virtual size: {{ (new_disk_info.stdout | from_json)['virtual-size'] | int // (1024*1024*1024) }}G"
+
+    - name: Start VM
+      virt:
+        name: "{{ target_vm }}"
+        state: running
+
+    - name: Wait for VM to be accessible via SSH
+      wait_for:
+        host: "{{ hostvars[target_vm]['ansible_host'] }}"
+        port: 22
+        delay: 5
+        timeout: 120
+
+- name: Grow Partition and Filesystem
+  hosts: "{{ target_vm }}"
+  become: true
+  vars:
+    disk_device: /dev/vda
+    partition_number: 1
+
+  tasks:
+    - name: Install growpart
+      apt:
+        name: cloud-guest-utils
+        state: present
+
+    - name: Grow partition to fill available space
+      command: growpart {{ disk_device }} {{ partition_number }}
+      register: growpart_result
+      changed_when: "'CHANGED' in growpart_result.stdout"
+      failed_when:
+        - growpart_result.rc != 0
+        - "'NOCHANGE' not in growpart_result.stdout"
+
+    - name: Resize filesystem
+      command: resize2fs {{ disk_device }}{{ partition_number }}
+      register: resize_result
+      changed_when: resize_result.rc == 0
+
+    - name: Display new filesystem size
+      command: df -h /
+      register: df_output
+      changed_when: false
+
+    - name: Show result
+      debug:
+        msg: "{{ df_output.stdout_lines }}"
