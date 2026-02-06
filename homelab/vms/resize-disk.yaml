@@ -2,7 +2,7 @@
 # Resize a VM's disk image and grow the guest partition/filesystem to match.
 #
 # Usage:
-#   ansible-playbook resize-disk.yaml -e "target_vm=staging-db new_disk_size=50G"
+#   ansible-playbook -i ../inventory.yaml resize-disk.yaml -e "target_vm=staging-db new_disk_size=50G"
 #
 # The new_disk_size can be an absolute size (e.g. "50G") or a relative increment (e.g. "+25G").
 #
@@ -21,7 +21,10 @@
         that:
           - target_vm is defined
           - new_disk_size is defined
-        fail_msg: "Usage: ansible-playbook resize-disk.yaml -e 'target_vm=<name> new_disk_size=<size>'"
+          - target_vm in hostvars
+        fail_msg: >-
+          Usage: ansible-playbook -i ../inventory.yaml resize-disk.yaml -e 'target_vm=<name> new_disk_size=<size>'
+          (make sure to pass the inventory file with -i)
 
     - name: Check VM exists
       virt:
