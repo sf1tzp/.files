@@ -35,7 +35,7 @@
               'gpu_domain': hostvars[item]['gpu_domain'] | default(''),
               'gpu_bus': hostvars[item]['gpu_bus'] | default(''),
               'gpu_slot': hostvars[item]['gpu_slot'] | default(''),
-              'username': hostvars[item]['username'] | default('ubuntu')
+              'username': hostvars[item]['username'] | default(vm_username | default('ubuntu'))
             }]
           }}
       loop: "{{ groups['vms'] }}"
