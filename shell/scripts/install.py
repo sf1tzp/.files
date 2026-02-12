@@ -31,6 +31,13 @@ AUTOMATIC = os.getenv("AUTOMATIC")
 
 
 PROGRAMS = {
+    "age": {
+        "version": "1.3.1",
+        "url_template": "https://github.com/FiloSottile/age/releases/download/v{version}/age-v{version}-linux-amd64.tar.gz",
+        "setup_script": """#!/usr/bin/env bash
+            mv age/age age/age-keygen {install_dir}
+        """,
+    },
     "bat": {
         "version": "0.25.0",
         "url_template": "https://github.com/sharkdp/bat/releases/download/v{version}/bat-v{version}-{arch}-unknown-linux-musl.tar.gz",
@@ -133,6 +140,14 @@ PROGRAMS = {
         "setup_script": """#!/usr/bin/env bash
             mv target/{arch}-unknown-linux-gnu/release/pipes-rs {install_dir}
             """,
+    },
+    "sops": {
+        "version": "3.11.0",
+        "url_template": "https://github.com/getsops/sops/releases/download/v{version}/sops-v{version}.linux.amd64",
+        "setup_script": """#!/usr/bin/env bash
+            chmod +x sops-v{version}.linux.amd64
+            mv sops-v{version}.linux.amd64 {install_dir}/sops
+        """,
     },
     "rg": {
         "version": "14.1.1",
