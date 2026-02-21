@@ -1,6 +1,6 @@
 global:
-  scrape_interval: 45s
-  evaluation_interval: 45s
+  scrape_interval: 15s
+  evaluation_interval: 60s
 
 rule_files:
   - /etc/prometheus/prometheus.rules.yaml
@@ -64,7 +64,8 @@ scrape_configs:
         regex: 10.0.0.31:9100
         replacement: staging-web
         target_label: instance
-      - regex: 10.0.0.32:9100
+      - source_labels: [__address__]
+        regex: 10.0.0.32:9100
         replacement: staging-db
         target_label: instance
 
