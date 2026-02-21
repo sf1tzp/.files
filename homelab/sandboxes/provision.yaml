@@ -1,0 +1,117 @@
+---
+# Provision sandbox VMs with containerd and deploy containers
+#
+# Usage:
+#   ansible-playbook provision.yaml -e "architecture=web-db"
+#
+# Reads the architecture definition, SSHs into each sandbox VM,
+# installs containerd (nerdctl), and deploys the specified containers.
+#
+- name: Provision Sandbox VMs
+  hosts: localhost
+  gather_facts: false
+  vars:
+    arch: "{{ lookup('file', 'architectures/' + architecture + '.yaml') | from_yaml }}"
+    sandbox_prefix: "sandbox-{{ arch.name }}"
+
+  tasks:
+    - name: Add sandbox VMs to in-memory inventory
+      add_host:
+        name: "{{ sandbox_prefix }}-{{ item.key }}"
+        groups:
+          - sandbox
+          - "sandbox_{{ item.key }}"
+        ansible_host: "{{ item.value.ip }}"
+        ansible_user: "{{ item.value.username | default(arch.defaults.username) | default('deployer') }}"
+        sandbox_role: "{{ item.key }}"
+        sandbox_containers: "{{ item.value.containers | default([]) }}"
+        sandbox_expose: "{{ item.value.expose | default([]) }}"
+        sandbox_arch: "{{ arch.name }}"
+        sandbox_nodes: "{{ arch.nodes }}"
+      loop: "{{ arch.nodes | dict2items }}"
+      loop_control:
+        label: "{{ item.key }} -> {{ item.value.ip }}"
+
+- name: Install containerd on sandbox VMs
+  hosts: sandbox
+  gather_facts: true
+  vars:
+    nerdctl_version: 2.1.3
+  tasks:
+    - name: Install containerd (nerdctl)
+      include_tasks: ../vms/tasks/containerd.yaml
+
+- name: Deploy containers to sandbox VMs
+  hosts: sandbox
+  gather_facts: true
+  vars:
+    compose_dir: "{{ ansible_env.HOME }}/sandbox"
+
+  tasks:
+    - name: Skip hosts with no containers
+      meta: end_host
+      when: sandbox_containers | length == 0
+
+    - name: Create sandbox compose directory
+      file:
+        path: "{{ compose_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Build node address map
+      set_fact:
+        sandbox_node_ips: >-
+          {{
+            sandbox_node_ips | default({}) | combine({
+              item.key: item.value.ip
+            })
+          }}
+      loop: "{{ sandbox_nodes | dict2items }}"
+      loop_control:
+        label: "{{ item.key }}"
+
+    - name: Template compose files for assigned containers
+      template:
+        src: "containers/{{ item }}/compose.yaml"
+        dest: "{{ compose_dir }}/compose.yaml"
+        mode: "0644"
+      vars:
+        node_ips: "{{ sandbox_node_ips }}"
+        role: "{{ sandbox_role }}"
+      loop: "{{ sandbox_containers }}"
+      loop_control:
+        label: "{{ item }}"
+      when: sandbox_containers | length == 1
+
+    - name: Template individual compose files (multi-container nodes)
+      template:
+        src: "containers/{{ item }}/compose.yaml"
+        dest: "{{ compose_dir }}/compose.{{ item }}.yaml"
+        mode: "0644"
+      vars:
+        node_ips: "{{ sandbox_node_ips }}"
+        role: "{{ sandbox_role }}"
+      loop: "{{ sandbox_containers }}"
+      loop_control:
+        label: "{{ item }}"
+      when: sandbox_containers | length > 1
+
+    - name: Start containers (single compose)
+      command: >
+        nerdctl compose -f {{ compose_dir }}/compose.yaml up -d
+      environment:
+        PATH: "{{ ansible_env.HOME }}/.local/bin:{{ ansible_env.PATH }}"
+        XDG_RUNTIME_DIR: "/run/user/{{ ansible_user_uid }}"
+      when: sandbox_containers | length == 1
+
+    - name: Start containers (multi compose)
+      command: >
+        nerdctl compose
+        {% for c in sandbox_containers %}
+        -f {{ compose_dir }}/compose.{{ c }}.yaml
+        {% endfor %}
+        up -d
+      environment:
+        PATH: "{{ ansible_env.HOME }}/.local/bin:{{ ansible_env.PATH }}"
+        XDG_RUNTIME_DIR: "/run/user/{{ ansible_user_uid }}"
+      when: sandbox_containers | length > 1

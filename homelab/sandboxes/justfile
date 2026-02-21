@@ -1,0 +1,62 @@
+# Sandbox lifecycle management
+#
+# Usage:
+#   just deploy web-db        # Create VMs and provision containers
+#   just teardown web-db      # Destroy all VMs for an architecture
+#   just test web-db          # Run k6 smoke tests
+#   just test web-db load     # Run k6 load tests
+#   just status web-db        # Check VM status
+#
+# Available architectures: web-db, web-cache-db, poller-queue-worker-db
+
+inventory := "~/.files/homelab/inventory.yaml"
+vault_password := "~/.ansible-password"
+
+# Full lifecycle: deploy VMs, provision containers, run smoke tests
+up arch:
+    just deploy {{ arch }}
+    just provision {{ arch }}
+    just test {{ arch }}
+
+# Create sandbox VMs from an architecture definition
+deploy arch:
+    ansible-playbook deploy.yaml \
+        --vault-password-file {{ vault_password }} \
+        --extra-vars "architecture={{ arch }}"
+
+# Provision sandbox VMs with containerd and deploy containers
+provision arch:
+    ansible-playbook provision.yaml \
+        --extra-vars "architecture={{ arch }}"
+
+# Tear down all VMs for an architecture
+teardown arch:
+    ansible-playbook teardown.yaml \
+        --extra-vars "architecture={{ arch }}"
+
+# Run k6 tests against a sandbox (default: smoke)
+test arch scenario="smoke":
+    cd tests && K6_SCENARIO={{ scenario }} npm run test:{{ arch }}
+
+# Check the status of sandbox VMs for an architecture
+status arch:
+    #!/bin/bash
+    set -e
+    arch_file="architectures/{{ arch }}.yaml"
+    prefix="sandbox-{{ arch }}"
+    for role in $(grep '^\s\+\w\+:$' "$arch_file" | sed 's/://;s/^ *//'); do
+        vm="${prefix}-${role}"
+        state=$(virsh domstate "$vm" 2>/dev/null || echo "not found")
+        printf "  %-30s %s\n" "$vm" "$state"
+    done
+
+# List all sandbox VMs currently defined on the hypervisor
+list:
+    @virsh list --all | grep sandbox || echo "No sandbox VMs found"
+
+# SSH into a specific sandbox node
+ssh arch role:
+    #!/bin/bash
+    arch_file="architectures/{{ arch }}.yaml"
+    ip=$(grep -A1 '^\s*{{ role }}:' "$arch_file" | grep 'ip:' | awk '{print $2}')
+    ssh deployer@"$ip"
