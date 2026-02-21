@@ -331,15 +331,26 @@ dial-in.staging.lofi {
   }
 
 streetfortress.staging.lofi {
+    @cors_preflight method OPTIONS
+    @cors_origin {
+        header Origin https://streetfortress..staging.lofi
+      }
+
+    handle @cors_preflight {
+        header Access-Control-Allow-Origin {http.request.header.Origin}
+        header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+        header Access-Control-Allow-Headers "Authorization, Content-Type, Origin, Accept"
+        header Access-Control-Allow-Credentials "true"
+        header Access-Control-Max-Age "1728000"
+        respond "" 204
+    }
+
+    header @cors_origin Access-Control-Allow-Origin {http.request.header.Origin}
+    header @cors_origin Access-Control-Allow-Credentials "true"
     header {
-        # Prevent clickjacking
-        X-Frame-Options "SAMEORIGIN"
-        # XSS protection
         X-Content-Type-Options "nosniff"
-        # Referrer policy
         Referrer-Policy "strict-origin-when-cross-origin"
-        # Remove server header for security
-        -server
+        -Server
     }
     encode gzip zstd
 
@@ -360,3 +371,78 @@ streetfortress.staging.lofi {
         header_up X-Real-IP {remote_host}
     }
   }
+
+symbology.staging.lofi {
+    header {
+        # Prevent clickjacking
+        X-Frame-Options "SAMEORIGIN"
+        # XSS protection
+        X-Content-Type-Options "nosniff"
+        # Referrer policy
+        Referrer-Policy "strict-origin-when-cross-origin"
+        # Remove server header for security
+        -Server
+    }
+    encode gzip zstd
+
+    log {
+        output stdout
+        format json
+    }
+
+    reverse_proxy 10.0.0.31:5555 {
+        # Timeouts
+        transport http {
+            dial_timeout 5s
+            response_header_timeout 10s
+        }
+
+        # Pass real client IP
+        header_up X-Real-IP {remote_host}
+    }
+}
+
+api.symbology.staging.lofi {
+    @cors_preflight method OPTIONS
+    @cors_origin header Origin https://symbology.staging.lofi
+
+    handle @cors_preflight {
+        header Access-Control-Allow-Origin "https://symbology.staging.lofi"
+        header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+        header Access-Control-Allow-Headers "Authorization, Content-Type, Origin, Accept"
+        header Access-Control-Max-Age "1728000"
+        respond "" 204
+    }
+
+    header @cors_origin Access-Control-Allow-Origin "https://symbology.staging.lofi"
+    header {
+        X-Content-Type-Options "nosniff"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        -Server
+    }
+    encode gzip zstd
+
+    log {
+        output stdout
+        format json
+    }
+
+    reverse_proxy 10.0.0.31:5556 {
+        # Timeouts
+        transport http {
+            dial_timeout 5s
+            response_header_timeout 10s
+        }
+
+        # Pass real client IP
+        header_up X-Real-IP {remote_host}
+
+        # Remove CORS headers from upstream to prevent duplicates
+        header_down -Access-Control-Allow-Origin
+        header_down -Access-Control-Allow-Methods
+        header_down -Access-Control-Allow-Headers
+        header_down -Access-Control-Allow-Credentials
+    }
+}
+
+
