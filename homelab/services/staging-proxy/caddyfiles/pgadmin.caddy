@@ -1,0 +1,23 @@
+pgadmin.staging.lofi {
+    header {
+        X-Frame-Options "SAMEORIGIN"
+        X-Content-Type-Options "nosniff"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        -Server
+    }
+    encode gzip zstd
+
+    log {
+        output stdout
+        format json
+    }
+
+    # staging-db (10.0.0.32)
+    reverse_proxy 10.0.0.32:5433 {
+        transport http {
+            dial_timeout 5s
+            response_header_timeout 10s
+        }
+        header_up X-Real-IP {remote_host}
+    }
+}
