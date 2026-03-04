@@ -60,6 +60,20 @@ services:
     command:
       - "--config.file=/etc/loki/loki-config.yaml"
 
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.120.0
+    container_name: otel-collector
+    ports:
+      - "${OTEL_COLLECTOR_HTTP_PORT:-4318}:4318"
+      - "${OTEL_COLLECTOR_METRICS_PORT:-8889}:8889"
+    restart: unless-stopped
+    volumes:
+      - ./config:/etc/otel-collector
+    command:
+      - "--config=/etc/otel-collector/otel-collector-config.yaml"
+    networks:
+      - lofi-lab-network
+
   blackbox-exporter:
     image: prom/blackbox-exporter:v0.28.0
     container_name: blackbox-exporter
