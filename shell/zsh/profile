@@ -70,6 +70,12 @@ if [[ -d /usr/local/nvim/bin ]]; then
     export PATH="${PATH:+${PATH}:}/usr/local/nvim/bin"
 fi
 
+# Claude Code
+if [[ ! -f "$HOME/.config/claude-code/settings.json" ]]; then
+    mkdir -p "$HOME/.config/claude-code"
+    ln -s "$HOME/.files/shell/config/claude-code/settings.json" "$HOME/.config/claude-code/settings.json"
+fi
+
 # Starship
 if which starship &>/dev/null; then
     # workaround a starship bug on MacOS https://github.com/starship/starship/issues/3418#issuecomment-2477375663
