@@ -1,0 +1,8 @@
+up:
+    nerdctl compose -f umami-compose.yaml up --env-file ~/.files/homelab/services/umami/.env --detach
+
+down:
+    nerdctl compose -f umami-compose.yaml down
+
+logs *ARGS:
+    nerdctl compose -f umami-compose.yaml logs {{ARGS}}

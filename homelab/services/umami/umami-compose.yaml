@@ -1,0 +1,38 @@
+services:
+  umami:
+    image: ghcr.io/umami-software/umami:postgresql-latest
+    container_name: umami-server
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${UMAMI_DB_USER:-umami}:${UMAMI_DB_PASSWORD:-umami}@umami-db:5432/${UMAMI_DB_NAME:-umami}
+      APP_SECRET: ${UMAMI_APP_SECRET:-replace-me-with-a-random-string}
+    ports:
+      - "${UMAMI_PORT:-3000}:3000"
+    depends_on:
+      umami-db:
+        condition: service_healthy
+    networks:
+      - lofi-lab-network
+
+  umami-db:
+    image: postgres:17
+    container_name: umami-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${UMAMI_DB_USER:-umami}
+      POSTGRES_PASSWORD: ${UMAMI_DB_PASSWORD:-umami}
+      POSTGRES_DB: ${UMAMI_DB_NAME:-umami}
+    volumes:
+      - ./umami-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${UMAMI_DB_USER:-umami} -d ${UMAMI_DB_NAME:-umami}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - lofi-lab-network
+
+networks:
+  lofi-lab-network:
+    driver: bridge
