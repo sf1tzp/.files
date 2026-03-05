@@ -163,6 +163,13 @@ PROGRAMS = {
             mv starship {install_dir}
             """,
     },
+    "stripe": {
+        "version": "1.35.0",
+        "url_template": "https://github.com/stripe/stripe-cli/releases/download/v{version}/stripe_{version}_linux_{arch}.tar.gz",
+        "setup_script": """#!/usr/bin/env bash
+            mv stripe {install_dir}
+            """,
+    },
     "step": {
         "version": "0.28.6",
         "url_template": "https://dl.smallstep.com/gh-release/cli/gh-release-header/v{version}/step_linux_{version}_{arch}.tar.gz",
