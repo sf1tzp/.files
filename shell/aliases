@@ -1,4 +1,5 @@
 # shellcheck disable=SC2148
+alias watch='watch '
 
 # git command aliases
 alias repo='git rev-parse --show-toplevel'
