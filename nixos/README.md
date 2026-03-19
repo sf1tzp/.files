@@ -13,7 +13,8 @@ nixos/
 │       └── hardware.nix   # Generated hardware config (disk UUIDs, kernel modules)
 ├── modules/
 │   ├── desktop.nix        # GNOME, PipeWire, fonts, Steam, Firefox
-│   └── development.nix    # Docker, dev tools (go, rust, kubectl, etc.)
+│   ├── development.nix    # Docker, dev tools (go, rust, kubectl, etc.)
+│   └── hypervisor.nix     # Libvirt, QEMU/KVM, bridge networking, virt-manager
 └── home/
     └── steven.nix         # Home Manager: user packages, dotfiles, shell config
 ```
@@ -44,13 +45,26 @@ modules = [
   ./hosts/zenbook
   ./modules/desktop.nix
   ./modules/development.nix
-  ./modules/hypervisor.nix    # <- add new modules here
+  ./modules/hypervisor.nix
+  # ./modules/kubernetes.nix    # <- add new modules here
   # ...
 ];
 ```
 
-Planned modules (see NIXOS-HOMELAB-NOTES.md):
-- `hypervisor.nix` - libvirt/QEMU/KVM
-- `kubernetes.nix` - k3s
-- `monitoring.nix` - Prometheus, node-exporter, Grafana
-- `networking.nix` - WireGuard, bridge networking
+## Network Layout
+
+| Host | IP | Role |
+|------|----|------|
+| Zenbook (br0) | 10.0.0.6 | Hypervisor, k3s control plane |
+| k8s-worker-1 (microVM) | 10.0.0.7 | k3s agent |
+| k8s-worker-2 (microVM) | 10.0.0.8 | k3s agent |
+| Router | 10.0.0.1 | Gateway |
+| DNS | 10.0.0.2 | Primary DNS (fallback: 8.8.8.8) |
+
+## Planned Modules
+
+See `NIXOS-HOMELAB-NOTES.md` for detailed notes.
+
+- `kubernetes.nix` — k3s control plane + microvm.nix worker nodes
+- `monitoring.nix` — Prometheus, node-exporter, Grafana
+- `networking.nix` — WireGuard, firewall rules for k3s/VM traffic

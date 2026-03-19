@@ -22,6 +22,7 @@
           # Role modules - add/remove as needed
           # ./modules/desktop.nix
           ./modules/development.nix
+          ./modules/hypervisor.nix
 
           # Home Manager as NixOS module (single nixos-rebuild updates everything)
           home-manager.nixosModules.home-manager
