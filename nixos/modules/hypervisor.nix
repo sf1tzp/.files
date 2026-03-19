@@ -59,6 +59,11 @@ let
         tokenFile = "/run/host-secrets/k3s-token";
       };
 
+      services.prometheus.exporters.node = {
+        enable = true;
+        openFirewall = true;
+      };
+
       system.stateVersion = "25.11";
     };
   };
@@ -94,6 +99,12 @@ in
   };
 
   networking.firewall.allowedTCPPorts = [ 6443 ];
+
+  # ── Monitoring ─────────────────────────────────────────────────────
+  services.prometheus.exporters.node = {
+    enable = true;
+    openFirewall = true; # opens port 9100
+  };
 
   # ── microVM workers ────────────────────────────────────────────────
   microvm.vms = {
