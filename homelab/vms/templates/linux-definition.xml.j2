@@ -1,6 +1,9 @@
 <domain type='kvm'>
   <name>{{ item.hostname }}</name>
   <memory unit='MiB'>{{ item.memory * 1024 }}</memory>
+  <memoryBacking>
+    <hugepages/>
+  </memoryBacking>
   <vcpu>{{ item.vcpus }}</vcpu>
   <os>
     <type arch='x86_64'>hvm</type>

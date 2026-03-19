@@ -6,6 +6,9 @@
     </libosinfo:libosinfo>
   </metadata>
   <memory unit='MiB'>{{ item.memory * 1024 }}</memory>
+  <memoryBacking>
+    <hugepages/>
+  </memoryBacking>
   <vcpu placement='static' {% if item.isol_cpus is defined %} cpuset='{{ item.isol_cpus }}'{% endif %}>{{ item.vcpus }}</vcpu>
   <-- Todo: Templatize -->
   <cputune>
