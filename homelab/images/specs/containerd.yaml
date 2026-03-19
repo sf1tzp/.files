@@ -1,0 +1,13 @@
+---
+# Containerd image spec -- base packages plus container runtime prerequisites
+# Phase 2: will add containerd-system tasks (apparmor, sysctl, subuid/subgid)
+apt_packages:
+  - curl
+  - git
+  - jq
+  - make
+  - tmux
+  - unzip
+  - wget
+  - zsh
+  - uidmap

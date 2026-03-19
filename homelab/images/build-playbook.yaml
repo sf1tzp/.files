@@ -1,0 +1,137 @@
+---
+# Image Build Playbook
+#
+# Builds a user-agnostic base image from an Ubuntu cloud image.
+# Connects as the cloud-init default user (ubuntu), installs system-level
+# packages from a spec file, cleans up, and converts the disk to a base image.
+#
+# Usage:
+#   ansible-playbook build-playbook.yaml -e "spec=base custom_image_name=my-image"
+#
+# Tags:
+#   setup    -- apt upgrade + package installation
+#   finalize -- cleanup, user deletion, VM shutdown, disk conversion
+
+- name: Build Image
+  hosts: custom-image-builder
+  remote_user: ubuntu
+  become: true
+  vars:
+    ansible_ssh_common_args: '-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+  vars_files:
+    - "specs/{{ spec }}.yaml"
+
+  tasks:
+    - name: Wait for system to be ready
+      wait_for_connection:
+        timeout: 300
+      tags: [setup]
+
+    - name: Update and upgrade apt packages
+      apt:
+        update_cache: true
+        upgrade: dist
+      tags: [setup]
+
+    - name: Install packages from spec
+      apt:
+        name: "{{ apt_packages }}"
+        state: present
+      when: apt_packages is defined and apt_packages | length > 0
+      tags: [setup]
+
+    # --- Finalize: clean system artifacts, then delete build user ---
+
+    - name: Clean package cache
+      apt:
+        autoclean: true
+        autoremove: true
+      tags: [finalize]
+
+    - name: Clear bash history
+      file:
+        path: /root/.bash_history
+        state: absent
+      tags: [finalize]
+
+    - name: Clear cloud-init logs and data
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /var/log/cloud-init.log
+        - /var/log/cloud-init-output.log
+        - /var/lib/cloud/instances
+        - /var/lib/cloud/instance
+      tags: [finalize]
+
+    - name: Clear SSH host keys (regenerated on first boot)
+      shell: rm -f /etc/ssh/ssh_host_*
+      tags: [finalize]
+
+    - name: Clear machine-id (regenerated on first boot)
+      copy:
+        content: ""
+        dest: /etc/machine-id
+      tags: [finalize]
+
+    - name: Vacuum systemd journal
+      command: journalctl --vacuum-time=1s
+      tags: [finalize]
+
+    - name: Clean temporary files and truncate logs
+      shell: |
+        rm -rf /tmp/*
+        rm -rf /var/tmp/*
+        find /var/log -type f -exec truncate -s 0 {} \;
+      tags: [finalize]
+
+    - name: Delete cloud-init default user and sudoers file
+      shell: |
+        userdel -rf ubuntu
+        rm -f /etc/sudoers.d/90-cloud-init-users
+      ignore_unreachable: true
+      tags: [finalize]
+
+- name: Convert VM to Base Image
+  hosts: localhost
+  vars:
+    live_images: /var/lib/libvirt/images
+    base_images: /var/lib/libvirt/images/bases
+  tasks:
+    - name: Shutdown the VM
+      command: virsh shutdown custom-image-builder
+      tags: [finalize]
+
+    - name: Wait for VM to shutdown
+      command: virsh domstate custom-image-builder
+      register: vm_state
+      until: vm_state.stdout.strip() == "shut off"
+      retries: 30
+      delay: 10
+      tags: [finalize]
+
+    - name: Convert VM disk to base image
+      command: >
+        qemu-img convert -f qcow2 -O qcow2 -c
+        {{ live_images }}/custom-image-builder.qcow2
+        {{ base_images }}/{{ custom_image_name }}.qcow2
+      tags: [finalize]
+
+    - name: Display image information
+      command: qemu-img info {{ base_images }}/{{ custom_image_name }}.qcow2
+      register: image_info
+      tags: [finalize]
+
+    - name: Show completion message
+      debug:
+        msg: |
+          Custom base image created successfully!
+
+          Image: {{ base_images }}/{{ custom_image_name }}.qcow2
+          Spec: {{ spec }}
+
+          {{ image_info.stdout }}
+
+          To use this image, set os: {{ custom_image_name }} in inventory.
+      tags: [finalize]
