@@ -1,0 +1,11 @@
+{
+    email tech@stev.lol
+
+    acme_ca https://step-ca.staging.lofi:9000/acme/acme/directory
+
+    metrics {
+        per_host
+    }
+}
+
+import caddyfiles/*.caddy
