@@ -35,8 +35,8 @@ if [[ -d .venv ]]; then
     source .venv/bin/activate
 fi
 
-# Check for / install utilities
-if [[ "$(uname -s)" == "Linux" ]]; then
+# Check for / install utilities (skip on NixOS, packages managed by Nix)
+if [[ "$(uname -s)" == "Linux" && ! -f /etc/NIXOS ]]; then
     "$HOME/.files/shell/scripts/install.py"
 fi
 
@@ -105,8 +105,13 @@ fi
 export FZF_ALT_C_COMMAND=""
 export FZF_CTRL_T_COMMAND=""
 
-# Set up zsh plugins
-source ~/.files/shell/zsh/zplug
+# Set up zsh plugins (NixOS uses home-manager plugins; non-NixOS uses zplug)
+if [[ ! -f /etc/NIXOS ]]; then
+    source ~/.files/shell/zsh/zplug
+else
+    # fzf init after zsh-vi-mode (loaded by home-manager)
+    zvm_after_init_commands+=('source <(fzf --zsh)')
+fi
 
 # aliases and command specific stuff
 source "$HOME/.files/shell/aliases"
