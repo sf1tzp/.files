@@ -11,8 +11,8 @@
   sops = {
     defaultSopsFile = ../secrets/cluster.yaml;
 
-    # Derive age key from the host's SSH key
-    age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+    age.sshKeyPaths = [];          # Don't derive from SSH host keys
+    age.keyFile = "/home/steven/.config/sops/age/keys.txt";
 
     secrets = {
       k3s-token = {

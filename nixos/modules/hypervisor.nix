@@ -42,10 +42,14 @@ let
       };
 
       networking.hostName = hostname;
-      networking.interfaces.eth0.ipv4.addresses = [{
-        inherit address;
-        prefixLength = 24;
-      }];
+      # networking.useDHCP = false;
+      networking.interfaces.eth0 = {
+        useDHCP = false;
+        ipv4.addresses = [{
+          inherit address;
+          prefixLength = 24;
+        }];
+      };
       networking.defaultGateway = {
         address = "10.0.0.1";
         interface = "eth0";
