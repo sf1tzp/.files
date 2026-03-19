@@ -1,0 +1,40 @@
+services:
+  timescaledb:
+    image: timescale/timescaledb-ha:pg18
+    container_name: timescaledb-server
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      PGDATA: /var/lib/postgresql/data
+    ports:
+      - ${POSTGRES_PORT:-6432}:5432
+    volumes:
+      - ./timescaledb-data:/var/lib/postgresql/data
+    networks:
+      - lofi-lab-network
+
+  tsdb-admin:
+    image: dpage/pgadmin4:9.11.0
+    container_name: tsdbadmin-server
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-test@example.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-postgres}
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+      PGADMIN_DISABLE_POSTFIX: "True"
+      PGADMIN_LISTEN_ADDRESS: "0.0.0.0"
+    ports:
+      - "${PGADMIN_PORT:-6433}:80"
+    volumes:
+      - ./pgadmin-data/servers.json:/pgadmin4/servers.json
+      - ./pgadmin-data/pgpass:/pgpass
+    depends_on:
+      - timescaledb
+    networks:
+      - lofi-lab-network
+
+networks:
+  lofi-lab-network:
+    driver: bridge
