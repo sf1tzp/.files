@@ -1,0 +1,14 @@
+---
+# Full image spec -- all packages (containerd + nvidia + monitoring)
+# Phase 2: will add containerd-system, nvidia, and monitoring tasks
+apt_packages:
+  - curl
+  - git
+  - jq
+  - make
+  - tmux
+  - unzip
+  - wget
+  - zsh
+  - uidmap
+  - ubuntu-drivers-common

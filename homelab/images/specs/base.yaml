@@ -1,0 +1,11 @@
+---
+# Base image spec -- minimal system packages on top of Ubuntu cloud image
+apt_packages:
+  - curl
+  - git
+  - jq
+  - make
+  - tmux
+  - unzip
+  - wget
+  - zsh

@@ -1,0 +1,13 @@
+---
+# NVIDIA image spec -- base packages plus GPU driver prerequisites
+# Phase 2: will add nvidia driver installation tasks
+apt_packages:
+  - curl
+  - git
+  - jq
+  - make
+  - tmux
+  - unzip
+  - wget
+  - zsh
+  - ubuntu-drivers-common

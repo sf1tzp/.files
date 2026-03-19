@@ -51,7 +51,7 @@ all:
         custom-image-builder:
           hosts:
             custom-image-builder:
-              ansible_host: 10.0.0.7
+              ansible_host: 10.0.0.10
               os: "ubuntu-server-24.04"
               vcpus: 4
               memory: 8

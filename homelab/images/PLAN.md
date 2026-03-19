@@ -51,21 +51,23 @@ Each image spec is a self-contained vars file that pins its own versions and
 package lists. Duplication across specs is acceptable -- keeping specs
 independent and readable is more valuable than DRY at this stage.
 
-- [ ] Create `images/build-playbook.yaml` with a single throwaway `builder` user
-  - Connects as `builder` (created by cloud-init for the build VM)
-  - Installs everything system-wide (no user home dependencies)q
+- [x] Create `images/build-playbook.yaml` with cloud-init default user
+  - Connects as `ubuntu` (cloud-init default -- simpler than creating a custom builder user)
+  - Installs everything system-wide via `become: true`
   - Loads a spec file via `--extra-vars "spec=base"` → `vars_files: [specs/{{ spec }}.yaml]`
-  - Deletes `builder` user at the end -- no finalize gymnastics
-- [ ] Adapt `build-custom-image.py` → `images/build.py`
-  - Simplify: no `vm_username` passthrough, builder user is always `builder`
+  - Deletes `ubuntu` user at the end -- no finalize gymnastics
+- [x] Adapt `build-custom-image.py` → `images/build.py`
+  - Simplify: no `vm_username` passthrough, cloud-init default user is always `ubuntu`
   - Accept `--spec` flag to select which image profile to build
   - Keep prerequisite checks, VM lifecycle management, arg parsing
-- [ ] Create image profile specs under `images/specs/`
-  - `base.yaml` -- apt packages, go, neovim, fzf, common CLI tools
-  - `containerd.yaml` -- base + nerdctl, uidmap, sysctl, apparmor for rootless containers
-  - `nvidia.yaml` -- base + GPU drivers, container toolkit, gpu exporter
-  - `full.yaml` -- containerd + nvidia + monitoring
+  - Validates spec file exists in `check_prerequisites()`
+- [x] Create image profile specs under `images/specs/`
+  - `base.yaml` -- minimal apt packages (curl, git, jq, make, tmux, etc.)
+  - `containerd.yaml` -- base + uidmap (stub, Phase 2 adds system tasks)
+  - `nvidia.yaml` -- base + ubuntu-drivers-common (stub, Phase 2 adds driver tasks)
+  - `full.yaml` -- containerd + nvidia packages (stub, Phase 2 adds all tasks)
   - Each spec owns its version pins (no shared versions manifest)
+- [x] Update inventory: custom-image-builder IP changed from 10.0.0.7 to 10.0.0.10
 
 ### Phase 2: Split containerd tasks
 
