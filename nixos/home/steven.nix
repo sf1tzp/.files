@@ -14,17 +14,21 @@
     bottom
     claude-code
     duf
+    dust
     eza
-    fzf
+    fastfetch
     fd
-    gping
+    fnm
+    fzf
     helix
     htop
     hyperfine
-    fastfetch  # neofetch is unmaintained, fastfetch is the successor
-    pipes
+    jq
+    just
+    pipes-rs
     ripgrep
     starship
+    uv
     yq
     zoxide
   ];
@@ -38,6 +42,7 @@
     ".inputrc".source = ../../shell/config/inputrc;
     ".shellcheckrc".source = ../../shell/config/shellcheckrc;
     ".tmux.conf".source = ../../shell/config/tmux.conf;
+
   };
 
   home.sessionVariables = {
@@ -69,13 +74,13 @@
     shellAliases = {
       nix-rebuild = "sudo nixos-rebuild switch --flake ~/.files/nixos";
     };
-  };
-
-  # GNOME settings
-  dconf.settings = {
-    "org/gnome/mutter" = {
-      experimental-features = [ "scale-monitor-framebuffer" ];
-    };
+    plugins = [
+      {
+        name = "zsh-vi-mode";
+        src = pkgs.zsh-vi-mode;
+        file = "share/zsh-vi-mode/zsh-vi-mode.plugin.zsh";
+      }
+    ];
   };
 
   programs.home-manager.enable = true;
