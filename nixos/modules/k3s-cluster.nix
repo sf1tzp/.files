@@ -2,6 +2,16 @@
 { config, pkgs, ... }:
 
 let
+  sshKeys = [
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBFSTKL7m9ViSstGGhgg1TBnrWEGkNptCCysU17Oxgfl"
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG0sCtYCOvdb/J7yluSSX9yixiG3pvhZo+OtVQWefjVj"
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBuuLb9A36fWGYZexMb2soTxpHFB0HVQTHqR8vihvFMD"
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINqO0N5rBif1+bFwnluWEmrkaoTAtqTrP/vONG6/fQKl"
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBhrjrcm0Mb4gSMGM/GiWXvkZj3a2ej7/MOcw0Qujx+M"
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFSfukFhjws+MpZu+qMqgVCoIitc43jGeqEnGMcF4ydQ"
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEdgJK6LiKUZ+fQQZX28B1v82hCl1z4RxomJLn5pHiPH"
+  ];
+
   # Shared worker VM config — avoids repeating the same block twice
   mkWorker = { hostname, address, tapId, mac }: {
     config = {
@@ -59,6 +69,9 @@ let
         serverAddr = "https://10.0.0.6:6443";
         tokenFile = "/run/host-secrets/k3s-token";
       };
+
+      users.users.root.openssh.authorizedKeys.keys = sshKeys;
+      services.openssh.enable = true;
 
       services.prometheus.exporters.node = {
         enable = true;
