@@ -20,7 +20,7 @@
           ./hosts/zenbook
 
           # Role modules - add/remove as needed
-          ./modules/desktop.nix
+          # ./modules/desktop.nix
           ./modules/development.nix
 
           # Home Manager as NixOS module (single nixos-rebuild updates everything)

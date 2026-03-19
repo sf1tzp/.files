@@ -35,6 +35,7 @@
     ".config/fzf.bash".source = ../../shell/bash/fzf.bash;
     ".config/nvim".source = ../../nvim;
     ".config/starship.toml".source = ../../shell/config/starship.toml;
+    ".inputrc".source = ../../shell/config/inputrc;
     ".shellcheckrc".source = ../../shell/config/shellcheckrc;
     ".tmux.conf".source = ../../shell/config/tmux.conf;
   };
@@ -43,27 +44,14 @@
     EDITOR = "nvim";
   };
 
+  # Ensure ~/.local/bin is on PATH (for tools managed by installs.py)
+  home.sessionPath = [
+    "$HOME/.local/bin"
+  ];
+
   programs.bash = {
     enable = true;
     shellAliases = {
-      ".." = "cd ..";
-      get = "git";
-      git-log = "git log --date=short --pretty=\"%h  %cd  %s\"";
-      git-out = "git commit --amend --date=\"$(date -R)\" --no-edit; git push --force-with-lease";
-      git-fetch-checkout = "git fetch; git checkout";
-      gl = "git-log";
-      git-fetch-rebase = "git fetch; git rebase -i";
-      gd = "git diff";
-      gs = "git status";
-      gfs = "git fetch; git status";
-      gfc = "git-fetch-checkout";
-      gfr = "git-fetch-rebase";
-      grc = "git rebase --continue";
-      gum = "git checkout main && git reset --hard origin/main";
-      gtfo = "git-out";
-      clera = "clear";
-      watch = "watch ";
-      # Simplified rebuild - HM is now a NixOS module, single command
       nix-rebuild = "sudo nixos-rebuild switch --flake ~/.files/nixos";
     };
     initExtra = ''
@@ -71,6 +59,16 @@
       eval "$(starship init bash)"
       [ -f ~/.files/shell/bash/profile ] && . ~/.files/shell/bash/profile
     '';
+  };
+
+  programs.zsh = {
+    enable = true;
+    initContent = ''
+      [ -f ~/.files/shell/zsh/profile ] && source ~/.files/shell/zsh/profile
+    '';
+    shellAliases = {
+      nix-rebuild = "sudo nixos-rebuild switch --flake ~/.files/nixos";
+    };
   };
 
   # GNOME settings

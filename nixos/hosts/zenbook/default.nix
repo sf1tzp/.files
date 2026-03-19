@@ -32,10 +32,14 @@
     LC_TIME = "en_US.UTF-8";
   };
 
+  # Enable ZSH system-wide (required for setting it as user's default shell)
+  programs.zsh.enable = true;
+
   # User account
   users.users.steven = {
     isNormalUser = true;
     description = "Steven Fitzpatrick";
+    shell = pkgs.zsh;
     extraGroups = [ "networkmanager" "wheel" "docker" ];
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBFSTKL7m9ViSstGGhgg1TBnrWEGkNptCCysU17Oxgfl"
