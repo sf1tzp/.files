@@ -1,0 +1,48 @@
+name: poller-queue-worker-db
+description: >
+  Async processing architecture: A poller feeds work into a RabbitMQ message
+  queue, workers consume and process jobs, results are persisted to Postgres.
+  Tests backpressure handling, queue depth, and worker throughput under load.
+
+defaults:
+  os: sf1tzp-24.04
+  disk_size: 25G
+  username: deployer
+
+nodes:
+  poller:
+    ip: 10.0.0.46
+    vcpus: 1
+    memory: 2
+    containers:
+      - nginx
+    expose:
+      - "80:80"
+
+  queue:
+    ip: 10.0.0.47
+    vcpus: 2
+    memory: 4
+    containers:
+      - rabbitmq
+    expose:
+      - "5672:5672"
+      - "15672:15672"
+
+  worker:
+    ip: 10.0.0.48
+    vcpus: 2
+    memory: 4
+    containers: []
+    expose: []
+
+  db:
+    ip: 10.0.0.49
+    vcpus: 2
+    memory: 4
+    containers:
+      - postgres
+    expose:
+      - "5432:5432"
+
+test: poller-queue-worker-db
