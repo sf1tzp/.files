@@ -42,19 +42,16 @@ let
       };
 
       networking.hostName = hostname;
-      # networking.useDHCP = false;
-      networking.interfaces.eth0 = {
-        useDHCP = false;
-        ipv4.addresses = [{
-          inherit address;
-          prefixLength = 24;
-        }];
+      networking.useDHCP = false;
+
+      # Match on MAC address — device name varies across hypervisors
+      systemd.network.enable = true;
+      systemd.network.networks."10-vm" = {
+        matchConfig.MACAddress = mac;
+        address = [ "${address}/24" ];
+        gateway = [ "10.0.0.1" ];
+        dns = [ "10.0.0.2" "8.8.8.8" ];
       };
-      networking.defaultGateway = {
-        address = "10.0.0.1";
-        interface = "eth0";
-      };
-      networking.nameservers = [ "10.0.0.2" "8.8.8.8" ];
 
       services.k3s = {
         enable = true;
