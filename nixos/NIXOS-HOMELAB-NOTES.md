@@ -26,10 +26,10 @@ as the k3s control plane and two microVM workers — all defined in Nix config.
 - **Phase 1:** Bridge networking on br0 (10.0.0.6/24), NetworkManager manages WiFi only
 - **Phase 2:** microvm.nix added as flake input, two worker VMs defined (k8s-worker-1/2),
   k3s server configured on host, k3s agent configured in each microVM, libvirt removed
+- **Phase 3:** sops-nix for secrets management, k3s token distributed via virtiofs share
+  from host `/run/secrets` into VMs. Cluster verified: all 3 nodes Ready.
 
 ### Next Steps
-- [ ] Deploy and test: `nixos-rebuild switch`, verify VMs boot and k3s agents join
-- [ ] Token distribution (shared virtiofs mount, sops-nix, or static token)
 - [ ] Test cluster with a simple workload
 - [ ] WireGuard peering with soundship
 - [ ] Monitoring (node-exporter, Prometheus)
@@ -69,60 +69,19 @@ Then add `microvm.nixosModules.host` to the host's module list.
 
 ### Defining a microVM
 
-```nix
-microvm.vms.k8s-worker-1 = {
-  config = { config, pkgs, ... }: {
-    microvm = {
-      vcpu = 4;
-      mem = 8192;
-      hypervisor = "qemu";  # or "cloud-hypervisor"
-
-      interfaces = [{
-        type = "tap";
-        id = "vm-w1";
-        bridge = "br0";
-      }];
-
-      volumes = [{
-        image = "worker-1.img";
-        mountPoint = "/";
-        size = 51200;  # MB
-      }];
-    };
-
-    networking.hostName = "k8s-worker-1";
-    networking.interfaces.eth0.ipv4.addresses = [{
-      address = "10.0.0.7";
-      prefixLength = 24;
-    }];
-    networking.defaultGateway = "10.0.0.1";
-    networking.nameservers = [ "10.0.0.2" "8.8.8.8" ];
-
-    services.k3s = {
-      enable = true;
-      role = "agent";
-      serverAddr = "https://10.0.0.6:6443";
-      tokenFile = "/var/lib/k3s/token";
-    };
-
-    system.stateVersion = "25.11";
-  };
-};
-```
+See `modules/hypervisor.nix` for the full config. Workers are defined with a
+`mkWorker` helper — each gets virtiofs shares for `/nix/store` and host secrets,
+a persistent `/var` volume, bridge networking with a static MAC/IP, and a k3s
+agent pointing at the control plane.
 
 ### Key decisions
 
-**Hypervisor backend:** qemu (most compatible, libvirt already configured),
-cloud-hypervisor (fastest boot), kvmtool (smallest). Start with qemu.
+**Hypervisor backend:** qemu (most compatible), cloud-hypervisor (fastest boot),
+kvmtool (smallest). Started with qemu.
 
-**Token distribution:** The k3s server generates a join token at
-`/var/lib/rancher/k3s/server/token`. Options:
-- Shared virtiofs mount from host to guests
-- sops-nix to encrypt and distribute a static token
-- Set `services.k3s.token` to a shared static value on all nodes
-
-**Storage:** microVMs support `volumes` (block devices, persistent) and
-`shares` (virtiofs mounts from host, good for shared data).
+**Storage:** microVMs share the host's `/nix/store` via virtiofs (no large root
+images needed). Each VM gets a persistent `/var` volume for k3s state, logs, and
+containerd layers.
 
 ---
 
@@ -141,20 +100,67 @@ cloud-hypervisor (fastest boot), kvmtool (smallest). Start with qemu.
 | `services.k3s.manifests` | Auto-deploy K8s manifests on startup |
 | `services.k3s.gracefulNodeShutdown` | Clean pod eviction on shutdown |
 
-### Example: control plane config
+---
 
-```nix
-{
-  services.k3s = {
-    enable = true;
-    role = "server";
-    clusterInit = true;
-    extraFlags = [ "--disable=traefik" ];  # if using your own ingress
-  };
+## Secrets (sops-nix)
 
-  networking.firewall.allowedTCPPorts = [ 6443 ];
-}
+[sops-nix](https://github.com/Mic92/sops-nix) decrypts secrets at NixOS
+activation time. Encrypted files live in the repo; decrypted secrets appear at
+`/run/secrets/<name>` on the host.
+
+### How it works
+
+1. The zenbook's SSH host key (`/etc/ssh/ssh_host_ed25519_key`) is converted to
+   an age key. The public half is in `.sops.yaml` as the encryption recipient.
+2. `secrets/cluster.yaml` is encrypted with `sops` using that age key. It
+   contains `k3s-token` (and any future secrets).
+3. On `nixos-rebuild switch`, sops-nix decrypts `cluster.yaml` and writes each
+   key as a file under `/run/secrets/`.
+4. `modules/secrets.nix` declares which secrets to extract and makes their paths
+   available to other modules via `config.sops.secrets.<name>.path`.
+
+### k3s token flow
+
 ```
+secrets/cluster.yaml (encrypted, in git)
+  ↓  sops-nix decrypts at activation
+/run/secrets/k3s-token (on host)
+  ├── k3s server reads via config.sops.secrets.k3s-token.path
+  └── virtiofs share → /run/host-secrets/k3s-token (in each microVM)
+      └── k3s agents read via tokenFile
+```
+
+### Managing secrets
+
+```bash
+# Edit secrets (opens $EDITOR with decrypted yaml, re-encrypts on save)
+sops nixos/secrets/cluster.yaml
+
+# Add a new secret: add the key in cluster.yaml, then declare it in secrets.nix:
+#   sops.secrets.my-new-secret = {};
+# It will appear at /run/secrets/my-new-secret after rebuild.
+
+# If the host SSH key changes, re-derive the age key and update .sops.yaml:
+cat /etc/ssh/ssh_host_ed25519_key.pub | ssh-to-age
+sops updatekeys secrets/cluster.yaml
+```
+
+---
+
+## kubeconfig
+
+k3s writes a kubeconfig to `/etc/rancher/k3s/k3s.yaml` (root-owned). To use
+`kubectl` and other tools as your user:
+
+```bash
+mkdir -p ~/.kube
+sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
+sudo chown $(id -u):$(id -g) ~/.kube/config
+```
+
+The config points at `https://127.0.0.1:6443`. This works because the k3s
+server runs on the host. For remote access (e.g. from soundship over
+WireGuard), change the server address to `https://10.0.0.6:6443`.
 
 ---
 
@@ -162,7 +168,6 @@ cloud-hypervisor (fastest boot), kvmtool (smallest). Start with qemu.
 
 - **Monitoring:** node-exporter on host + workers, Prometheus scraping all nodes
 - **WireGuard:** Peer with soundship for cross-network cluster access
-- **Secrets:** sops-nix for k3s tokens, WireGuard keys, service credentials
 - **Woodpecker CI:** Run on this cluster (resolves containerd/Docker backend issue)
 
 ---
@@ -171,6 +176,5 @@ cloud-hypervisor (fastest boot), kvmtool (smallest). Start with qemu.
 
 - [microvm.nix](https://github.com/microvm-nix/microvm.nix)
 - [NixOS k3s module](https://search.nixos.org/options?query=services.k3s)
-- [NixOS libvirt wiki](https://wiki.nixos.org/wiki/Libvirt)
 - [sops-nix](https://github.com/Mic92/sops-nix)
 - [NixOS options search](https://search.nixos.org/options)

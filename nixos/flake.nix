@@ -11,9 +11,13 @@
       url = "github:microvm-nix/microvm.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, microvm, ... }:
+  outputs = { self, nixpkgs, home-manager, microvm, sops-nix, ... }:
     let
       system = "x86_64-linux";
     in {
@@ -26,8 +30,10 @@
           # Role modules - add/remove as needed
           # ./modules/desktop.nix
           ./modules/development.nix
+          ./modules/secrets.nix
           ./modules/hypervisor.nix
           microvm.nixosModules.host
+          sops-nix.nixosModules.sops
 
           # Home Manager as NixOS module (single nixos-rebuild updates everything)
           home-manager.nixosModules.home-manager

@@ -3,7 +3,7 @@
 
 let
   # Shared worker VM config — avoids repeating the same block twice
-  mkWorker = { hostname, address, tapId }: {
+  mkWorker = { hostname, address, tapId, mac }: {
     config = {
       microvm = {
         vcpu = 4;
@@ -11,18 +11,27 @@ let
         hypervisor = "qemu";
 
         interfaces = [{
-          type = "tap";
+          type = "bridge";
           id = tapId;
+          mac = mac;
           bridge = "br0";
         }];
 
         # Share host nix store (avoids large disk images)
-        shares = [{
-          tag = "ro-store";
-          source = "/nix/store";
-          mountPoint = "/nix/.ro-store";
-          proto = "virtiofs";
-        }];
+        shares = [
+          {
+            tag = "ro-store";
+            source = "/nix/store";
+            mountPoint = "/nix/.ro-store";
+            proto = "virtiofs";
+          }
+          {
+            tag = "k3s-token";
+            source = "/run/secrets";
+            mountPoint = "/run/host-secrets";
+            proto = "virtiofs";
+          }
+        ];
 
         # Persistent volume for /var (k3s state, logs, etc.)
         volumes = [{
@@ -37,14 +46,17 @@ let
         inherit address;
         prefixLength = 24;
       }];
-      networking.defaultGateway = "10.0.0.1";
+      networking.defaultGateway = {
+        address = "10.0.0.1";
+        interface = "eth0";
+      };
       networking.nameservers = [ "10.0.0.2" "8.8.8.8" ];
 
       services.k3s = {
         enable = true;
         role = "agent";
         serverAddr = "https://10.0.0.6:6443";
-        tokenFile = "/var/lib/k3s/token";
+        tokenFile = "/run/host-secrets/k3s-token";
       };
 
       system.stateVersion = "25.11";
@@ -77,6 +89,7 @@ in
     enable = true;
     role = "server";
     clusterInit = true;
+    tokenFile = config.sops.secrets.k3s-token.path;
     extraFlags = [ "--disable=traefik" ];
   };
 
@@ -88,11 +101,13 @@ in
       hostname = "k8s-worker-1";
       address = "10.0.0.7";
       tapId = "vm-w1";
+      mac = "02:00:00:00:00:01";
     };
     k8s-worker-2 = mkWorker {
       hostname = "k8s-worker-2";
       address = "10.0.0.8";
       tapId = "vm-w2";
+      mac = "02:00:00:00:00:02";
     };
   };
 }

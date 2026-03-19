@@ -1,0 +1,8 @@
+keys:
+  # zenbook host key — derive with: cat /etc/ssh/ssh_host_ed25519_key.pub | ssh-to-age
+  - &zenbook age1346tu2xhtsc7skgkfp0lptdaa7m9t7hcy289k87ppl9kzhnkr3mqht2vsm
+creation_rules:
+  - path_regex: secrets/.*\.yaml$
+    key_groups:
+      - age:
+          - *zenbook
