@@ -69,7 +69,7 @@ Then add `microvm.nixosModules.host` to the host's module list.
 
 ### Defining a microVM
 
-See `modules/hypervisor.nix` for the full config. Workers are defined with a
+See `modules/k3s-cluster.nix` for the full config. Workers are defined with a
 `mkWorker` helper — each gets virtiofs shares for `/nix/store` and host secrets,
 a persistent `/var` volume, bridge networking with a static MAC/IP, and a k3s
 agent pointing at the control plane.

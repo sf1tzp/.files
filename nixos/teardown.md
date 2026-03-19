@@ -20,7 +20,7 @@
   sudo systemctl start microvm@k8s-worker-2
 
   A couple of notes:
-  - The worker volume images will be recreated automatically on next VM boot (per the volumes config in hypervisor.nix)
+  - The worker volume images will be recreated automatically on next VM boot (per the volumes config in k3s-cluster.nix)
   - Wait for sudo k3s kubectl get nodes to show the server as Ready before starting the workers
   - You may also want to verify the sops token decrypted correctly first: sudo cat /run/secrets/k3s-token
 

@@ -14,7 +14,7 @@ nixos/
 ├── modules/
 │   ├── desktop.nix        # GNOME, PipeWire, fonts, Steam, Firefox
 │   ├── development.nix    # Docker, dev tools (go, rust, kubectl, etc.)
-│   └── hypervisor.nix     # Libvirt, QEMU/KVM, bridge networking, virt-manager
+│   └── k3s-cluster.nix    # k3s control plane, microVM workers, bridge networking
 └── home/
     └── steven.nix         # Home Manager: user packages, dotfiles, shell config
 ```
@@ -45,8 +45,8 @@ modules = [
   ./hosts/zenbook
   ./modules/desktop.nix
   ./modules/development.nix
-  ./modules/hypervisor.nix
-  # ./modules/kubernetes.nix    # <- add new modules here
+  ./modules/k3s-cluster.nix
+  # ./modules/monitoring.nix    # <- add new modules here
   # ...
 ];
 ```
@@ -65,6 +65,23 @@ modules = [
 
 See `NIXOS-HOMELAB-NOTES.md` for detailed notes.
 
-- `kubernetes.nix` — k3s control plane + microvm.nix worker nodes
 - `monitoring.nix` — Prometheus, node-exporter, Grafana
 - `networking.nix` — WireGuard, firewall rules for k3s/VM traffic
+
+---
+
+# K8s cluster notes
+
+## Rebuild
+
+Rebuild the cluster with scripts/teardown-cluster.sh
+
+## Prepare kubeconfig for distribution
+
+```
+sudo cp /etc/rancher/k3s/k3s.yaml /tmp/kubeconfig
+sudo chown $USER /tmp/kubeconfig
+sed -i 's|127.0.0.1|10.0.0.6|' /tmp/kubeconfig
+
+scp /tmp/kubeconfig other-host:~/.kube/config
+```

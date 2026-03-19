@@ -1,4 +1,4 @@
-# Hypervisor module: microvm.nix host, bridge networking, k8s worker VMs
+# k3s cluster: control plane, microVM worker nodes, bridge networking
 { config, pkgs, ... }:
 
 let

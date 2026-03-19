@@ -31,7 +31,7 @@
           # ./modules/desktop.nix
           ./modules/development.nix
           ./modules/secrets.nix
-          ./modules/hypervisor.nix
+          ./modules/k3s-cluster.nix
           microvm.nixosModules.host
           sops-nix.nixosModules.sops
 
