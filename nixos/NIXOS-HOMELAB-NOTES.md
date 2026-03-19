@@ -23,14 +23,12 @@ as the k3s control plane and two microVM workers — all defined in Nix config.
 
 ### Completed
 - **Phase 0:** Flake on nixos-unstable, modular config, Home Manager as NixOS module
-- **Phase 1:** Libvirt/QEMU/KVM enabled, bridge networking on br0 (10.0.0.6/24),
-  NetworkManager manages WiFi only
+- **Phase 1:** Bridge networking on br0 (10.0.0.6/24), NetworkManager manages WiFi only
+- **Phase 2:** microvm.nix added as flake input, two worker VMs defined (k8s-worker-1/2),
+  k3s server configured on host, k3s agent configured in each microVM, libvirt removed
 
 ### Next Steps
-- [ ] Add microvm.nix flake input and define two worker VMs
-- [ ] Configure k3s server on the host
-- [ ] Configure k3s agent inside each microVM
-- [ ] Networking: microVMs bridged to br0 with static IPs
+- [ ] Deploy and test: `nixos-rebuild switch`, verify VMs boot and k3s agents join
 - [ ] Token distribution (shared virtiofs mount, sops-nix, or static token)
 - [ ] Test cluster with a simple workload
 - [ ] WireGuard peering with soundship
@@ -40,7 +38,7 @@ as the k3s control plane and two microVM workers — all defined in Nix config.
 
 ## microvm.nix
 
-[microvm.nix](https://github.com/astro/microvm.nix) runs NixOS guests as
+[microvm.nix](https://github.com/microvm-nix/microvm.nix) runs NixOS guests as
 lightweight VMs using QEMU, cloud-hypervisor, or kvmtool. Guests are defined
 entirely in Nix — no disk images, no cloud-init, no Ansible.
 
@@ -62,7 +60,7 @@ entire cluster is a single `nixos-rebuild switch`.
 
 ```nix
 inputs.microvm = {
-  url = "github:astro/microvm.nix";
+  url = "github:microvm-nix/microvm.nix";
   inputs.nixpkgs.follows = "nixpkgs";
 };
 ```
@@ -171,7 +169,7 @@ cloud-hypervisor (fastest boot), kvmtool (smallest). Start with qemu.
 
 ## References
 
-- [microvm.nix](https://github.com/astro/microvm.nix)
+- [microvm.nix](https://github.com/microvm-nix/microvm.nix)
 - [NixOS k3s module](https://search.nixos.org/options?query=services.k3s)
 - [NixOS libvirt wiki](https://wiki.nixos.org/wiki/Libvirt)
 - [sops-nix](https://github.com/Mic92/sops-nix)

@@ -7,9 +7,13 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    microvm = {
+      url = "github:microvm-nix/microvm.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, ... }:
+  outputs = { self, nixpkgs, home-manager, microvm, ... }:
     let
       system = "x86_64-linux";
     in {
@@ -23,6 +27,7 @@
           # ./modules/desktop.nix
           ./modules/development.nix
           ./modules/hypervisor.nix
+          microvm.nixosModules.host
 
           # Home Manager as NixOS module (single nixos-rebuild updates everything)
           home-manager.nixosModules.home-manager
