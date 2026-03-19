@@ -34,6 +34,7 @@ services:
       - 9000:9000
     volumes:
       - step-ca-data:/home/step
+      - ./ca.json:/home/step/config/ca.json
     environment:
       - DOCKER_STEPCA_INIT_NAME=lofi lab CA
       - DOCKER_STEPCA_INIT_DNS_NAMES=step-ca,localhost,127.0.0.1,step-ca.lofi,step-ca-server

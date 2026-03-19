@@ -2,7 +2,7 @@
     email tech@stev.lol
 
     acme_ca https://step-ca.lofi:9000/acme/acme/directory
-    # acme_ca_root /step-ca-data/certs/root_ca.crt
+    acme_ca_root /step-ca-data/certs/root_ca.crt
 
 	metrics {
 		per_host
