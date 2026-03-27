@@ -1,0 +1,33 @@
+---
+# Post-rotation verification checks.
+
+- name: Verify Postgres accepts connections with new password
+  shell: >
+    ssh {{ db_host }}
+    "{{ nerdctl }} exec -e PGPASSWORD='{{ pg_new_password }}' postgres-server
+    psql -U {{ host_config.postgres_user }} -h localhost
+    -c 'SELECT count(*) FROM pg_stat_activity;'"
+  no_log: true
+  register: pg_verify
+  changed_when: false
+
+- name: Postgres connection verified
+  debug:
+    msg: "Postgres is accepting connections with the new password. Active connections: {{ pg_verify.stdout | trim }}"
+
+- name: Check app service containers are running
+  shell: >
+    ssh {{ item.deploy_host }}
+    "{{ nerdctl }} ps --filter name={{ item.name }} --format {% raw %}'{{.Names}}\t{{.Status}}'{% endraw %}"
+  loop: "{{ host_config.services }}"
+  loop_control:
+    label: "{{ item.name }} @ {{ item.deploy_host }}"
+  register: container_status
+  changed_when: false
+
+- name: Display container status
+  debug:
+    msg: "{{ item.stdout }}"
+  loop: "{{ container_status.results }}"
+  loop_control:
+    label: "{{ item.item.name }}"

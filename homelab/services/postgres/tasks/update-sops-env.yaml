@@ -1,0 +1,11 @@
+---
+# Updates POSTGRES_PASSWORD in a single SOPS-encrypted env file.
+# Called with `service` loop var from the main playbook.
+# Uses `sops set --value-stdin` to update in-place without temp files.
+
+- name: "{{ service.name }} - Update POSTGRES_PASSWORD in SOPS env"
+  shell: >
+    echo -n '"{{ pg_new_password }}"'
+    | sops set --input-type dotenv --output-type dotenv --value-stdin
+    {{ service.secrets_file }} '["POSTGRES_PASSWORD"]'
+  no_log: true

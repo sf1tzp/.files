@@ -11,6 +11,12 @@ down:
 logs *ARGS: # just logs-db -f
     nerdctl compose -f postgres-compose.yaml logs {{ARGS}}
 
+edit-secrets HOST:
+    sops secrets/{{HOST}}.env
+
+rotate-credentials HOST:
+    ansible-playbook rotate-credentials.yaml -e db_host={{HOST}}
+
 _generate-pgadmin-config:
     #!/usr/bin/env bash
     set -euo pipefail

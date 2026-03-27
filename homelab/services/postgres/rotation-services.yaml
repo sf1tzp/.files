@@ -1,0 +1,67 @@
+# Services that hold Postgres credentials and need updating during rotation.
+# Keyed by the db host (inventory hostname) that runs the Postgres instance.
+#
+# Every service stores the password as a plain POSTGRES_PASSWORD env var.
+# Connection strings (DATABASE_URL) are constructed at runtime in each
+# service's compose file, so rotation only needs to swap the password value.
+#
+# For each service, specify:
+#   secrets_file : path to the SOPS-encrypted env file (on devbox)
+#   justfile_dir : local directory containing the service justfile
+#   deploy_host  : the HOST arg passed to `just deploy <HOST>`
+#
+# The postgres service entry is special — it has no justfile deploy.
+# It is bounced directly via SSH + nerdctl on the db host.
+
+hosts:
+  staging-db:
+    postgres_user: postgres
+    postgres_secrets_file: ~/.files/homelab/services/postgres/secrets/staging-db.env
+    postgres_compose_file: ~/.files/homelab/services/postgres/postgres-compose.yaml
+    postgres_env_path: ~/.files/homelab/services/postgres/.env
+    services:
+      # - name: dial-in
+      #   secrets_file: ~/dial-in/secrets/staging-web.env
+      #   justfile_dir: ~/dial-in
+      #   deploy_host: staging-web
+
+      - name: auth-service
+        secrets_file: ~/auth-service/secrets/staging-web.env
+        justfile_dir: ~/auth-service
+        deploy_host: staging-web
+
+      - name: sketches
+        secrets_file: ~/sketches/secrets/staging-web.env
+        justfile_dir: ~/sketches
+        deploy_host: staging-web
+
+      - name: streetfortress
+        secrets_file: ~/streetfortress.com/secrets/staging-web.env
+        justfile_dir: ~/streetfortress.com
+        deploy_host: staging-web
+
+  db2.streetfortress.cloud:
+    postgres_user: deployer
+    postgres_secrets_file: ~/.files/homelab/services/postgres/secrets/db2.streetfortress.cloud.env
+    postgres_compose_file: ~/.files/homelab/services/postgres/postgres-compose.yaml
+    postgres_env_path: ~/.files/homelab/services/postgres/.env
+    services:
+      - name: dial-in
+        secrets_file: ~/dial-in/secrets/web2.streetfortress.cloud.env
+        justfile_dir: ~/dial-in
+        deploy_host: web2.streetfortress.cloud
+
+      - name: auth-service
+        secrets_file: ~/auth-service/secrets/web2.streetfortress.cloud.env
+        justfile_dir: ~/auth-service
+        deploy_host: web2.streetfortress.cloud
+
+      - name: sketches
+        secrets_file: ~/sketches/secrets/web2.streetfortress.cloud.env
+        justfile_dir: ~/sketches
+        deploy_host: web2.streetfortress.cloud
+
+      - name: streetfortress
+        secrets_file: ~/streetfortress.com/secrets/web2.streetfortress.cloud.env
+        justfile_dir: ~/streetfortress.com
+        deploy_host: web2.streetfortress.cloud
