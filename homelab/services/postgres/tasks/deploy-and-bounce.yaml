@@ -1,0 +1,9 @@
+---
+# Deploys updated env and bounces a service using its justfile.
+# Called with `service` loop var from the main playbook.
+# Runs `just build <host> && just deploy <host>` from the service's repo directory.
+
+- name: "{{ service.name }} - Build and deploy via justfile"
+  shell: just build {{ service.deploy_host }} && just deploy {{ service.deploy_host }}
+  args:
+    chdir: "{{ service.justfile_dir }}"
