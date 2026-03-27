@@ -1,0 +1,26 @@
+base_image: ubuntu-server-24.04
+
+user:
+  name: steven
+  shell: /usr/bin/zsh
+  github: sf1tzp
+
+packages:
+  - gcc
+  - git
+  - libpq-dev
+  - make
+  - tmux
+  - unzip
+  - zsh
+  - postgresql-client
+
+versions:
+  go: "1.24.2"
+  neovim: "0.11.3"
+
+scripts:
+  - install-dotfiles.sh
+  - install-rust.sh
+  - install-go.sh
+  - install-neovim.sh

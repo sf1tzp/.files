@@ -17,3 +17,4 @@ homelab/services/timescaledb/pgadmin-data/
 homelab/services/traggo/.traggodata
 
 
+__pycache__
