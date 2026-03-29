@@ -25,6 +25,7 @@
     k9s
 
     # CLI tools
+    bind
     curl
     htop
     jq

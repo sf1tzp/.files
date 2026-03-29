@@ -1,5 +1,5 @@
 creation_rules:
-  - path_regex: ^secrets/.*\.env$
+  - path_regex: .*/secrets\.yaml$
     age: >-
       age1rgr7hqdjsu4y3m98z3yw7cfwf9w8q4xdvmrv4jc97na32svm5y2qtpsw9x,age1vv7v50lygkd88nqhmy7mnxyp9jvaqmet6wdccc0zsvdjxf3t0emq4rmwrx,age1s59a0sgvuqutt9kyck3cz347g0mlzgrjg6z3ushzyp2jxy5h9gnqsjfj2a,age1qg7umu2tev8057x4qte4g8smua7nqhdhqmrk49pq9xpx6zxc0p3qjurnlh
 
