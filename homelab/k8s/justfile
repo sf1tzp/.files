@@ -63,10 +63,40 @@ deploy-runner token:
         --namespace gitea-actions \
         --from-literal=token={{ token }} \
         --dry-run=client -o yaml | kubectl apply -f -
+    kubectl apply -f gitea-actions/docker-daemon-config.yaml
     helm upgrade --install gitea-actions gitea-charts/actions \
         --namespace gitea-actions \
         --values gitea-actions/values.yaml \
         --wait
+
+# --- Mirrors ---
+
+# Store GitHub PAT for mirroring private repos
+set-github-pat token:
+    kubectl create secret generic github-pat \
+        --namespace gitea \
+        --from-literal=token={{ token }} \
+        --dry-run=client -o yaml | kubectl apply -f -
+
+# Create pull mirrors from GitHub repos into Gitea
+mirror github_user +repos:
+    bash gitea/mirror.sh {{ github_user }} {{ repos }}
+
+# List existing mirror repositories
+list-mirrors:
+    @GITEA_USER=$(kubectl get secret gitea-admin -n gitea -o jsonpath='{.data.username}' | base64 -d) && \
+        GITEA_PASS=$(kubectl get secret gitea-admin -n gitea -o jsonpath='{.data.password}' | base64 -d) && \
+        curl -s -u "$GITEA_USER:$GITEA_PASS" \
+            "http://gitea.zen.lofi/api/v1/repos/search?mirror=true&limit=50" | \
+            jq -r '.data[] | "\(.full_name) <- \(.original_url)"'
+
+# Trigger immediate mirror sync for a repo (owner/repo)
+sync-mirror repo:
+    @GITEA_USER=$(kubectl get secret gitea-admin -n gitea -o jsonpath='{.data.username}' | base64 -d) && \
+        GITEA_PASS=$(kubectl get secret gitea-admin -n gitea -o jsonpath='{.data.password}' | base64 -d) && \
+        curl -s -X POST -u "$GITEA_USER:$GITEA_PASS" \
+            "http://gitea.zen.lofi/api/v1/repos/{{ repo }}/mirror-sync" && \
+        echo "Sync triggered for {{ repo }}"
 
 # --- Orchestration ---
 
