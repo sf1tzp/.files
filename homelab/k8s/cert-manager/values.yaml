@@ -1,0 +1,9 @@
+# cert-manager Helm chart values
+# Chart: jetstack/cert-manager
+# Docs: https://cert-manager.io/docs/installation/helm/
+
+crds:
+  enabled: true
+
+config:
+  enableGatewayAPI: true

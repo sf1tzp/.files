@@ -50,7 +50,7 @@ gitea:
 
     server:
       DOMAIN: gitea.zen.lofi
-      ROOT_URL: http://gitea.zen.lofi
+      ROOT_URL: https://gitea.zen.lofi
       SSH_DOMAIN: gitea.zen.lofi
       SSH_PORT: 30022
       SSH_LISTEN_PORT: 2222

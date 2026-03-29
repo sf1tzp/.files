@@ -14,7 +14,7 @@ fi
 GITHUB_USER="$1"; shift
 REPOS=("$@")
 
-GITEA_URL="${GITEA_URL:-http://gitea.zen.lofi}"
+GITEA_URL="${GITEA_URL:-https://gitea.zen.lofi}"
 
 # Read credentials from k8s secrets
 GITEA_USER=$(kubectl get secret gitea-admin -n gitea -o jsonpath='{.data.username}' | base64 -d)
