@@ -1,0 +1,85 @@
+# Gitea Helm chart values
+# Chart: gitea-charts/gitea
+# Docs: https://gitea.com/gitea/helm-gitea
+
+# --- Image ---
+image:
+  rootless: true
+
+# --- Disable bundled sub-charts (we deploy postgres separately) ---
+postgresql:
+  enabled: false
+postgresql-ha:
+  enabled: false
+
+# Use standalone valkey for cache (not the HA cluster variant)
+valkey-cluster:
+  enabled: false
+valkey:
+  enabled: true
+
+# --- Ingress disabled (we use Gateway API HTTPRoutes) ---
+ingress:
+  enabled: false
+
+# --- Service ---
+service:
+  http:
+    type: ClusterIP
+    port: 3000
+  ssh:
+    type: NodePort
+    port: 22
+    nodePort: 30022   # git clone ssh://git@<nodeIP>:30022/user/repo.git
+
+# --- Gitea configuration (becomes app.ini) ---
+gitea:
+  admin:
+    existingSecret: gitea-admin
+
+  # Inject DB password from k8s Secret (overrides gitea.config.database.PASSWD)
+  additionalConfigFromEnvs:
+    - name: GITEA__DATABASE__PASSWD
+      valueFrom:
+        secretKeyRef:
+          name: gitea-db-credentials
+          key: password
+
+  config:
+    APP_NAME: "Gitea"
+
+    server:
+      DOMAIN: gitea.lofi
+      ROOT_URL: http://gitea.lofi
+      SSH_DOMAIN: gitea.lofi
+      SSH_PORT: 30022
+      SSH_LISTEN_PORT: 2222
+
+    database:
+      DB_TYPE: postgres
+      HOST: postgres-postgresql.postgres.svc.cluster.local:5432
+      NAME: gitea
+      USER: gitea
+
+    actions:
+      ENABLED: true
+
+    repository:
+      DEFAULT_BRANCH: main
+
+    service:
+      DISABLE_REGISTRATION: false
+      REQUIRE_SIGNIN_VIEW: false
+
+# --- Persistence ---
+persistence:
+  enabled: true
+  size: 10Gi
+
+# --- Resources ---
+resources:
+  requests:
+    memory: 256Mi
+    cpu: 100m
+  limits:
+    memory: 1Gi

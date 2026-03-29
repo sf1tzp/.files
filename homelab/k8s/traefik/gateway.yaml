@@ -1,0 +1,31 @@
+# Gateway API resources for the homelab k8s cluster
+#
+# Architecture:
+#   GatewayClass (cluster-scoped) -> tells k8s "traefik is a gateway implementation"
+#   Gateway (namespace-scoped)    -> defines listeners (ports/protocols) and which namespaces can attach routes
+#   HTTPRoute (namespace-scoped)  -> per-service routing rules, created alongside each service
+#
+# Docs: https://gateway-api.sigs.k8s.io/
+
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: traefik
+spec:
+  controllerName: traefik.io/gateway-controller
+
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: homelab
+  namespace: traefik
+spec:
+  gatewayClassName: traefik
+  listeners:
+    - name: http
+      port: 8000
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: All

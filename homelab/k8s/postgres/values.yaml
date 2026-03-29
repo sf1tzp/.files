@@ -1,0 +1,30 @@
+# Bitnami PostgreSQL Helm chart values
+# Chart: bitnami/postgresql
+# Docs: https://github.com/bitnami/charts/tree/main/bitnami/postgresql
+
+auth:
+  existingSecret: postgres-credentials
+  secretKeys:
+    adminPasswordKey: postgres-password
+    userPasswordKey: password
+    replicationPasswordKey: replication-password
+  database: gitea
+  username: gitea
+
+primary:
+  persistence:
+    enabled: true
+    size: 10Gi
+    # storageClass: local-path  # k3s default, no need to specify
+
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+    limits:
+      memory: 512Mi
+
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: false # enable if you add prometheus-operator to k8s

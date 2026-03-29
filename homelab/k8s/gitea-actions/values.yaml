@@ -1,0 +1,45 @@
+# Gitea Actions Runner Helm chart values
+# Chart: gitea-charts/actions
+# Docs: https://gitea.com/gitea/helm-actions
+#
+# Prerequisites:
+#   1. Gitea must be running with actions.ENABLED = true
+#   2. Create a runner registration token in Gitea:
+#      Site Administration > Runners > Create new Runner
+#   3. Create the k8s secret:
+#      kubectl create secret generic runner-token \
+#        --namespace gitea-actions \
+#        --from-literal=token=<YOUR_TOKEN>
+
+enabled: true
+
+# --- Connection to Gitea ---
+giteaRootURL: "http://gitea-http.gitea.svc.cluster.local:3000"
+
+existingSecret: "runner-token"
+existingSecretKey: "token"
+
+# --- Runner StatefulSet ---
+statefulset:
+  replicas: 1
+
+  persistence:
+    enabled: true
+    size: 5Gi
+
+  actRunner:
+    config: |
+      log:
+        level: info
+      cache:
+        enabled: true
+      container:
+        network: bridge
+        docker_timeout: 300s
+
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+    limits:
+      memory: 1Gi
