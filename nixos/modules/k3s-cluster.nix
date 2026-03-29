@@ -3,13 +3,7 @@
 
 let
   sshKeys = [
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBFSTKL7m9ViSstGGhgg1TBnrWEGkNptCCysU17Oxgfl"
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG0sCtYCOvdb/J7yluSSX9yixiG3pvhZo+OtVQWefjVj"
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBuuLb9A36fWGYZexMb2soTxpHFB0HVQTHqR8vihvFMD"
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINqO0N5rBif1+bFwnluWEmrkaoTAtqTrP/vONG6/fQKl"
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBhrjrcm0Mb4gSMGM/GiWXvkZj3a2ej7/MOcw0Qujx+M"
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFSfukFhjws+MpZu+qMqgVCoIitc43jGeqEnGMcF4ydQ"
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEdgJK6LiKUZ+fQQZX28B1v82hCl1z4RxomJLn5pHiPH"
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEayc+I1Tk02u5tJHL309jiYj0gC5pf5MrUznXDCxP58 steven@nixos"
   ];
 
   # Shared worker VM config — avoids repeating the same block twice
@@ -63,6 +57,18 @@ let
         dns = [ "10.0.0.2" "8.8.8.8" ];
       };
 
+      # Flannel VXLAN + kubelet metrics
+      networking.firewall.allowedUDPPorts = [ 8472 ];
+      networking.firewall.allowedTCPPorts = [ 10250 80 443 ];
+
+      # Persist /etc/rancher across reboots so the node password survives
+      systemd.tmpfiles.rules = [ "d /var/lib/rancher-etc 0700 root root -" ];
+      fileSystems."/etc/rancher" = {
+        device = "/var/lib/rancher-etc";
+        fsType = "none";
+        options = [ "bind" ];
+      };
+
       services.k3s = {
         enable = true;
         role = "agent";
@@ -112,7 +118,7 @@ in
     extraFlags = [ "--disable=traefik" ];
   };
 
-  networking.firewall.allowedTCPPorts = [ 6443 ];
+  networking.firewall.allowedTCPPorts = [ 6443 80 443 ];
 
   # ── Monitoring ─────────────────────────────────────────────────────
   services.prometheus.exporters.node = {

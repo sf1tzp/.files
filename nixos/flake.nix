@@ -15,9 +15,13 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixos-vscode-server = {
+      url = "github:nix-community/nixos-vscode-server";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, microvm, sops-nix, ... }:
+  outputs = { self, nixpkgs, home-manager, microvm, sops-nix, nixos-vscode-server, ... }:
     let
       system = "x86_64-linux";
     in {
@@ -40,6 +44,9 @@
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
+            home-manager.sharedModules = [
+              nixos-vscode-server.homeModules.default
+            ];
             home-manager.users.steven = import ./home/steven.nix;
           }
         ];

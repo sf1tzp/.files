@@ -1,0 +1,145 @@
+# Kubernetes service deployment
+# Deploys: Traefik (Gateway API), PostgreSQL, pgAdmin, Gitea, Gitea Actions
+
+gateway_api_version := "v1.2.1"
+
+# --- Setup ---
+
+# Add all required Helm repositories
+add-repos:
+    helm repo add traefik https://traefik.github.io/charts
+    helm repo add bitnami https://charts.bitnami.com/bitnami
+    helm repo add gitea-charts https://dl.gitea.com/charts/
+    helm repo update
+
+# Install Gateway API CRDs (standard channel)
+install-gateway-crds:
+    kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/{{ gateway_api_version }}/standard-install.yaml
+
+# --- Secrets (SOPS + age) ---
+
+# Encrypt secrets files (run once after setting real passwords)
+encrypt-secrets:
+    sops -e -i postgres/secrets.yaml
+    sops -e -i gitea/secrets.yaml
+
+# Edit secrets in-place (decrypts, opens $EDITOR, re-encrypts)
+edit-secrets service:
+    sops {{ service }}/secrets.yaml
+
+# --- Deploy individual components ---
+
+deploy-traefik:
+    kubectl create namespace traefik --dry-run=client -o yaml | kubectl apply -f -
+    helm upgrade --install traefik traefik/traefik \
+        --namespace traefik \
+        --values traefik/values.yaml \
+        --wait
+    kubectl apply -f traefik/gateway.yaml
+
+deploy-postgres:
+    kubectl create namespace postgres --dry-run=client -o yaml | kubectl apply -f -
+    sops -d postgres/secrets.yaml | kubectl apply -f -
+    helm upgrade --install postgres bitnami/postgresql \
+        --namespace postgres \
+        --values postgres/values.yaml \
+        --wait
+    kubectl apply -f postgres/pgadmin.yaml
+    kubectl apply -f postgres/routes.yaml
+
+deploy-gitea:
+    kubectl create namespace gitea --dry-run=client -o yaml | kubectl apply -f -
+    sops -d gitea/secrets.yaml | kubectl apply -f -
+    helm upgrade --install gitea gitea-charts/gitea \
+        --namespace gitea \
+        --values gitea/values.yaml \
+        --wait
+    kubectl apply -f gitea/routes.yaml
+
+# Deploy actions runner (requires a registration token from Gitea admin panel)
+deploy-runner token:
+    kubectl create namespace gitea-actions --dry-run=client -o yaml | kubectl apply -f -
+    kubectl create secret generic runner-token \
+        --namespace gitea-actions \
+        --from-literal=token={{ token }} \
+        --dry-run=client -o yaml | kubectl apply -f -
+    helm upgrade --install gitea-actions gitea-charts/actions \
+        --namespace gitea-actions \
+        --values gitea-actions/values.yaml \
+        --wait
+
+# --- Orchestration ---
+
+# Deploy everything (except actions runner, which needs a token from Gitea)
+deploy-all: add-repos install-gateway-crds deploy-traefik deploy-postgres deploy-gitea
+    @echo ""
+    @echo "All services deployed."
+    @echo "Next steps:"
+    @echo "  1. Add DNS entries for gitea.lofi and pgadmin.lofi -> any node IP"
+    @echo "  2. Get a runner token from Gitea: Site Administration > Runners > Create new Runner"
+    @echo "  3. Run: just deploy-actions <token>"
+
+# --- Status ---
+
+status:
+    @echo "=== Nodes ==="
+    @kubectl get nodes -o wide
+    @echo "\n=== Gateway API ==="
+    @kubectl get gatewayclass,gateway,httproutes -A
+    @echo "\n=== Pods ==="
+    @kubectl get pods -A -l 'app.kubernetes.io/managed-by=Helm'
+    @kubectl get pods -n postgres -l app=pgadmin
+    @echo "\n=== Services ==="
+    @kubectl get svc -A -l 'app.kubernetes.io/managed-by=Helm'
+    @kubectl get svc -n postgres -l app=pgadmin
+
+# --- Logs ---
+
+logs-traefik *ARGS:
+    kubectl logs -n traefik -l app.kubernetes.io/name=traefik {{ ARGS }}
+
+logs-postgres *ARGS:
+    kubectl logs -n postgres -l app.kubernetes.io/name=postgresql {{ ARGS }}
+
+logs-pgadmin *ARGS:
+    kubectl logs -n postgres -l app=pgadmin {{ ARGS }}
+
+logs-gitea *ARGS:
+    kubectl logs -n gitea -l app.kubernetes.io/name=gitea {{ ARGS }}
+
+logs-actions *ARGS:
+    kubectl logs -n gitea-actions -l app.kubernetes.io/name=actions {{ ARGS }}
+
+# --- Teardown ---
+
+[confirm]
+destroy-traefik:
+    kubectl delete -f traefik/gateway.yaml --ignore-not-found
+    helm uninstall traefik --namespace traefik --ignore-not-found
+    kubectl delete namespace traefik --ignore-not-found
+
+[confirm]
+destroy-postgres:
+    kubectl delete -f postgres/routes.yaml --ignore-not-found
+    kubectl delete -f postgres/pgadmin.yaml --ignore-not-found
+    helm uninstall postgres --namespace postgres --ignore-not-found
+    kubectl delete namespace postgres --ignore-not-found
+
+[confirm]
+destroy-gitea:
+    kubectl delete -f gitea/routes.yaml --ignore-not-found
+    kubectl delete -f gitea-actions/routes.yaml --ignore-not-found 2>/dev/null || true
+    helm uninstall gitea-actions --namespace gitea-actions --ignore-not-found 2>/dev/null || true
+    helm uninstall gitea --namespace gitea --ignore-not-found
+    kubectl delete namespace gitea-actions --ignore-not-found 2>/dev/null || true
+    kubectl delete namespace gitea --ignore-not-found
+
+[confirm]
+destroy-runner:
+    kubectl delete -f gitea-actions/routes.yaml --ignore-not-found 2>/dev/null || true
+    helm uninstall gitea-actions --namespace gitea-actions --ignore-not-found 2>/dev/null || true
+    kubectl delete namespace gitea-actions --ignore-not-found 2>/dev/null || true
+
+[confirm]
+destroy-all: destroy-gitea destroy-postgres destroy-traefik
+    kubectl delete -f https://github.com/kubernetes-sigs/gateway-api/releases/download/{{ gateway_api_version }}/standard-install.yaml --ignore-not-found
