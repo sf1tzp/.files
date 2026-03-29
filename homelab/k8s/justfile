@@ -57,7 +57,7 @@ deploy-gitea:
     kubectl apply -f gitea/routes.yaml
 
 # Deploy actions runner (requires a registration token from Gitea admin panel)
-deploy-actions token:
+deploy-runner token:
     kubectl create namespace gitea-actions --dry-run=client -o yaml | kubectl apply -f -
     kubectl create secret generic runner-token \
         --namespace gitea-actions \
@@ -133,6 +133,12 @@ destroy-gitea:
     helm uninstall gitea --namespace gitea --ignore-not-found
     kubectl delete namespace gitea-actions --ignore-not-found 2>/dev/null || true
     kubectl delete namespace gitea --ignore-not-found
+
+[confirm]
+destroy-runner:
+    kubectl delete -f gitea-actions/routes.yaml --ignore-not-found 2>/dev/null || true
+    helm uninstall gitea-actions --namespace gitea-actions --ignore-not-found 2>/dev/null || true
+    kubectl delete namespace gitea-actions --ignore-not-found 2>/dev/null || true
 
 [confirm]
 destroy-all: destroy-gitea destroy-postgres destroy-traefik
