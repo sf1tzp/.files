@@ -94,6 +94,13 @@ PROGRAMS = {
             mv fnm {install_dir}
             """,
     },
+    "helm": {
+        "version": "4.1.3",
+        "url_template": "https://get.helm.sh/helm-v{version}-linux-amd64.tar.gz",
+        "setup_script": """#!/usr/bin/env bash
+            mv linux-amd64/helm {install_dir}
+        """,
+    },
     "jq": {
         "version": "1.7.1",
         "url_template": "https://github.com/jqlang/jq/releases/download/jq-{version}/jq-linux-{arch}",
@@ -116,6 +123,14 @@ PROGRAMS = {
         "setup_script": """#!/usr/bin/env bash
             tar xzvf k6-v{version}-linux-amd64.tar.gz
             mv k6-v{version}-linux-amd64/k6 {install_dir}
+        """
+    },
+    "kubectl": {
+        "version": "1.35.3",
+        "url_template": "https://dl.k8s.io/release/v{version}/bin/linux/amd64/kubectl",
+        "setup_script": """#!/usr/bin/env bash
+            chmod +x kubectl
+            mv kubectl {install_dir}
         """
     },
     "nerdctl": {

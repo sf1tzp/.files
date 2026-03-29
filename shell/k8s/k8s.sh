@@ -1,16 +1,21 @@
-#!/bin/bash
-
-export PATH="$PATH:/usr/local/opt/kubernetes-cli/bin/"
+# shellcheck disable=SC1090
 
 alias k=kubectl
 alias kc=kubectl
 alias kx=kubectx
 
-source <(kubectl completion bash)
-complete -F __start_kubectl k
-complete -F __start_kubectl kc
+if [ -n "$ZSH_VERSION" ]; then
+  source <(kubectl completion zsh)
+  compdef k=kubectl
+  compdef kc=kubectl
+  source <(helm completion zsh)
 
-source <(helm completion bash)
+elif [ -n "$BASH_VERSION" ]; then
+  source <(kubectl completion bash)
+  complete -F __start_kubectl k
+  complete -F __start_kubectl kc
+  source <(helm completion bash)
+fi
 
 function kstat {
     if [ -z "$1" ]; then
@@ -62,21 +67,3 @@ function merge-kubeconfig {
   chmod 600 ~/.kube/wtf
   mv ~/.kube/wtf ~/.kube/config
 }
-
-function reset-kubeconfig {
-  if [[ -f ~/.kube/config.bak ]]; then
-    cp ~/.kube/config.bak ~/.kube/config
-  fi
-}
-
-function simulator-reset {
-  rm ~/.ssh/known_hosts
-  rm ~/.kube/bootstrap-kubeconfig.yaml
-  rm ~/.kube/undercloud-kubeconfig.yaml
-  reset-kubeconfig
-}
-
-function open-ephemeral {
-  ssh rack1compute01 -- sudo iptables -A INPUT -p tcp --dport 6443 -j ACCEPT
-}
-

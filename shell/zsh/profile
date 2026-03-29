@@ -31,9 +31,9 @@ if [[ -d ~/go/bin/ ]]; then
     export PATH=$PATH:/go/bin
 fi
 
-if [[ -d .venv ]]; then
-    source .venv/bin/activate
-fi
+# if [[ -d .venv ]]; then
+#     source .venv/bin/activate
+# fi
 
 # Check for / install utilities (skip on NixOS, packages managed by Nix)
 if [[ "$(uname -s)" == "Linux" && ! -f /etc/NIXOS ]]; then
@@ -111,6 +111,10 @@ if [[ ! -f /etc/NIXOS ]]; then
 else
     # fzf init after zsh-vi-mode (loaded by home-manager)
     zvm_after_init_commands+=('source <(fzf --zsh)')
+fi
+
+if which kubectl &>/dev/null; then
+    source "$HOME/.files/shell/k8s/k8s.sh"
 fi
 
 # aliases and command specific stuff
