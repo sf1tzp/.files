@@ -11,7 +11,7 @@ spec:
     - name: homelab
       namespace: traefik
   hostnames:
-    - pgadmin.zenbook.lofi
+    - pgadmin.zen.lofi
   rules:
     - backendRefs:
         - name: pgadmin

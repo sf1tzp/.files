@@ -49,9 +49,9 @@ gitea:
     APP_NAME: "Gitea"
 
     server:
-      DOMAIN: gitea.lofi
-      ROOT_URL: http://gitea.lofi
-      SSH_DOMAIN: gitea.lofi
+      DOMAIN: gitea.zen.lofi
+      ROOT_URL: http://gitea.zen.lofi
+      SSH_DOMAIN: gitea.zen.lofi
       SSH_PORT: 30022
       SSH_LISTEN_PORT: 2222
 

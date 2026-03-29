@@ -14,7 +14,7 @@ spec:
     - name: homelab
       namespace: traefik
   hostnames:
-    - gitea.lofi
+    - gitea.zen.lofi
   rules:
     - backendRefs:
         - name: gitea-http
