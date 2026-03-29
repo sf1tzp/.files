@@ -63,6 +63,10 @@ let
         dns = [ "10.0.0.2" "8.8.8.8" ];
       };
 
+      # Flannel VXLAN + kubelet metrics
+      networking.firewall.allowedUDPPorts = [ 8472 ];
+      networking.firewall.allowedTCPPorts = [ 10250 ];
+
       services.k3s = {
         enable = true;
         role = "agent";
