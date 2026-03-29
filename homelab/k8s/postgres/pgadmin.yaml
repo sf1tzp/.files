@@ -40,6 +40,15 @@ spec:
       labels:
         app: pgadmin
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: node-role.kubernetes.io/control-plane
+                    operator: In
+                    values:
+                      - "true"
       containers:
         - name: pgadmin
           image: dpage/pgadmin4:9.11.0

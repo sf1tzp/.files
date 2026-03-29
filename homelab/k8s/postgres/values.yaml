@@ -12,6 +12,15 @@ auth:
   username: gitea
 
 primary:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: node-role.kubernetes.io/control-plane
+                operator: In
+                values:
+                  - "true"
   persistence:
     enabled: true
     size: 10Gi
