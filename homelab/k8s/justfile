@@ -10,11 +10,16 @@ add-repos:
     helm repo add traefik https://traefik.github.io/charts
     helm repo add bitnami https://charts.bitnami.com/bitnami
     helm repo add gitea-charts https://dl.gitea.com/charts/
+    helm repo add jetstack https://charts.jetstack.io
     helm repo update
 
 # Install Gateway API CRDs (standard channel)
 install-gateway-crds:
     kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/{{ gateway_api_version }}/standard-install.yaml
+
+# Configure CoreDNS to forward .lofi queries to homelab DNS (dnsmasq)
+setup-dns:
+    kubectl apply -f coredns-custom.yaml
 
 # --- Secrets (SOPS + age) ---
 
@@ -26,6 +31,24 @@ encrypt-secrets:
 # Edit secrets in-place (decrypts, opens $EDITOR, re-encrypts)
 edit-secrets service:
     sops {{ service }}/secrets.yaml
+
+# --- TLS (cert-manager + step-ca) ---
+
+# Fetch step-ca root CA certificate for cert-manager trust
+fetch-step-ca-root:
+    curl -sk https://step-ca.lofi:9000/roots.pem -o cert-manager/step-ca-root.pem
+    @echo "Saved step-ca root CA to cert-manager/step-ca-root.pem"
+
+# Deploy cert-manager with step-ca ACME ClusterIssuer
+deploy-cert-manager:
+    #!/usr/bin/env bash
+    kubectl create namespace cert-manager --dry-run=client -o yaml | kubectl apply -f -
+    helm upgrade --install cert-manager jetstack/cert-manager \
+        --namespace cert-manager \
+        --values cert-manager/values.yaml \
+        --wait
+    CA_BUNDLE=$(base64 -w0 cert-manager/step-ca-root.pem)
+    sed "s|<CA_BUNDLE>|${CA_BUNDLE}|" cert-manager/cluster-issuer.yaml | kubectl apply -f -
 
 # --- Deploy individual components ---
 
@@ -63,15 +86,45 @@ deploy-runner token:
         --namespace gitea-actions \
         --from-literal=token={{ token }} \
         --dry-run=client -o yaml | kubectl apply -f -
+    kubectl apply -f gitea-actions/docker-daemon-config.yaml
     helm upgrade --install gitea-actions gitea-charts/actions \
         --namespace gitea-actions \
         --values gitea-actions/values.yaml \
         --wait
 
+# --- Mirrors ---
+
+# Store GitHub PAT for mirroring private repos
+set-github-pat token:
+    kubectl create secret generic github-pat \
+        --namespace gitea \
+        --from-literal=token={{ token }} \
+        --dry-run=client -o yaml | kubectl apply -f -
+
+# Create pull mirrors from GitHub repos into Gitea
+mirror github_user +repos:
+    bash gitea/mirror.sh {{ github_user }} {{ repos }}
+
+# List existing mirror repositories
+list-mirrors:
+    @GITEA_USER=$(kubectl get secret gitea-admin -n gitea -o jsonpath='{.data.username}' | base64 -d) && \
+        GITEA_PASS=$(kubectl get secret gitea-admin -n gitea -o jsonpath='{.data.password}' | base64 -d) && \
+        curl -s -u "$GITEA_USER:$GITEA_PASS" \
+            "https://gitea.zen.lofi/api/v1/repos/search?mirror=true&limit=50" | \
+            jq -r '.data[] | "\(.full_name) <- \(.original_url)"'
+
+# Trigger immediate mirror sync for a repo (owner/repo)
+sync-mirror repo:
+    @GITEA_USER=$(kubectl get secret gitea-admin -n gitea -o jsonpath='{.data.username}' | base64 -d) && \
+        GITEA_PASS=$(kubectl get secret gitea-admin -n gitea -o jsonpath='{.data.password}' | base64 -d) && \
+        curl -s -X POST -u "$GITEA_USER:$GITEA_PASS" \
+            "https://gitea.zen.lofi/api/v1/repos/{{ repo }}/mirror-sync" && \
+        echo "Sync triggered for {{ repo }}"
+
 # --- Orchestration ---
 
 # Deploy everything (except actions runner, which needs a token from Gitea)
-deploy-all: add-repos install-gateway-crds deploy-traefik deploy-postgres deploy-gitea
+deploy-all: add-repos install-gateway-crds setup-dns fetch-step-ca-root deploy-traefik deploy-cert-manager deploy-postgres deploy-gitea
     @echo ""
     @echo "All services deployed."
     @echo "Next steps:"
@@ -141,5 +194,11 @@ destroy-runner:
     kubectl delete namespace gitea-actions --ignore-not-found 2>/dev/null || true
 
 [confirm]
-destroy-all: destroy-gitea destroy-postgres destroy-traefik
+destroy-cert-manager:
+    kubectl delete -f cert-manager/cluster-issuer.yaml --ignore-not-found
+    helm uninstall cert-manager --namespace cert-manager --ignore-not-found
+    kubectl delete namespace cert-manager --ignore-not-found
+
+[confirm]
+destroy-all: destroy-gitea destroy-postgres destroy-cert-manager destroy-traefik
     kubectl delete -f https://github.com/kubernetes-sigs/gateway-api/releases/download/{{ gateway_api_version }}/standard-install.yaml --ignore-not-found

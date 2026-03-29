@@ -29,3 +29,46 @@ spec:
       allowedRoutes:
         namespaces:
           from: All
+    - name: https-gitea
+      port: 8443
+      protocol: HTTPS
+      hostname: gitea.zen.lofi
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: gitea-tls
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: https-pgadmin
+      port: 8443
+      protocol: HTTPS
+      hostname: pgadmin.zen.lofi
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: pgadmin-tls
+      allowedRoutes:
+        namespaces:
+          from: All
+
+---
+# Redirect HTTP -> HTTPS for all hostnames.
+# cert-manager ACME challenge routes also attach to the http listener
+# with an exact path match, so they take precedence over this catch-all.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: http-to-https
+  namespace: traefik
+spec:
+  parentRefs:
+    - name: homelab
+      namespace: traefik
+      sectionName: http
+  rules:
+    - filters:
+        - type: RequestRedirect
+          requestRedirect:
+            scheme: https
+            statusCode: 301

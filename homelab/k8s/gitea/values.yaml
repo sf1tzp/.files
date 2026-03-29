@@ -50,7 +50,7 @@ gitea:
 
     server:
       DOMAIN: gitea.zen.lofi
-      ROOT_URL: http://gitea.zen.lofi
+      ROOT_URL: https://gitea.zen.lofi
       SSH_DOMAIN: gitea.zen.lofi
       SSH_PORT: 30022
       SSH_LISTEN_PORT: 2222
@@ -63,6 +63,14 @@ gitea:
 
     actions:
       ENABLED: true
+
+    packages:
+      ENABLED: true
+
+    mirror:
+      ENABLED: true
+      DEFAULT_INTERVAL: 8h
+      MIN_INTERVAL: 10m
 
     repository:
       DEFAULT_BRANCH: main

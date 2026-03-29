@@ -68,6 +68,13 @@
     };
   };
 
+  # Homelab CA Trust
+  # See .files/homelab/k8s/justfile fetch-step-ca-root
+  # Copy step-ca-root.pem to .files/nixos/hosts/zenbook/step-ca-root.pem
+  security.pki.certificateFiles = [
+    ./step-ca-root.pem
+  ];
+
   # Firewall
   networking.firewall.allowedTCPPorts = [ 22 ];
 

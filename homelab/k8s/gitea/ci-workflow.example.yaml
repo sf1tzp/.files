@@ -1,0 +1,51 @@
+# Example Gitea Actions CI workflow
+# Copy to .gitea/workflows/ci.yaml in your GitHub repos.
+# Since pull mirrors are read-only, the workflow file must live upstream.
+#
+# Prerequisites:
+#   1. Create a Gitea PAT with write:packages scope
+#      (Settings > Applications > Generate Token)
+#   2. Add it as a repo/org Actions secret named REGISTRY_TOKEN
+#      (repo Settings > Actions > Secrets)
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+
+env:
+  REGISTRY: gitea.zen.lofi
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run tests
+        run: |
+          # Replace with your repo's test command:
+          # go test ./...
+          # npm test
+          # cargo test
+          echo "No tests configured"
+
+  build-and-push:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to Gitea Container Registry
+        run: |
+          echo "${{ secrets.REGISTRY_TOKEN }}" | \
+            docker login ${{ env.REGISTRY }} \
+              --username ${{ gitea.actor }} \
+              --password-stdin
+
+      - name: Build and push image
+        run: |
+          IMAGE="${{ env.REGISTRY }}/${{ gitea.repository }}"
+          docker build -t "$IMAGE:${{ gitea.sha }}" -t "$IMAGE:latest" .
+          docker push "$IMAGE:${{ gitea.sha }}"
+          docker push "$IMAGE:latest"

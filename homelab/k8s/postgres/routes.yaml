@@ -10,6 +10,7 @@ spec:
   parentRefs:
     - name: homelab
       namespace: traefik
+      sectionName: https-pgadmin
   hostnames:
     - pgadmin.zen.lofi
   rules:
