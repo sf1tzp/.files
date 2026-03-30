@@ -3,14 +3,15 @@ services:
     container_name: caddy-server
     image: caddy:2.10-alpine
     restart: always
+    annotations:
+      - nerdctl/bypass4netns=true
     ports:
       - 80:80
       - 443:443
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - ./caddyfiles:/etc/caddy/caddyfiles
-
-      # Certificate storage (IMPORTANT - preserves SSL certs across restarts)
+      - ./certs:/step-ca-data/certs
       - caddy-data:/data
       - caddy-config:/config
     environment:
@@ -18,7 +19,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
-      - caddy-network
+      - caddy_network
 
 volumes:
   caddy-data:
@@ -26,5 +27,5 @@ volumes:
   step-ca-data:
 
 networks:
-  caddy-network:
+  caddy_network:
     driver: bridge
