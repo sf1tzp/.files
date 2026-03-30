@@ -30,23 +30,16 @@ VM_XML = """\
 <domain type='kvm'>
   <name>{vm_name}</name>
   <memory unit='MiB'>{memory}</memory>
-  <vcpu placement='static'>{vcpus}</vcpu>
+  <vcpu>{vcpus}</vcpu>
   <os>
-    <type arch='x86_64' machine='pc-q35-6.2'>hvm</type>
-    <boot dev='hd'/>
+    <type arch='x86_64'>hvm</type>
   </os>
   <features>
     <acpi/>
     <apic/>
   </features>
-  <cpu mode='host-passthrough' check='none'/>
-  <clock offset='utc'>
-    <timer name='rtc' tickpolicy='catchup'/>
-    <timer name='pit' tickpolicy='delay'/>
-    <timer name='hpet' present='no'/>
-  </clock>
+  <cpu mode='host-passthrough'/>
   <devices>
-    <emulator>/usr/bin/qemu-system-x86_64</emulator>
     <disk type='file' device='disk'>
       <driver name='qemu' type='qcow2'/>
       <source file='{disk_path}'/>
@@ -62,12 +55,7 @@ VM_XML = """\
       <source network='default'/>
       <model type='virtio'/>
     </interface>
-    <serial type='pty'>
-      <target type='isa-serial' port='0'/>
-    </serial>
-    <console type='pty'>
-      <target type='serial' port='0'/>
-    </console>
+    <console type='pty'/>
     <graphics type='vnc' port='-1' autoport='yes'/>
   </devices>
 </domain>"""

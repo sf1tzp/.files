@@ -1,0 +1,270 @@
+steven 🌀 soundship ~/.files/homelab/vms                                                         [steven v3.14.0a6] | image-and-cloud-init 2 U / 1 M -- 09:28:06 UTC
+ >  ./build-custom-image.py -b ubuntu-server-24.04 -o march27 -u deployer
+🚀 Building custom base image with the following configuration:
+   Base image: ubuntu-server-24.04
+   Custom name: march27
+   Username: deployer
+   Run tags: setup,finalize
+   Common tools: True
+   Containerd: True
+   NVIDIA: False
+   Monitoring: True
+
+🔍 Checking prerequisites...
+✅ Prerequisites check passed
+
+🔧 Cleaning up any existing custom image builder VM...
+   Existing VM cleaned up
+🔧 Creating custom image builder VM...
+[WARNING]: Invalid characters were found in group names but not replaced, use -vvvv to see details
+[WARNING]: Found both group and host with same name: db2-streetfortress-cloud
+[WARNING]: Found both group and host with same name: custom-image-builder
+[WARNING]: Found both group and host with same name: staging-v2
+[WARNING]: Found both group and host with same name: staging-web
+[WARNING]: Found both group and host with same name: junktown
+[WARNING]: Found both group and host with same name: web2-streetfortress-cloud
+[WARNING]: Found both group and host with same name: devbox
+[WARNING]: Found both group and host with same name: staging-db
+[WARNING]: Found both group and host with same name: llm-server
+[WARNING]: Found both group and host with same name: staging-1g
+
+PLAY [Create Virtual Machines] *************************************************************************************************************************************
+
+TASK [Gathering Facts] *********************************************************************************************************************************************
+ok: [localhost]
+
+TASK [Parse target VMs from command line] **************************************************************************************************************************
+ok: [localhost]
+
+TASK [Build VM specs from inventory] *******************************************************************************************************************************
+skipping: [localhost] => (item=Building spec for devbox)
+skipping: [localhost] => (item=Building spec for junktown)
+skipping: [localhost] => (item=Building spec for llm-server)
+ok: [localhost] => (item=Building spec for custom-image-builder)
+skipping: [localhost] => (item=Building spec for staging-1g)
+skipping: [localhost] => (item=Building spec for staging-v2)
+skipping: [localhost] => (item=Building spec for staging-web)
+skipping: [localhost] => (item=Building spec for staging-db)
+skipping: [localhost] => (item=Building spec for db2-streetfortress-cloud)
+skipping: [localhost] => (item=Building spec for web2-streetfortress-cloud)
+
+TASK [Display final VM specifications] *****************************************************************************************************************************
+ok: [localhost] => (item=custom-image-builder) => {
+    "msg": "VM custom-image-builder: 4vCPU, 8GB RAM, 25G disk, OS: ubuntu-server-24.04, IP: 10.0.0.11"
+}
+
+TASK [Checking if VMs exist] ***************************************************************************************************************************************
+ok: [localhost] => (item=Checking if custom-image-builder is already defined)
+
+TASK [set_fact] ****************************************************************************************************************************************************
+ok: [localhost]
+
+TASK [meta] ********************************************************************************************************************************************************
+skipping: [localhost]
+
+TASK [debug] *******************************************************************************************************************************************************
+ok: [localhost] => {
+    "msg": "Will create the following VMs: custom-image-builder"
+}
+
+TASK [Generate user passwords] *************************************************************************************************************************************
+included: /home/steven/.files/homelab/vms/tasks/passwords.yaml for localhost => (item=Generated custom-image-builder user password)
+
+TASK [Check if passwords file exists] ******************************************************************************************************************************
+ok: [localhost]
+
+TASK [Initialize passwords file with empty structure] **************************************************************************************************************
+skipping: [localhost]
+
+TASK [Check for existing user password] ****************************************************************************************************************************
+ok: [localhost]
+
+TASK [set_fact] ****************************************************************************************************************************************************
+ok: [localhost]
+
+TASK [Generate password] *******************************************************************************************************************************************
+skipping: [localhost]
+
+TASK [Encrypt password] ********************************************************************************************************************************************
+skipping: [localhost]
+
+TASK [Write encrypted password to passwords file] ******************************************************************************************************************
+skipping: [localhost]
+
+TASK [Create cloud-init image] *************************************************************************************************************************************
+included: /home/steven/.files/homelab/vms/tasks/cloud-init.yaml for localhost => (item=Generated custom-image-builder cloud-init image)
+
+TASK [Create temporary build directory] ****************************************************************************************************************************
+changed: [localhost]
+
+TASK [Open passwords file] *****************************************************************************************************************************************
+ok: [localhost]
+
+TASK [Get encrypted password] **************************************************************************************************************************************
+ok: [localhost]
+
+TASK [Decrypt password] ********************************************************************************************************************************************
+ok: [localhost]
+
+TASK [Render cloud-init templates] *********************************************************************************************************************************
+changed: [localhost] => (item=Writing /tmp/ansible.iwnmmm1sbuild/custom-image-builder-metadata.yaml)
+changed: [localhost] => (item=Writing /tmp/ansible.iwnmmm1sbuild/custom-image-builder-network-config.yaml)
+changed: [localhost] => (item=Writing /tmp/ansible.iwnmmm1sbuild/custom-image-builder-userdata.yaml)
+
+TASK [Create cloud-init images] ************************************************************************************************************************************
+changed: [localhost]
+
+TASK [Remove temporary cloud-init build directory] *****************************************************************************************************************
+changed: [localhost]
+
+TASK [Create OS disk images] ***************************************************************************************************************************************
+changed: [localhost] => (item=Created custom-image-builder OS Disk Image)
+
+TASK [Create GPU passthrough hook directories] *********************************************************************************************************************
+skipping: [localhost] => (item=Created custom-image-builder prepare/begin hook directory)
+skipping: [localhost] => (item=Created custom-image-builder release/end hook directory)
+skipping: [localhost]
+
+TASK [Render GPU passthrough hook scripts] *************************************************************************************************************************
+skipping: [localhost] => (item=Wrote custom-image-builder hook prepare/begin/gpu-start-hook.sh)
+skipping: [localhost] => (item=Wrote custom-image-builder hook release/end/gpu-stop-hook.sh)
+skipping: [localhost]
+
+TASK [Define virtual machines] *************************************************************************************************************************************
+changed: [localhost] => (item=Defined custom-image-builder libvirt domain)
+
+TASK [Start virtual machines] **************************************************************************************************************************************
+changed: [localhost] => (item=Started custom-image-builder)
+
+PLAY RECAP *********************************************************************************************************************************************************
+localhost                  : ok=22   changed=7    unreachable=0    failed=0    skipped=6    rescued=0    ignored=0
+
+✅ Custom image builder VM created successfully
+🔧 Running custom image build playbook...
+🔧 Running: ansible-playbook custom-base-image.yaml -e base_image_name=ubuntu-server-24.04 -e custom_image_name=march27 -e target_username=deployer -e include_common=true -e include_containerd=true -e include_nvidia=false -e include_monitoring=true --inventory /home/steven/.files/homelab/inventory.yaml
+[WARNING]: Invalid characters were found in group names but not replaced, use -vvvv to see details
+[WARNING]: Found both group and host with same name: devbox
+[WARNING]: Found both group and host with same name: custom-image-builder
+[WARNING]: Found both group and host with same name: web2-streetfortress-cloud
+[WARNING]: Found both group and host with same name: staging-1g
+[WARNING]: Found both group and host with same name: staging-db
+[WARNING]: Found both group and host with same name: db2-streetfortress-cloud
+[WARNING]: Found both group and host with same name: staging-v2
+[WARNING]: Found both group and host with same name: staging-web
+[WARNING]: Found both group and host with same name: llm-server
+[WARNING]: Found both group and host with same name: junktown
+
+PLAY [Create target user] ******************************************************************************************************************************************
+
+TASK [Gathering Facts] *********************************************************************************************************************************************
+ok: [custom-image-builder]
+
+TASK [Wait for system to be ready] *********************************************************************************************************************************
+ok: [custom-image-builder]
+
+TASK [Create target user] ******************************************************************************************************************************************
+changed: [custom-image-builder]
+
+TASK [Allow target user to sudo without password] ******************************************************************************************************************
+changed: [custom-image-builder]
+
+TASK [Set up SSH authorized keys for target user] ******************************************************************************************************************
+changed: [custom-image-builder]
+
+PLAY [Set up for deployer] *****************************************************************************************************************************************
+
+TASK [Gathering Facts] *********************************************************************************************************************************************
+ok: [custom-image-builder]
+
+TASK [Update and upgrade apt packages] *****************************************************************************************************************************
+changed: [custom-image-builder]
+
+TASK [Install apt packages] ****************************************************************************************************************************************
+changed: [custom-image-builder]
+
+TASK [Clone dotfiles repository] ***********************************************************************************************************************************
+changed: [custom-image-builder]
+
+TASK [Create directories in ~] *************************************************************************************************************************************
+changed: [custom-image-builder] => (item=~/.config)
+changed: [custom-image-builder] => (item=~/.local)
+changed: [custom-image-builder] => (item=~/.local/bin)
+
+TASK [Create symlink for zsh profile] ******************************************************************************************************************************
+changed: [custom-image-builder]
+
+TASK [Change default shell to zsh] *********************************************************************************************************************************
+changed: [custom-image-builder]
+
+TASK [Install zplug] ***********************************************************************************************************************************************
+changed: [custom-image-builder]
+
+TASK [Install TPM (Tmux Plugin Manager)] ***************************************************************************************************************************
+changed: [custom-image-builder]
+
+TASK [Create a sym link for ~/.tmux.conf] **************************************************************************************************************************
+changed: [custom-image-builder]
+
+TASK [Install fzf] *************************************************************************************************************************************************
+changed: [custom-image-builder]
+
+TASK [Run fzf install script] **************************************************************************************************************************************
+changed: [custom-image-builder]
+
+TASK [Install bins] ************************************************************************************************************************************************
+changed: [custom-image-builder]
+
+TASK [Install Rust] ************************************************************************************************************************************************
+changed: [custom-image-builder]
+
+TASK [Install Go] **************************************************************************************************************************************************
+changed: [custom-image-builder]
+
+TASK [Install Neovim] **********************************************************************************************************************************************
+changed: [custom-image-builder]
+
+TASK [Place flag file in user home directory] **********************************************************************************************************************
+changed: [custom-image-builder]
+
+PLAY [Finalize Custom Base Image] **********************************************************************************************************************************
+
+TASK [Gathering Facts] *********************************************************************************************************************************************
+ok: [custom-image-builder]
+
+TASK [Clean up package cache] **************************************************************************************************************************************
+ok: [custom-image-builder]
+
+TASK [Clear bash history] ******************************************************************************************************************************************
+ok: [custom-image-builder] => (item=/home/deployer/.bash_history)
+ok: [custom-image-builder] => (item=/root/.bash_history)
+
+TASK [Clear cloud-init logs and data] ******************************************************************************************************************************
+changed: [custom-image-builder] => (item=/var/log/cloud-init.log)
+changed: [custom-image-builder] => (item=/var/log/cloud-init-output.log)
+changed: [custom-image-builder] => (item=/var/lib/cloud/instances)
+changed: [custom-image-builder] => (item=/var/lib/cloud/instance)
+
+TASK [Clear SSH host keys (will be regenerated on first boot)] *****************************************************************************************************
+ok: [custom-image-builder]
+
+TASK [Clear machine-id (will be regenerated on first boot)] ********************************************************************************************************
+changed: [custom-image-builder]
+
+TASK [Clear systemd journal logs] **********************************************************************************************************************************
+changed: [custom-image-builder]
+
+TASK [Clean temporary files] ***************************************************************************************************************************************
+changed: [custom-image-builder]
+
+TASK [Remove passwordless sudo] ************************************************************************************************************************************
+changed: [custom-image-builder]
+
+TASK [Get group data from target user] *****************************************************************************************************************************
+ok: [custom-image-builder]
+
+TASK [remove target user from sudo group] **************************************************************************************************************************
+fatal: [custom-image-builder]: FAILED! => {"msg": "Missing sudo password"}
+
+PLAY RECAP *********************************************************************************************************************************************************
+custom-image-builder       : ok=32   changed=24   unreachable=0    failed=1    skipped=0    rescued=0    ignored=0
+

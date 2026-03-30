@@ -51,7 +51,7 @@ all:
         custom-image-builder:
           hosts:
             custom-image-builder:
-              ansible_host: 10.0.0.7
+              ansible_host: 10.0.0.11
               os: "ubuntu-server-24.04"
               vcpus: 4
               memory: 8
@@ -62,8 +62,9 @@ all:
           hosts:
             image-test:
               ansible_host: 10.0.0.30
-              ansible_user: deployer
-              os: sudoless-test2
+              username: steven
+              ansible_user: steven
+              os: dev-24.04
               vcpus: 2
               memory: 2
               gpu_passthrough: false
@@ -148,12 +149,8 @@ all:
         devbox: {}
         junktown: {}
         llm-server: {}
-        staging-1g: {}
-        staging-v2: {}
         staging-web: {}
         staging-db: {}
-        symbology-production: {}
-        fitz-gg-production: {}
         db2-streetfortress-cloud: {}
         web2-streetfortress-cloud: {}
 
@@ -175,8 +172,6 @@ all:
         staging-web: {}
         staging-db: {}
         hypervisor: {}
-        symbology-production: {}
-        fitz-gg-production: {}
         db2-streetfortress-cloud: {}
         web2-streetfortress-cloud: {}
 

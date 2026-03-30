@@ -1,0 +1,88 @@
+
+---
+
+- host: soundship
+  desc: Main physical homelab server
+  services:
+    - monitoring (loki/prometheus/grafana/alertmanager/blackbox exporter)
+    - caddy + step ca for .lofi domain (previously for .staging.lofi domains too)
+    - DNSmasq for .lofi services
+    - traggo time tracking service
+    - homebridge (govee smart lights -> apple home ecosystem connector)
+    - postgres/pgadmin for homelab services
+    - NAS / s3 for homelab services (planned for the future)
+
+
+- host: nixos (hostname pending change to something cooler)
+  desc: repurposed laptop, running nixos, configured to run k3s with 2 VMs as worker nodes.
+  services:
+    - woodpecker or tekton CI (Or suitable alternative, need to evaluate)
+
+- host: devbox
+  hypervisor: soundship
+  desc: main dev environment
+  services:
+    - no static services, but has facilities to build & run containers as necessary
+
+- host: junktown
+  hypervisor: soundship
+  desc: secondary dev environment for agentic workflows with loose permissions
+  services:
+    - no static services, but has facilities to build & run containers as necessary
+
+- host: llm-server
+  hypervisor: soundship
+  desc: nvidia drivers, gpu passthrough, ollama/open-webui chat interface
+  services:
+    - ollama / open-webui chat UI
+
+- host: win11
+  hypervisor: soundship
+  desc: windows OS, gpu passthrough, available for windows only apps & games
+  services:
+
+- host: staging-db
+  hypervisor: soundship
+  desc: database host for staging env
+  services:
+    - postgres
+    - timescaledb
+    - pgadmin
+
+- host: db2.streetfortress.cloud
+  hypervisor: linode VPS
+  desc: database host for prod env
+  services:
+    - postgres
+    - timescaledb
+    - pgadmin
+
+- host: staging-web
+  hypervisor: soundship
+  desc: proxy + service host in staging env
+  services:
+    - caddy + step-ca for *.staging.lofi (planned, currently the soundship caddy is handling these services)
+    - fitz homepage *
+    - auth service (staging) *
+    - sketchess project *
+    - dial-in project *
+    - osrs-flips project *
+    - streetfortress homepage *
+
+- host: web2.streetfortress.cloud
+  hypervisor: linode VPS
+  desc: proxy + service host in prod env
+  services:
+    - caddy (default prod letsencrypt settings)
+    - fitz homepage *
+    - auth service *
+    - sketchess project *
+    - dial-in project *
+    - osrs-flips project *
+    - streetfortress homepage *
+
+---
+
+Notes:
+- serivces marked with an asterisk (*) are written by me. They utilize a common pattern of justfiles to test, build & deploy from devbox to the target system (eg 'cd ~/auth-service && just test build deploy web2.streetfortress.cloud').
+- We've adopted SOPS for env file encryption/decryption. All of the custom services use this, but some lingering homelab services don't have it implemented yet
