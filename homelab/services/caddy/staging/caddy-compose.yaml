@@ -1,0 +1,30 @@
+services:
+  caddy:
+    container_name: caddy-server
+    image: caddy:2.10-alpine
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./caddyfiles:/etc/caddy/caddyfiles
+
+      # Certificate storage (IMPORTANT - preserves SSL certs across restarts)
+      - caddy-data:/data
+      - caddy-config:/config
+    environment:
+      - SSL_CERT_DIR=/step-ca-data/certs
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - caddy-network
+
+volumes:
+  caddy-data:
+  caddy-config:
+  step-ca-data:
+
+networks:
+  caddy-network:
+    driver: bridge
