@@ -129,5 +129,8 @@ source "$HOME/.files/shell/scripts/worktrees.sh"
 
 # zoxide wants to be at the end
 if which zoxide &>/dev/null; then
-    eval "$(zoxide init zsh)"
+    # Don't init zoxide for claude code
+    if [[ "$CLAUDECODE" != "1" ]]; then
+      eval "$(zoxide init --cmd cd zsh)"
+    fi
 fi
