@@ -101,10 +101,6 @@ if which rg &>/dev/null; then
 	alias grep='rg'
 fi
 
-if which zoxide &>/dev/null; then
-	# alias cd="z" # note: agents don't handle zoxide very well
-fi
-
 if which virsh &>/dev/null; then
 	export LIBVIRT_DEFAULT_URI=qemu:///system
 	alias v='virsh'
