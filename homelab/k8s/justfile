@@ -39,6 +39,10 @@ fetch-step-ca-root:
     curl -sk https://step-ca.lofi:9000/roots.pem -o cert-manager/step-ca-root.pem
     @echo "Saved step-ca root CA to cert-manager/step-ca-root.pem"
 
+install-root-ca: fetch-step-ca-root
+    sudo cp cert-manager/step-ca-root.pem /usr/local/share/ca-certificates/lofi-root-ca.crt
+    sudo update-ca-certificates
+
 # Deploy cert-manager with step-ca ACME ClusterIssuer
 deploy-cert-manager:
     #!/usr/bin/env bash

@@ -1,0 +1,20 @@
+deploy HOST:
+  #!/usr/bin/env bash
+  set -euo pipefail
+  ssh {{HOST}} -C "mkdir -p ~/caddyfiles"
+  ssh {{HOST}} -C "mkdir -p ~/certs"
+  scp Caddyfile {{HOST}}:~/Caddyfile
+  scp step-ca-root.pem {{HOST}}:~/certs/step-ca-root.pem
+  scp caddy-compose.yaml {{HOST}}:~/caddy-compose.yaml
+  ssh {{HOST}} -C "~/.local/bin/nerdctl compose -f ~/caddy-compose.yaml down"
+  ssh {{HOST}} -C "~/.local/bin/nerdctl compose -f ~/caddy-compose.yaml up -d"
+
+reload HOST:
+  ssh {{HOST}} -C "~/.local/bin/nerdctl exec caddy-server -- caddy reload --config /etc/caddy/Caddyfile"
+
+# Fetch step-ca root CA certificate for cert-manager trust
+fetch-step-ca-root:
+    curl -sk https://step-ca.lofi:9000/roots.pem -o step-ca-root.pem
+    @echo "Saved step-ca root CA to step-ca-root.pem"
+
+
