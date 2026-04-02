@@ -6,3 +6,12 @@ down:
 
 logs *ARGS:
     nerdctl compose -f ollama.yaml logs {{ARGS}}
+
+filtered-ollama-logs:
+    just logs ollama -f | grep -v '/api/ps' | grep -v '"/"'
+
+update: down
+    nerdctl image rm ghcr.io/open-webui/open-webui:main
+    nerdctl image rm ollama/ollama:latest
+
+
