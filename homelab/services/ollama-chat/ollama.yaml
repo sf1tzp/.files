@@ -29,3 +29,12 @@ services:
       - ${OPEN_WEBUI_PORT:-3000}:8080
     volumes:
       - ${OPEN_WEBUI_DATA:-$HOME/.open-webui/data}:/app/backend/data
+
+  ollama-exporter:
+    image: ollama-exporter:latest
+    container_name: ollama-exporter
+    restart: unless-stopped
+    environment:
+      OLLAMA_HOST: http://10.0.0.4:11434
+    ports:
+      - 8000:8000
