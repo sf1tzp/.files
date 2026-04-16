@@ -1,0 +1,44 @@
+{
+    email tech@stev.lol
+
+    acme_ca https://step-ca.lofi:9000/acme/acme/directory
+
+    metrics {
+        per_host
+    }
+}
+
+import caddyfiles/*.caddy
+
+# pgadmin isn't deployed to staging-web, so we're defining that here
+# note the ip for staging-db
+pgadmin.staging.lofi {
+    header {
+        # Prevent clickjacking
+        X-Frame-Options "SAMEORIGIN"
+        # XSS protection
+        X-Content-Type-Options "nosniff"
+        # Referrer policy
+        Referrer-Policy "strict-origin-when-cross-origin"
+        # Remove server header for security
+        -server
+    }
+    encode gzip zstd
+
+    log {
+        output stdout
+        format json
+    }
+
+    reverse_proxy 10.0.0.32:5433 {
+        # Timeouts
+        transport http {
+            dial_timeout 5s
+            response_header_timeout 10s
+        }
+
+        # Pass real client IP
+        header_up X-Real-IP {remote_host}
+    }
+
+}

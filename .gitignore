@@ -1,8 +1,12 @@
 **/.DS_Store
 
+__pycache__
+
 .vscode
 
 homelab/services/*/.env
+
+homelab/services/caddy/staging/*.pem
 
 homelab/services/dolibarr/dolibarr-data/
 

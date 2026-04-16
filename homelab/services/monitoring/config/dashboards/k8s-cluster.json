@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 0,
+  "id": 21,
   "links": [],
   "panels": [
     {
@@ -81,6 +81,8 @@
             }
           },
           "mappings": [],
+          "max": 100,
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -115,29 +117,33 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "moving average"
+              "options": "temperature"
             },
             "properties": [
               {
                 "id": "custom.lineWidth",
-                "value": 0
+                "value": 2
               },
               {
                 "id": "custom.lineStyle",
                 "value": {
                   "dash": [
-                    25,
-                    20
+                    0,
+                    10
                   ],
-                  "fill": "dash"
+                  "fill": "dot"
                 }
               },
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "super-light-orange",
+                  "fixedColor": "semi-dark-orange",
                   "mode": "fixed"
                 }
+              },
+              {
+                "id": "unit",
+                "value": "celsius"
               }
             ]
           },
@@ -153,6 +159,39 @@
                   "legend": true,
                   "tooltip": false,
                   "viz": false
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "battery_level"
+            },
+            "properties": [
+              {
+                "id": "custom.lineWidth",
+                "value": 2
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    0,
+                    10
+                  ],
+                  "fill": "dot"
+                }
+              },
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "light-green",
+                  "mode": "fixed"
                 }
               }
             ]
@@ -204,6 +243,32 @@
           "legendFormat": "all_cpu",
           "range": true,
           "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "fenqsyb8rfke8c"
+          },
+          "editorMode": "code",
+          "expr": "node_hwmon_temp_celsius{instance=\"$k8s_node\", chip=\"0000:00:08_1_0000:73:00_0\"}",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "temperature",
+          "range": true,
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "fenqsyb8rfke8c"
+          },
+          "editorMode": "code",
+          "expr": "node_power_supply_capacity{instance=\"$k8s_node\",power_supply=\"BAT0\"}",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "battery_level",
+          "range": true,
+          "refId": "D"
         }
       ],
       "title": "CPU Usage",
@@ -618,7 +683,9 @@
     "list": [
       {
         "current": {
-          "text": "All",
+          "text": [
+            "All"
+          ],
           "value": [
             "$__all"
           ]
@@ -627,7 +694,7 @@
           "type": "prometheus",
           "uid": "fenqsyb8rfke8c"
         },
-        "definition": "query_result(up{job=\"k8s\"} == 1)",
+        "definition": "query_result(up{job=\"k8s_nodes\"} == 1)",
         "hide": 2,
         "includeAll": true,
         "multi": true,
@@ -635,11 +702,12 @@
         "options": [],
         "query": {
           "qryType": 3,
-          "query": "query_result(up{job=\"k8s\"} == 1)",
+          "query": "query_result(up{job=\"k8s_nodes\"} == 1)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
         "regex": "/instance=\"(?<value>[^\"]*)\"/",
+        "sort": 1,
         "type": "query"
       }
     ]
@@ -652,5 +720,5 @@
   "timezone": "browser",
   "title": "K8s Cluster",
   "uid": "k8s-cluster",
-  "version": 3
+  "version": 6
 }
