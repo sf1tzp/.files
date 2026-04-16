@@ -92,10 +92,10 @@ in
   # ── Bridge networking ──────────────────────────────────────────────
   # Keep NetworkManager away from the bridged ethernet interface
   # (NM continues to manage WiFi for desktop use)
-  networking.networkmanager.unmanaged = [ "enp116s0f4u1" ];
+  networking.networkmanager.unmanaged = [ "enp116s0f4u1u1" ];
 
   networking.bridges.br0 = {
-    interfaces = [ "enp116s0f4u1" ];
+    interfaces = [ "enp116s0f4u1u1" ];
   };
 
   networking.interfaces.br0.ipv4.addresses = [{
