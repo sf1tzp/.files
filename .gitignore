@@ -6,6 +6,8 @@ __pycache__
 
 homelab/services/*/.env
 
+homelab/services/caddy/staging/*.pem
+
 homelab/services/dolibarr/dolibarr-data/
 
 homelab/services/monitoring/config/discord_webhook_url
