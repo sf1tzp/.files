@@ -16,8 +16,6 @@ services:
       - caddy-config:/config
     environment:
       - SSL_CERT_DIR=/step-ca-data/certs
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     networks:
       - caddy_network
 
