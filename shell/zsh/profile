@@ -105,13 +105,25 @@ fi
 export FZF_ALT_C_COMMAND=""
 export FZF_CTRL_T_COMMAND=""
 
-# Set up zsh plugins (NixOS uses home-manager plugins; non-NixOS uses zplug)
+# Set up fzf zsh plugins (NixOS uses home-manager plugins; non-NixOS uses zplug)
 if [[ ! -f /etc/NIXOS ]]; then
     source ~/.files/shell/zsh/zplug
 else
     # fzf init after zsh-vi-mode (loaded by home-manager)
     zvm_after_init_commands+=('source <(fzf --zsh)')
 fi
+
+# Override fzf Ctrl-R to start with empty query instead of current buffer contents
+zvm_after_init_commands+=('
+  _fzf_history_empty_query() {
+    local orig=$LBUFFER
+    LBUFFER=""
+    zle fzf-history-widget
+    [[ -z $LBUFFER ]] && LBUFFER=$orig
+  }
+  zle -N _fzf_history_empty_query
+  bindkey "^R" _fzf_history_empty_query
+')
 
 if which kubectl &>/dev/null; then
     source "$HOME/.files/shell/k8s/k8s.sh"
