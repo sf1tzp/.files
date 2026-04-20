@@ -1,0 +1,10 @@
+services:
+  umami:
+    restart: unless-stopped
+    container_name: umami-server
+    image: docker.umami.is/umami-software/umami:latest
+    networks:
+      - caddy_network
+networks:
+  caddy_network:
+      driver: bridge

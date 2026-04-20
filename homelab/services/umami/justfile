@@ -1,0 +1,11 @@
+deploy HOST:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    ssh {{HOST}} -C "mkdir -p ~/images"
+    ssh {{HOST}} -C "mkdir -p ~/caddyfiles"
+    ssh {{HOST}} -C "mkdir -p ~/umami"
+    sops -d secrets/{{HOST}}.env | ssh {{HOST}} "cat > ~/umami/.env"
+    scp caddyfiles/{{HOST}} {{HOST}}:~/caddyfiles/umami.caddy
+    scp umami-compose.yaml {{HOST}}:~/umami-compose.yaml
+    ssh {{HOST}} -C "~/.local/bin/nerdctl compose -f ~/umami-compose.yaml down"
+    ssh {{HOST}} -C "~/.local/bin/nerdctl compose -f ~/umami-compose.yaml up -d --env-file ~/umami/.env"
