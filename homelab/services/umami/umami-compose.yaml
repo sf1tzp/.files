@@ -2,7 +2,7 @@ services:
   umami:
     restart: unless-stopped
     container_name: umami-server
-    image: docker.umami.is/umami-software/umami:latest
+    image: docker.umami.is/umami-software/umami:3.1.0
     networks:
       - caddy_network
 networks:
