@@ -29,7 +29,6 @@
     curl
     htop
     jq
-    moreutils
     tmux
     unzip
     wget

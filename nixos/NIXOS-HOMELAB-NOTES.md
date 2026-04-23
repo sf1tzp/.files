@@ -171,6 +171,7 @@ zenbook joins the homelab mesh as a regular peer (wg_vpn_ip `10.1.0.6`). Peer me
 Bootstrap:
 
 ```sh
+nix-shell -p wireguard-tools moreutils # get wg and sponge commands for the steps below:
 cd /home/steven/.files/nixos
 PRIV=$(wg genkey)
 sops --set "[\"wireguard-private-key\"] \"$PRIV\"" secrets/cluster.yaml
