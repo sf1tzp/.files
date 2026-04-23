@@ -30,7 +30,7 @@
     "web2-streetfortress-cloud": {
       "wg_vpn_ip": "10.1.0.52",
       "wg_endpoint_ip": "web2.streetfortress.cloud",
-      "public_key": "REPLACE_WITH_WEB2_PUBKEY"
+      "public_key": "5A3rjmLZyxZ6OW/5R9X9LmpYAWgF112o7sjx4Q1ZkFo="
     }
   },
   "clients": {
