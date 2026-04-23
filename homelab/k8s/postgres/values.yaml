@@ -26,6 +26,21 @@ primary:
     size: 10Gi
     # storageClass: local-path  # k3s default, no need to specify
 
+  # Exposes GHA_CACHE_PG_PASSWORD to the initdb script below.
+  # Only runs on a fresh cluster init; for the existing cluster use
+  # `just provision-gha-cache-db` to create the role + db manually.
+  extraEnvVarsSecret: postgres-credentials
+  initdb:
+    scripts:
+      02-gha-cache.sh: |
+        #!/usr/bin/env bash
+        set -e
+        psql -U postgres -v ON_ERROR_STOP=1 <<SQL
+        CREATE ROLE gha_cache LOGIN PASSWORD '${GHA_CACHE_PG_PASSWORD}';
+        CREATE DATABASE gha_cache OWNER gha_cache;
+        GRANT ALL PRIVILEGES ON DATABASE gha_cache TO gha_cache;
+        SQL
+
   resources:
     requests:
       memory: 256Mi

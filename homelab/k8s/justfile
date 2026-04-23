@@ -29,6 +29,7 @@ encrypt-secrets:
     sops -e -i postgres/secrets.yaml
     sops -e -i gitea/secrets.yaml
     sops -e -i rustfs/secrets.yaml
+    sops -e -i gha-cache/secrets.yaml
 
 # Edit secrets in-place (decrypts, opens $EDITOR, re-encrypts)
 edit-secrets service:
@@ -85,6 +86,23 @@ deploy-gitea:
         --wait
     kubectl apply -f gitea/routes.yaml
 
+# One-time: create the gha_cache role + database in the already-running postgres.
+# primary.initdb.scripts only runs on fresh cluster init, so we provision the
+# tenant imperatively for the existing deployment. Idempotent via DO/\gexec guards.
+provision-gha-cache-db:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    PG_PASS=$(sops -d postgres/secrets.yaml | yq '.stringData.postgres-password')
+    GHA_PASS=$(sops -d postgres/secrets.yaml | yq '.stringData.GHA_CACHE_PG_PASSWORD')
+    kubectl exec -n postgres -i postgres-postgresql-0 -- \
+        env PGPASSWORD="$PG_PASS" psql -U postgres -v ON_ERROR_STOP=1 <<SQL
+    DO \$\$ BEGIN
+      CREATE ROLE gha_cache LOGIN PASSWORD '$GHA_PASS';
+    EXCEPTION WHEN duplicate_object THEN NULL; END \$\$;
+    SELECT 'CREATE DATABASE gha_cache OWNER gha_cache'
+      WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'gha_cache')\gexec
+    SQL
+
 deploy-rustfs:
     kubectl create namespace rustfs --dry-run=client -o yaml | kubectl apply -f -
     sops -d rustfs/secrets.yaml | kubectl apply -f -
@@ -95,6 +113,15 @@ deploy-rustfs:
     kubectl apply -f rustfs/routes.yaml
     kubectl apply -f rustfs/bucket-job.yaml
     kubectl wait --for=condition=complete job/rustfs-bucket-init -n rustfs --timeout=120s
+
+deploy-gha-cache:
+    kubectl create namespace gha-cache --dry-run=client -o yaml | kubectl apply -f -
+    sops -d gha-cache/secrets.yaml | kubectl apply -f -
+    helm upgrade --install gha-cache \
+        oci://ghcr.io/falcondev-oss/charts/github-actions-cache-server \
+        --namespace gha-cache \
+        --values gha-cache/values.yaml \
+        --wait
 
 # Deploy actions runner (requires a registration token from Gitea admin panel)
 deploy-runner token:
@@ -141,7 +168,7 @@ sync-mirror repo:
 # --- Orchestration ---
 
 # Deploy everything (except actions runner, which needs a token from Gitea)
-deploy-all: add-repos install-gateway-crds setup-dns fetch-step-ca-root deploy-traefik deploy-cert-manager deploy-postgres deploy-gitea
+deploy-all: add-repos install-gateway-crds setup-dns fetch-step-ca-root deploy-traefik deploy-cert-manager deploy-postgres provision-gha-cache-db deploy-rustfs deploy-gha-cache deploy-gitea
     @echo ""
     @echo "All services deployed."
     @echo "Next steps:"
@@ -182,6 +209,10 @@ logs-actions *ARGS:
 
 logs-rustfs *ARGS:
     kubectl logs -n rustfs -l app.kubernetes.io/name=rustfs {{ ARGS }}
+
+logs-gha-cache *ARGS:
+    kubectl logs -n gha-cache -l app.kubernetes.io/name=github-actions-cache-server {{ ARGS }}
+
 # --- Teardown ---
 
 [confirm]
@@ -226,5 +257,10 @@ destroy-rustfs:
     kubectl delete namespace rustfs --ignore-not-found
 
 [confirm]
-destroy-all: destroy-rustfs destroy-gitea destroy-postgres destroy-cert-manager destroy-traefik
+destroy-gha-cache:
+    helm uninstall gha-cache --namespace gha-cache --ignore-not-found
+    kubectl delete namespace gha-cache --ignore-not-found
+
+[confirm]
+destroy-all: destroy-gha-cache destroy-rustfs destroy-gitea destroy-postgres destroy-cert-manager destroy-traefik
     kubectl delete -f https://github.com/kubernetes-sigs/gateway-api/releases/download/{{ gateway_api_version }}/standard-install.yaml --ignore-not-found
