@@ -10,7 +10,7 @@
     },
     "zenbook": {
       "wg_vpn_ip": "10.1.0.6",
-      "public_key": ""
+      "public_key": "VBGldmEDBk0t17q2HotN77vK3eB8c5zzwBXT7J0UtFU="
     },
     "staging-web": {
       "wg_vpn_ip": "10.1.0.11",
