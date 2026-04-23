@@ -18,6 +18,11 @@
       k3s-token = {
         # Available at /run/secrets/k3s-token after activation
       };
+      wireguard-private-key = {
+        # Available at /run/secrets/wireguard-private-key after activation
+        mode = "0400";
+        owner = "root";
+      };
     };
   };
 }

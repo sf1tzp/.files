@@ -164,6 +164,25 @@ WireGuard), change the server address to `https://10.0.0.6:6443`.
 
 ---
 
+## wireguard
+
+zenbook joins the homelab mesh as a regular peer (wg_vpn_ip `10.1.0.6`). Peer metadata lives in `../homelab/wireguard/peers.json`, shared with the Ansible playbook at `../homelab/wireguard/playbook.yaml`. `nixos/modules/wireguard.nix` imports that JSON and configures `networking.wg-quick.interfaces.wg0`. The private key is the only sops-managed value.
+
+Bootstrap:
+
+```sh
+cd /home/steven/.files/nixos
+PRIV=$(wg genkey)
+sops --set "[\"wireguard-private-key\"] \"$PRIV\"" secrets/cluster.yaml
+PUB=$(echo "$PRIV" | wg pubkey)
+jq --arg k "$PUB" '.peers.zenbook.public_key = $k' ../homelab/wireguard/peers.json | sponge ../homelab/wireguard/peers.json
+sudo nixos-rebuild switch --flake .#zenbook
+```
+
+Then, from the Ansible controller, re-run `just wireguard` so all VM peers pick up zenbook's pubkey.
+
+---
+
 ## Future Considerations
 
 - **Monitoring:** node-exporter on host + workers, Prometheus scraping all nodes
