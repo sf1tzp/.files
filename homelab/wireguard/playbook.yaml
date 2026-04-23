@@ -174,8 +174,31 @@
         enabled: yes
         state: started
 
+    # Split-DNS: route *.lofi queries over the tunnel to soundship's dnsmasq.
+    # Only needed on hosts that can't reach soundship on the LAN directly —
+    # the streetfortress.cloud VMs.
+    - name: Ensure systemd-resolved drop-in directory exists
+      ansible.builtin.file:
+        path: /etc/systemd/resolved.conf.d
+        state: directory
+        mode: "0755"
+      when: "'streetfortress-cloud' in inventory_hostname"
+
+    - name: Install homelab resolved.conf drop-in
+      ansible.builtin.template:
+        src: "{{ playbook_dir }}/templates/homelab-resolved.conf.j2"
+        dest: /etc/systemd/resolved.conf.d/homelab.conf
+        mode: "0644"
+      notify: restart systemd-resolved
+      when: "'streetfortress-cloud' in inventory_hostname"
+
   handlers:
     - name: restart wireguard
       ansible.builtin.service:
         name: wg-quick@wg0
+        state: restarted
+
+    - name: restart systemd-resolved
+      ansible.builtin.service:
+        name: systemd-resolved
         state: restarted
