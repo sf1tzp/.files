@@ -2,13 +2,13 @@
 - name: Install and configure Wireguard on homelab hosts
   hosts: wireguard
   become: yes
+  serial: 1  # serialize to avoid concurrent peers.json mutations
   vars:
     vault_password: "{{ lookup('env', 'ANSIBLE_VAULT_PASSWORD') }}"
     wg_keys_file: "~/.homelab-wireguard-keys.yaml"
+    peers_file: "{{ playbook_dir }}/peers.json"
     wg_port: 51820
-    public_endpoint: "{{ lookup('env', 'WIREGUARD_PUBLIC_ENDPOINT') }}"
   tasks:
-    # Install Wireguard
     - name: Install Wireguard packages
       ansible.builtin.package:
         name:
@@ -16,7 +16,7 @@
           - wireguard
         state: present
 
-    # Manage keys in the vault
+    # --- Private key management (vault-encrypted keys file, unchanged from prior playbook) ---
     - name: Check if private keys file exists
       ansible.builtin.stat:
         path: "{{ wg_keys_file }}"
@@ -26,10 +26,10 @@
 
     - name: Initialize private keys file with empty structure
       ansible.builtin.copy:
-        content: "wireguard:\n  private_keys: {}\n  public_keys: {}\n"
+        content: "wireguard:\n  private_keys: {}\n"
         dest: "{{ wg_keys_file }}"
         mode: "0600"
-        force: false # Don't overwrite if exists
+        force: false
       when: not keys_file.stat.exists
       delegate_to: localhost
       become: no
@@ -45,7 +45,7 @@
 
     - name: Set fact if private key exists
       ansible.builtin.set_fact:
-        private_key_not_set: "{{ private_key_check.rc != 0 }}" # yq failed, meaning key doesn't exist
+        private_key_not_set: "{{ private_key_check.rc != 0 }}"
 
     - name: Generate Wireguard private key
       ansible.builtin.command:
@@ -94,55 +94,111 @@
       ansible.builtin.set_fact:
         private_key: "{{ current_private_key }}"
 
-    - name: Generate public key from private key
+    - name: Derive public key from private key
       ansible.builtin.shell:
         cmd: echo '{{ current_private_key }}' | wg pubkey
       register: wg_public_key
+      changed_when: false
       delegate_to: localhost
       become: no
 
-    - name: Store public key (unencrypted) in vault
-      ansible.builtin.command:
-        cmd: yq -i '.wireguard.public_keys.{{ inventory_hostname }} = "{{ wg_public_key.stdout }}"' {{ wg_keys_file }}
-      delegate_to: localhost
-      become: no
+    # --- peers.json is the source of truth for all peer metadata ---
+    - name: Read peers.json
+      ansible.builtin.include_vars:
+        file: "{{ peers_file }}"
+        name: peers_data
 
-    # Create a fact with all public keys for configuring peers
-    - name: Get all public keys
-      ansible.builtin.command:
-        cmd: yq -e '.wireguard.public_keys' {{ wg_keys_file }}
-      register: all_public_keys
-      delegate_to: localhost
-      become: no
-
-    - name: Parse public keys
+    - name: Read committed pubkey for this host
       ansible.builtin.set_fact:
-        public_keys: "{{ all_public_keys.stdout | from_yaml }}"
+        committed_pubkey: "{{ peers_data.peers[inventory_hostname].public_key | default('') }}"
 
-    # Configure Wireguard
+    - name: Write this host's pubkey into peers.json if empty
+      ansible.builtin.command:
+        cmd: >-
+          jq --arg k "{{ wg_public_key.stdout }}"
+             '.peers["{{ inventory_hostname }}"].public_key = $k'
+             {{ peers_file }}
+      register: peers_json_patched
+      changed_when: true
+      when: committed_pubkey == ""
+      delegate_to: localhost
+      become: no
+
+    - name: Persist patched peers.json
+      ansible.builtin.copy:
+        content: "{{ peers_json_patched.stdout }}\n"
+        dest: "{{ peers_file }}"
+        mode: "0644"
+      when: committed_pubkey == ""
+      delegate_to: localhost
+      become: no
+
+    - name: Re-read peers.json after pubkey write
+      ansible.builtin.include_vars:
+        file: "{{ peers_file }}"
+        name: peers_data
+      when: committed_pubkey == ""
+
+    - name: Fail if committed pubkey does not match this host's key
+      ansible.builtin.fail:
+        msg: >-
+          peers.json has public_key '{{ committed_pubkey }}' for {{ inventory_hostname }},
+          but the private key in {{ wg_keys_file }} derives to '{{ wg_public_key.stdout }}'.
+          Someone regenerated a key. Reconcile manually.
+      when:
+        - committed_pubkey != ""
+        - committed_pubkey != wg_public_key.stdout
+
+    - name: Fail if this host is missing from peers.json
+      ansible.builtin.fail:
+        msg: "{{ inventory_hostname }} is not listed under peers in {{ peers_file }}"
+      when: inventory_hostname not in peers_data.peers
+
+    # --- Render and deploy wg0.conf ---
     - name: Create Wireguard configuration directory
       ansible.builtin.file:
         path: /etc/wireguard
         state: directory
         mode: "0700"
 
-    # Create template for wg0.conf
-    - name: Configure Wireguard interface
+    - name: Render wg0.conf
       ansible.builtin.template:
         src: "{{ playbook_dir }}/templates/wg0.conf.j2"
         dest: /etc/wireguard/wg0.conf
         mode: "0600"
       notify: restart wireguard
 
-    # Enable and start Wireguard
     - name: Enable and start Wireguard
       ansible.builtin.service:
         name: wg-quick@wg0
         enabled: yes
         state: started
 
+    # Split-DNS: route *.lofi queries over the tunnel to soundship's dnsmasq.
+    # Only needed on hosts that can't reach soundship on the LAN directly —
+    # the streetfortress.cloud VMs.
+    - name: Ensure systemd-resolved drop-in directory exists
+      ansible.builtin.file:
+        path: /etc/systemd/resolved.conf.d
+        state: directory
+        mode: "0755"
+      when: "'streetfortress-cloud' in inventory_hostname"
+
+    - name: Install homelab resolved.conf drop-in
+      ansible.builtin.template:
+        src: "{{ playbook_dir }}/templates/homelab-resolved.conf.j2"
+        dest: /etc/systemd/resolved.conf.d/homelab.conf
+        mode: "0644"
+      notify: restart systemd-resolved
+      when: "'streetfortress-cloud' in inventory_hostname"
+
   handlers:
     - name: restart wireguard
       ansible.builtin.service:
         name: wg-quick@wg0
+        state: restarted
+
+    - name: restart systemd-resolved
+      ansible.builtin.service:
+        name: systemd-resolved
         state: restarted

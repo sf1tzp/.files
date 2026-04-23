@@ -152,8 +152,6 @@ all:
         staging-v2: {}
         staging-web: {}
         staging-db: {}
-        symbology-production: {}
-        fitz-gg-production: {}
         db2-streetfortress-cloud: {}
         web2-streetfortress-cloud: {}
 
@@ -171,12 +169,9 @@ all:
     wireguard:
       children:
         devbox: {}
-        junktown: {}
         staging-web: {}
         staging-db: {}
         hypervisor: {}
-        symbology-production: {}
-        fitz-gg-production: {}
         db2-streetfortress-cloud: {}
         web2-streetfortress-cloud: {}
 

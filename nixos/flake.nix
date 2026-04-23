@@ -36,6 +36,7 @@
           ./modules/development.nix
           ./modules/secrets.nix
           ./modules/k3s-cluster.nix
+          ./modules/wireguard.nix
           microvm.nixosModules.host
           sops-nix.nixosModules.sops
 
