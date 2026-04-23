@@ -1,0 +1,29 @@
+# One-shot Job that creates the `gha-cache` bucket in rustfs.
+# Rustfs does not auto-create buckets; the gha-cache server needs it to exist.
+# Safe to re-apply: `mc mb -p` is idempotent and the Job has ttlSecondsAfterFinished.
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: rustfs-bucket-init
+  namespace: rustfs
+spec:
+  ttlSecondsAfterFinished: 300
+  backoffLimit: 10
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: mc
+          image: minio/mc:latest
+          envFrom:
+            - secretRef:
+                name: rustfs-credentials
+          command: ["sh", "-c"]
+          args:
+            - |
+              until mc alias set r http://rustfs-svc:9000 "$RUSTFS_ACCESS_KEY" "$RUSTFS_SECRET_KEY"; do
+                echo "waiting for rustfs-svc..."; sleep 2
+              done
+              mc mb -p r/gha-cache || true
+              mc ls r

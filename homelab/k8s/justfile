@@ -11,6 +11,7 @@ add-repos:
     helm repo add bitnami https://charts.bitnami.com/bitnami
     helm repo add gitea-charts https://dl.gitea.com/charts/
     helm repo add jetstack https://charts.jetstack.io
+    helm repo add rustfs https://charts.rustfs.com/
     helm repo update
 
 # Install Gateway API CRDs (standard channel)
@@ -27,6 +28,7 @@ setup-dns:
 encrypt-secrets:
     sops -e -i postgres/secrets.yaml
     sops -e -i gitea/secrets.yaml
+    sops -e -i rustfs/secrets.yaml
 
 # Edit secrets in-place (decrypts, opens $EDITOR, re-encrypts)
 edit-secrets service:
@@ -82,6 +84,17 @@ deploy-gitea:
         --values gitea/values.yaml \
         --wait
     kubectl apply -f gitea/routes.yaml
+
+deploy-rustfs:
+    kubectl create namespace rustfs --dry-run=client -o yaml | kubectl apply -f -
+    sops -d rustfs/secrets.yaml | kubectl apply -f -
+    helm upgrade --install rustfs rustfs/rustfs \
+        --namespace rustfs \
+        --values rustfs/values.yaml \
+        --wait
+    kubectl apply -f rustfs/routes.yaml
+    kubectl apply -f rustfs/bucket-job.yaml
+    kubectl wait --for=condition=complete job/rustfs-bucket-init -n rustfs --timeout=120s
 
 # Deploy actions runner (requires a registration token from Gitea admin panel)
 deploy-runner token:
@@ -167,6 +180,8 @@ logs-gitea *ARGS:
 logs-actions *ARGS:
     kubectl logs -n gitea-actions -l app.kubernetes.io/name=actions {{ ARGS }}
 
+logs-rustfs *ARGS:
+    kubectl logs -n rustfs -l app.kubernetes.io/name=rustfs {{ ARGS }}
 # --- Teardown ---
 
 [confirm]
@@ -204,5 +219,12 @@ destroy-cert-manager:
     kubectl delete namespace cert-manager --ignore-not-found
 
 [confirm]
-destroy-all: destroy-gitea destroy-postgres destroy-cert-manager destroy-traefik
+destroy-rustfs:
+    kubectl delete -f rustfs/routes.yaml --ignore-not-found
+    kubectl delete -f rustfs/bucket-job.yaml --ignore-not-found
+    helm uninstall rustfs --namespace rustfs --ignore-not-found
+    kubectl delete namespace rustfs --ignore-not-found
+
+[confirm]
+destroy-all: destroy-rustfs destroy-gitea destroy-postgres destroy-cert-manager destroy-traefik
     kubectl delete -f https://github.com/kubernetes-sigs/gateway-api/releases/download/{{ gateway_api_version }}/standard-install.yaml --ignore-not-found

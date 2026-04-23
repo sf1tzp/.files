@@ -51,6 +51,28 @@ spec:
       allowedRoutes:
         namespaces:
           from: All
+    - name: https-rustfs-s3
+      port: 8443
+      protocol: HTTPS
+      hostname: s3.zen.lofi
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: rustfs-s3-tls
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: https-rustfs-console
+      port: 8443
+      protocol: HTTPS
+      hostname: s3-console.zen.lofi
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: rustfs-console-tls
+      allowedRoutes:
+        namespaces:
+          from: All
 
 ---
 # Redirect HTTP -> HTTPS for all hostnames.
