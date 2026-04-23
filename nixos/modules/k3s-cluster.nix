@@ -55,6 +55,9 @@ let
         address = [ "${address}/24" ];
         gateway = [ "10.0.0.1" ];
         dns = [ "10.0.0.2" "8.8.8.8" ];
+        routes = [
+          { Destination = "10.1.0.0/24"; Gateway = "10.0.0.6"; }
+        ];
       };
 
       # Flannel VXLAN + kubelet metrics
