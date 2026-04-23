@@ -1,0 +1,42 @@
+{
+  "peers": {
+    "soundship": {
+      "wg_vpn_ip": "10.1.0.1",
+      "public_key": "EpvbuawUq6V5cCrGxpmCqvJr7BGgVznZSJ839IAGRD4="
+    },
+    "devbox": {
+      "wg_vpn_ip": "10.1.0.3",
+      "public_key": "vNlWuO2Hz1vNYTGPpctq56Vw2LIlktIxLRHjAerLIUI="
+    },
+    "zenbook": {
+      "wg_vpn_ip": "10.1.0.6",
+      "public_key": ""
+    },
+    "staging-web": {
+      "wg_vpn_ip": "10.1.0.11",
+      "wg_endpoint_ip": "10.0.0.31",
+      "public_key": "DVqcHiaMz9kw76EamhHNgtrbQrvuRa8xCxx8mqZEWBM="
+    },
+    "staging-db": {
+      "wg_vpn_ip": "10.1.0.12",
+      "wg_endpoint_ip": "10.0.0.32",
+      "public_key": "kfEEvsKXb/CVG+Byp2WK6jBxjIXKcKi17rxAMqdqIGk="
+    },
+    "db2-streetfortress-cloud": {
+      "wg_vpn_ip": "10.1.0.51",
+      "wg_endpoint_ip": "db2.streetfortress.cloud",
+      "public_key": "BmgDSTuXqzccVKbFyJNjNrGllDBaw4z/x/trI3X25H4="
+    },
+    "web2-streetfortress-cloud": {
+      "wg_vpn_ip": "10.1.0.52",
+      "wg_endpoint_ip": "web2.streetfortress.cloud",
+      "public_key": "REPLACE_WITH_WEB2_PUBKEY"
+    }
+  },
+  "clients": {
+    "macbook-air": {
+      "wg_vpn_ip": "10.1.0.100",
+      "public_key": "Ds4OCjPV5+zS3InfJy+P7LDFHmalqFVPiyPbww3ptQc="
+    }
+  }
+}
