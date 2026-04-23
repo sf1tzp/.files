@@ -28,6 +28,16 @@ config:
     log_level: "info"
     region: "us-east-1"
 
+# rustfs writes scratch data to /tmp/rustfs_scanner; the chart's default
+# readOnlyRootFilesystem: true blocks this and the /health probe never passes.
+containerSecurityContext:
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: false
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+
 service:
   type: ClusterIP
   endpoint:
@@ -64,3 +74,19 @@ resources:
     cpu: 100m
   limits:
     memory: 1Gi
+
+# The chart's default probes hit /health on the S3 port. Recent rustfs versions
+# route /health through the S3 handler which returns AccessDenied for anonymous
+# requests. Use TCP probes — they still catch crashes without needing auth.
+livenessProbe:
+  enabled: false
+  tcpSocket:
+    port: 9000
+  initialDelaySeconds: 30
+  periodSeconds: 10
+readinessProbe:
+  enabled: false
+  tcpSocket:
+    port: 9000
+  initialDelaySeconds: 10
+  periodSeconds: 5
