@@ -17,6 +17,7 @@
       "y": -160,
       "width": 260,
       "height": 340,
+      "color": "5",
       "text": "# devbox\n\nhostname: devbox\n\ndns record: n/a\n\ninterfaces:\n- eth0: 10.0.0.3\n- wg0 10.1.0.3"
     },
     {
@@ -26,6 +27,7 @@
       "y": -160,
       "width": 260,
       "height": 340,
+      "color": "5",
       "text": "# llm-server\n\nhostname: llm-server\n\ndns record: llm.lofi, chat.lofi\n\ninterfaces:\n- eth0: 10.0.0.4\n\nservices:\n- ollama port 11434\n- openwebui port 8080"
     },
     {
@@ -65,6 +67,7 @@
       "y": -160,
       "width": 280,
       "height": 340,
+      "color": "5",
       "text": "# staging-web\n\nhostname: staging-web\n\ndns record: *.staging.lofi\n\ninterfaces:\n- eth0: 10.0.0.21\n\nservices:\n- SSH\n-  UI 80/443"
     },
     {
@@ -94,6 +97,7 @@
       "y": -160,
       "width": 260,
       "height": 340,
+      "color": "5",
       "text": "# win11\n\ninterfaces:\n- eth0: 10.0.0.99"
     },
     {
@@ -113,6 +117,7 @@
       "y": 960,
       "width": 340,
       "height": 280,
+      "color": "5",
       "text": "k8s-worker-1"
     },
     {
@@ -122,15 +127,17 @@
       "y": 1260,
       "width": 340,
       "height": 300,
+      "color": "5",
       "text": "k8s-worker-2"
     },
     {
       "type": "text",
       "id": "f6316b9f-2d31-457f-8a71-cf2049979703",
-      "x": -160,
+      "x": -140,
       "y": -160,
       "width": 280,
       "height": 340,
+      "color": "5",
       "text": "# staging-db\n\nhostname: staging-db\n\ninterfaces:\n- eth0: 10.0.0.21\n\nservices:\n- SSH\n-  UI 80/443"
     }
   ],
