@@ -14,9 +14,6 @@ add-repos:
     helm repo add rustfs https://charts.rustfs.com/
     helm repo update
 
-# Install Gateway API CRDs (standard channel)
-install-gateway-crds:
-    kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/{{ gateway_api_version }}/standard-install.yaml
 
 # Configure CoreDNS to forward .lofi queries to homelab DNS (dnsmasq)
 setup-dns:
@@ -168,7 +165,7 @@ sync-mirror repo:
 # --- Orchestration ---
 
 # Deploy everything (except actions runner, which needs a token from Gitea)
-deploy-all: add-repos install-gateway-crds setup-dns fetch-step-ca-root deploy-traefik deploy-cert-manager deploy-postgres provision-gha-cache-db deploy-rustfs deploy-gha-cache deploy-gitea
+deploy-all: add-repos setup-dns fetch-step-ca-root deploy-traefik deploy-cert-manager deploy-postgres provision-gha-cache-db deploy-rustfs deploy-gha-cache deploy-gitea
     @echo ""
     @echo "All services deployed."
     @echo "Next steps:"
@@ -220,6 +217,8 @@ destroy-traefik:
     kubectl delete -f traefik/gateway.yaml --ignore-not-found
     helm uninstall traefik --namespace traefik --ignore-not-found
     kubectl delete namespace traefik --ignore-not-found
+    kubectl get crd -o name | grep gateway.networking.k8s.io | xargs kubectl delete
+
 
 [confirm]
 destroy-postgres:
