@@ -6,10 +6,7 @@ auth:
   existingSecret: postgres-credentials
   secretKeys:
     adminPasswordKey: postgres-password
-    userPasswordKey: password
     replicationPasswordKey: replication-password
-  database: gitea
-  username: gitea
 
 primary:
   affinity:
@@ -32,6 +29,14 @@ primary:
   extraEnvVarsSecret: postgres-credentials
   initdb:
     scripts:
+      01-gitea.sh: |
+        #!/usr/bin/env bash
+        set -e
+        psql -U postgres -v ON_ERROR_STOP=1 <<SQL
+        CREATE ROLE gitea LOGIN PASSWORD '${GITEA_PG_PASSWORD}';
+        CREATE DATABASE gitea OWNER gitea;
+        GRANT ALL PRIVILEGES ON DATABASE gitea TO gitea;
+        SQL
       02-gha-cache.sh: |
         #!/usr/bin/env bash
         set -e
