@@ -67,3 +67,15 @@ function merge-kubeconfig {
   chmod 600 ~/.kube/wtf
   mv ~/.kube/wtf ~/.kube/config
 }
+
+function kube-images {
+  kubectl get pods -A -o json | jq -r '
+    .items[] |
+    .metadata.namespace as $ns |
+    .metadata.name as $pod |
+    (.spec.containers + (.spec.initContainers // [])) |
+    .[].image |
+    [$ns, $pod, .] |
+    @tsv
+  ' | sort | column -t
+}
