@@ -41,6 +41,7 @@ in
       # WG silently drops, breaking long TLS records with "bad record MAC".
       ${pkgs.iptables}/bin/iptables -t mangle -A FORWARD -o wg0 -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
       ${pkgs.iptables}/bin/iptables -t mangle -A FORWARD -i wg0 -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+      ${pkgs.iptables}/bin/iptables -t mangle -A OUTPUT  -o wg0 -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss 1360
     '';
     preDown = ''
       ${pkgs.iptables}/bin/iptables -D FORWARD -i br0 -o wg0 -j ACCEPT
@@ -48,6 +49,7 @@ in
       ${pkgs.iptables}/bin/iptables -t nat -D POSTROUTING -s 10.0.0.0/24 -o wg0 -j MASQUERADE
       ${pkgs.iptables}/bin/iptables -t mangle -D FORWARD -o wg0 -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
       ${pkgs.iptables}/bin/iptables -t mangle -D FORWARD -i wg0 -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+      ${pkgs.iptables}/bin/iptables -t mangle -D OUTPUT  -o wg0 -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss 1360
     '';
     peers =
       (lib.mapAttrsToList mkMeshPeer otherPeers)
