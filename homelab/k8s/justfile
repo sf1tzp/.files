@@ -89,6 +89,7 @@ deploy-gitea:
 provision-gha-cache-db:
     #!/usr/bin/env bash
     set -euo pipefail
+    echo "cache-db"
     PG_PASS=$(sops -d postgres/secrets.yaml | yq '.stringData.postgres-password')
     GHA_PASS=$(sops -d postgres/secrets.yaml | yq '.stringData.GHA_CACHE_PG_PASSWORD')
     kubectl exec -n postgres -i postgres-postgresql-0 -- \
@@ -165,7 +166,7 @@ sync-mirror repo:
 # --- Orchestration ---
 
 # Deploy everything (except actions runner, which needs a token from Gitea)
-deploy-all: add-repos setup-dns fetch-step-ca-root deploy-traefik deploy-cert-manager deploy-postgres provision-gha-cache-db deploy-rustfs deploy-gha-cache deploy-gitea
+deploy-all: add-repos setup-dns fetch-step-ca-root deploy-traefik deploy-cert-manager deploy-postgres deploy-rustfs deploy-gha-cache deploy-gitea
     @echo ""
     @echo "All services deployed."
     @echo "Next steps:"

@@ -32,6 +32,7 @@ primary:
       01-gitea.sh: |
         #!/usr/bin/env bash
         set -e
+        export PGPASSWORD="$POSTGRES_PASSWORD"
         psql -U postgres -v ON_ERROR_STOP=1 <<SQL
         CREATE ROLE gitea LOGIN PASSWORD '${GITEA_PG_PASSWORD}';
         CREATE DATABASE gitea OWNER gitea;
@@ -40,6 +41,7 @@ primary:
       02-gha-cache.sh: |
         #!/usr/bin/env bash
         set -e
+        export PGPASSWORD="$POSTGRES_PASSWORD"
         psql -U postgres -v ON_ERROR_STOP=1 <<SQL
         CREATE ROLE gha_cache LOGIN PASSWORD '${GHA_CACHE_PG_PASSWORD}';
         CREATE DATABASE gha_cache OWNER gha_cache;
