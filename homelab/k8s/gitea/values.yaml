@@ -1,6 +1,5 @@
 # Gitea Helm chart values
-# Chart: gitea-charts/gitea
-# Docs: https://gitea.com/gitea/helm-gitea
+# Default Values: https://gitea.com/gitea/helm-gitea/src/branch/main/values.yaml
 
 # --- Image ---
 image:

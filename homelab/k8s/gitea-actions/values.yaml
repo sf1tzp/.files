@@ -1,6 +1,5 @@
 # Gitea Actions Runner Helm chart values
-# Chart: gitea-charts/actions
-# Docs: https://gitea.com/gitea/helm-actions
+# Default Values: https://gitea.com/gitea/helm-actions/src/branch/main/values.yaml
 #
 # Prerequisites:
 #   1. Gitea must be running with actions.ENABLED = true
@@ -12,21 +11,6 @@
 #        --from-literal=token=<YOUR_TOKEN>
 
 enabled: true
-
-# --- Images ---
-image:
-  repository: act_runner
-  tag: "0.3.1"
-  pullPolicy: IfNotPresent
-
-dind:
-  image:
-
-busybox:
-  image:
-    repository: busybox
-    tag: "1.37.0"
-    pullPolicy: IfNotPresent
 
 # --- Connection to Gitea ---
 giteaRootURL: "http://gitea-http.gitea.svc.cluster.local:3000"
@@ -58,7 +42,7 @@ statefulset:
   actRunner:
     registry: docker.gitea.com
     repository: act_runner
-    tag: "0.3.1"
+    tag: "0.4.1"
     pullPolicy: IfNotPresent
     # Disable the built-in cache so runners use the external gha-cache server.
     # ACTIONS_RESULTS_URL / ACTIONS_CACHE_URL point at the in-cluster Service;
