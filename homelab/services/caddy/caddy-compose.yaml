@@ -31,6 +31,8 @@ services:
     container_name: step-ca-server
     image: smallstep/step-ca:0.29.0
     restart: always
+    annotations: # note: not working on soundship atm...
+    - nerdctl/bypass4netns=true
     ports:
       - 9000:9000
     volumes:
