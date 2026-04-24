@@ -69,6 +69,8 @@ statefulset:
         value: "http://gha-cache.gha-cache.svc.cluster.local:3000/"
       - name: ACTIONS_CACHE_URL
         value: "http://gha-cache.gha-cache.svc.cluster.local:3000/"
+      - name: RUNNER_TOOL_CACHE
+        value: "/data/hostedtoolcache"
 
   dind:
     registry: docker.io
