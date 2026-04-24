@@ -33,7 +33,7 @@ statefulset:
     enabled: true
     size: 5Gi
 
-  # Mount daemon.json into DinD sidecar for insecure registry support
+  # Mount daemon.json and lab CA into DinD sidecar for registry trust
   extraVolumes:
     - name: docker-daemon-config
       configMap:
@@ -71,6 +71,9 @@ statefulset:
       - name: docker-daemon-config
         mountPath: /etc/docker/daemon.json
         subPath: daemon.json
+      - name: docker-daemon-config
+        mountPath: /usr/local/share/ca-certificates/lab-ca.crt
+        subPath: lab-ca.crt
 
 
 init:
