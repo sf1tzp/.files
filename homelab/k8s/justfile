@@ -264,3 +264,4 @@ destroy-gha-cache:
 [confirm]
 destroy-all: destroy-gha-cache destroy-rustfs destroy-gitea destroy-postgres destroy-cert-manager destroy-traefik
     kubectl delete -f https://github.com/kubernetes-sigs/gateway-api/releases/download/{{ gateway_api_version }}/standard-install.yaml --ignore-not-found
+

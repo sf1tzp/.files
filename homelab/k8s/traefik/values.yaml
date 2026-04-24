@@ -2,6 +2,9 @@
 # Chart: traefik/traefik
 # Docs: https://doc.traefik.io/traefik/routing/providers/kubernetes-gateway/
 
+image:
+  tag: v3.6.13
+
 # --- Gateway API provider ---
 providers:
   kubernetesGateway:

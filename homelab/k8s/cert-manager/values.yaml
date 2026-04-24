@@ -2,6 +2,17 @@
 # Chart: jetstack/cert-manager
 # Docs: https://cert-manager.io/docs/installation/helm/
 
+image:
+  tag: v1.20.2
+
+cainjector:
+  image:
+    tag: v1.20.2
+
+webhook:
+  image:
+    tag: v1.20.2
+
 crds:
   enabled: true
 
