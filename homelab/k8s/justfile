@@ -1,11 +1,4 @@
-# Kubernetes service deployment
-# Deploys: Traefik (Gateway API), PostgreSQL, pgAdmin, Gitea, Gitea Actions
 
-gateway_api_version := "v1.2.1"
-
-# --- Setup ---
-
-# Add all required Helm repositories
 add-repos:
     helm repo add traefik https://traefik.github.io/charts
     helm repo add bitnami https://charts.bitnami.com/bitnami
@@ -15,22 +8,8 @@ add-repos:
     helm repo update
 
 
-# Configure CoreDNS to forward .lofi queries to homelab DNS (dnsmasq)
 setup-dns:
     kubectl apply -f coredns-custom.yaml
-
-# --- Secrets (SOPS + age) ---
-
-# Encrypt secrets files (run once after setting real passwords)
-encrypt-secrets:
-    sops -e -i postgres/secrets.yaml
-    sops -e -i gitea/secrets.yaml
-    sops -e -i rustfs/secrets.yaml
-    sops -e -i gha-cache/secrets.yaml
-
-# Edit secrets in-place (decrypts, opens $EDITOR, re-encrypts)
-edit-secrets service:
-    sops {{ service }}/secrets.yaml
 
 # --- TLS (cert-manager + step-ca) ---
 
@@ -83,24 +62,6 @@ deploy-gitea:
         --wait
     kubectl apply -f gitea/routes.yaml
 
-# One-time: create the gha_cache role + database in the already-running postgres.
-# primary.initdb.scripts only runs on fresh cluster init, so we provision the
-# tenant imperatively for the existing deployment. Idempotent via DO/\gexec guards.
-provision-gha-cache-db:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    echo "cache-db"
-    PG_PASS=$(sops -d postgres/secrets.yaml | yq '.stringData.postgres-password')
-    GHA_PASS=$(sops -d postgres/secrets.yaml | yq '.stringData.GHA_CACHE_PG_PASSWORD')
-    kubectl exec -n postgres -i postgres-postgresql-0 -- \
-        env PGPASSWORD="$PG_PASS" psql -U postgres -v ON_ERROR_STOP=1 <<SQL
-    DO \$\$ BEGIN
-      CREATE ROLE gha_cache LOGIN PASSWORD '$GHA_PASS';
-    EXCEPTION WHEN duplicate_object THEN NULL; END \$\$;
-    SELECT 'CREATE DATABASE gha_cache OWNER gha_cache'
-      WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'gha_cache')\gexec
-    SQL
-
 deploy-rustfs:
     kubectl create namespace rustfs --dry-run=client -o yaml | kubectl apply -f -
     sops -d rustfs/secrets.yaml | kubectl apply -f -
@@ -121,7 +82,7 @@ deploy-gha-cache:
         --values gha-cache/values.yaml \
         --wait
 
-# Deploy actions runner (requires a registration token from Gitea admin panel)
+# Deploy Gitea actions runner (requires a registration token from Gitea admin panel)
 deploy-runner token:
     kubectl create namespace gitea-actions --dry-run=client -o yaml | kubectl apply -f -
     kubectl create secret generic runner-token \
@@ -134,36 +95,12 @@ deploy-runner token:
         --values gitea-actions/values.yaml \
         --wait
 
-# --- Mirrors ---
-
-# Store GitHub PAT for mirroring private repos
+# Configure GitHub PAT for Gitea access to private repos
 set-github-pat token:
     kubectl create secret generic github-pat \
         --namespace gitea \
         --from-literal=token={{ token }} \
         --dry-run=client -o yaml | kubectl apply -f -
-
-# Create pull mirrors from GitHub repos into Gitea
-mirror github_user +repos:
-    bash gitea/mirror.sh {{ github_user }} {{ repos }}
-
-# List existing mirror repositories
-list-mirrors:
-    @GITEA_USER=$(kubectl get secret gitea-admin -n gitea -o jsonpath='{.data.username}' | base64 -d) && \
-        GITEA_PASS=$(kubectl get secret gitea-admin -n gitea -o jsonpath='{.data.password}' | base64 -d) && \
-        curl -s -u "$GITEA_USER:$GITEA_PASS" \
-            "https://gitea.zen.lofi/api/v1/repos/search?mirror=true&limit=50" | \
-            jq -r '.data[] | "\(.full_name) <- \(.original_url)"'
-
-# Trigger immediate mirror sync for a repo (owner/repo)
-sync-mirror repo:
-    @GITEA_USER=$(kubectl get secret gitea-admin -n gitea -o jsonpath='{.data.username}' | base64 -d) && \
-        GITEA_PASS=$(kubectl get secret gitea-admin -n gitea -o jsonpath='{.data.password}' | base64 -d) && \
-        curl -s -X POST -u "$GITEA_USER:$GITEA_PASS" \
-            "https://gitea.zen.lofi/api/v1/repos/{{ repo }}/mirror-sync" && \
-        echo "Sync triggered for {{ repo }}"
-
-# --- Orchestration ---
 
 # Deploy everything (except actions runner, which needs a token from Gitea)
 deploy-all: add-repos setup-dns fetch-step-ca-root deploy-traefik deploy-cert-manager deploy-postgres deploy-rustfs deploy-gha-cache deploy-gitea
@@ -173,43 +110,6 @@ deploy-all: add-repos setup-dns fetch-step-ca-root deploy-traefik deploy-cert-ma
     @echo "  1. Add DNS entries for gitea.lofi and pgadmin.lofi -> any node IP"
     @echo "  2. Get a runner token from Gitea: Site Administration > Runners > Create new Runner"
     @echo "  3. Run: just deploy-runner <token>"
-
-# --- Status ---
-
-status:
-    @echo "=== Nodes ==="
-    @kubectl get nodes -o wide
-    @echo "\n=== Gateway API ==="
-    @kubectl get gatewayclass,gateway,httproutes -A
-    @echo "\n=== Pods ==="
-    @kubectl get pods -A -l 'app.kubernetes.io/managed-by=Helm'
-    @kubectl get pods -n postgres -l app=pgadmin
-    @echo "\n=== Services ==="
-    @kubectl get svc -A -l 'app.kubernetes.io/managed-by=Helm'
-    @kubectl get svc -n postgres -l app=pgadmin
-
-# --- Logs ---
-
-logs-traefik *ARGS:
-    kubectl logs -n traefik -l app.kubernetes.io/name=traefik {{ ARGS }}
-
-logs-postgres *ARGS:
-    kubectl logs -n postgres -l app.kubernetes.io/name=postgresql {{ ARGS }}
-
-logs-pgadmin *ARGS:
-    kubectl logs -n postgres -l app=pgadmin {{ ARGS }}
-
-logs-gitea *ARGS:
-    kubectl logs -n gitea -l app.kubernetes.io/name=gitea {{ ARGS }}
-
-logs-actions *ARGS:
-    kubectl logs -n gitea-actions -l app.kubernetes.io/name=actions {{ ARGS }}
-
-logs-rustfs *ARGS:
-    kubectl logs -n rustfs -l app.kubernetes.io/name=rustfs {{ ARGS }}
-
-logs-gha-cache *ARGS:
-    kubectl logs -n gha-cache -l app.kubernetes.io/name=github-actions-cache-server {{ ARGS }}
 
 # --- Teardown ---
 
@@ -263,5 +163,4 @@ destroy-gha-cache:
 
 [confirm]
 destroy-all: destroy-gha-cache destroy-rustfs destroy-gitea destroy-postgres destroy-cert-manager destroy-traefik
-    kubectl delete -f https://github.com/kubernetes-sigs/gateway-api/releases/download/{{ gateway_api_version }}/standard-install.yaml --ignore-not-found
 
