@@ -172,7 +172,7 @@ deploy-all: add-repos setup-dns fetch-step-ca-root deploy-traefik deploy-cert-ma
     @echo "Next steps:"
     @echo "  1. Add DNS entries for gitea.lofi and pgadmin.lofi -> any node IP"
     @echo "  2. Get a runner token from Gitea: Site Administration > Runners > Create new Runner"
-    @echo "  3. Run: just deploy-actions <token>"
+    @echo "  3. Run: just deploy-runner <token>"
 
 # --- Status ---
 
