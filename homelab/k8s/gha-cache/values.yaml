@@ -11,7 +11,7 @@
 
 image:
   repository: ghcr.io/falcondev-oss/github-actions-cache-server
-  tag: v9.4.6
+  tag: 9.4.6
   pullPolicy: IfNotPresent
 
 replicaCount: 1
