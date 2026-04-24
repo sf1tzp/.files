@@ -33,7 +33,15 @@ statefulset:
     enabled: true
     size: 5Gi
 
-  # Mount daemon.json and lab CA into DinD sidecar for registry trust
+  # Mount daemon.json and lab CA into DinD sidecar for registry trust.
+  #
+  # daemon.json disables containerd-snapshotter (Docker 29.x default) because
+  # the containerd image store ignores "insecure-registries" — its resolver has
+  # its own TLS config, but dockerd's embedded containerd doesn't expose a way
+  # to set registry cert paths. Disabling the snapshotter falls back to the
+  # classic Docker image store where "insecure-registries" works for our lab CA.
+  # To re-enable: build a custom DinD image that adds the lab CA to the system
+  # trust store before dockerd starts (update-ca-certificates in entrypoint).
   extraVolumes:
     - name: docker-daemon-config
       configMap:
@@ -71,9 +79,6 @@ statefulset:
       - name: docker-daemon-config
         mountPath: /etc/docker/daemon.json
         subPath: daemon.json
-      - name: docker-daemon-config
-        mountPath: /usr/local/share/ca-certificates/lab-ca.crt
-        subPath: lab-ca.crt
 
 
 init:

@@ -92,7 +92,6 @@ deploy-runner token:
     kubectl create configmap docker-daemon-config \
         --namespace gitea-actions \
         --from-file=daemon.json=gitea-actions/daemon.json \
-        --from-file=lab-ca.crt=cert-manager/step-ca-root.pem \
         --dry-run=client -o yaml | kubectl apply -f -
     helm upgrade --install gitea-actions gitea-charts/actions \
         --namespace gitea-actions \
