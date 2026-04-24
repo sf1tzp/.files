@@ -31,7 +31,7 @@ statefulset:
 
   persistence:
     enabled: true
-    size: 5Gi
+    size: 10Gi
 
   # Mount daemon.json and lab CA into DinD sidecar for registry trust.
   #
