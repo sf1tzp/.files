@@ -22,13 +22,13 @@ config:
   enableDirectDownloads: false
   cacheCleanupOlderThanDays: 90
 
-storage:
-  driver: s3
-  # s3.* values come from `existingSecret` (AWS_* env vars)
+  storage:
+    driver: s3
+    # s3.* values come from `existingSecret` (AWS_* env vars)
 
-db:
-  driver: postgres
-  # DB_POSTGRES_URL comes from `existingSecret`
+  db:
+    driver: postgres
+    # DB_POSTGRES_URL comes from `existingSecret`
 
 existingSecret: gha-cache-env
 
