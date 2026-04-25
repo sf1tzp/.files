@@ -20,7 +20,7 @@ existingSecretKey: "token"
 
 # --- Runner StatefulSet ---
 statefulset:
-  replicas: 4
+  replicas: 2
   affinity:
     nodeAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -46,6 +46,10 @@ statefulset:
     - name: docker-daemon-config
       configMap:
         name: docker-daemon-config
+    - name: runner-ssh
+      secret:
+        secretName: runner-ssh
+        defaultMode: 0400
 
   actRunner:
     registry: docker.gitea.com
@@ -55,22 +59,36 @@ statefulset:
     # Disable the built-in cache so runners use the external gha-cache server.
     # ACTIONS_RESULTS_URL / ACTIONS_CACHE_URL point at the in-cluster Service;
     # trailing slash on ACTIONS_RESULTS_URL is required by the cache server.
+    #
+    # runner.labels override the registered labels: ubuntu-latest keeps the
+    # upstream catthehacker image; ubuntu-deploy maps to our custom image
+    # (sops/age/just/lab-CA + entrypoint that materializes ~/.ssh from the
+    # runner-ssh volume).
+    #
+    # container.options binds /run/ssh-secrets from the DinD sidecar into every
+    # job container; valid_volumes whitelists the path so the bind is permitted.
     config: |
       log:
         level: info
       cache:
         enabled: false
+      runner:
+        labels:
+          - "ubuntu-latest:docker://catthehacker/ubuntu:act-22.04"
+          - "ubuntu-deploy:docker://gitea.zen.lofi/sfi/action-runner-image:c25ef66"
       container:
         network: bridge
         docker_timeout: 300s
-        options: --add-host=gitea.zen.lofi:10.0.0.6
+        options: --add-host=gitea.zen.lofi:10.0.0.6 --volume /run/ssh-secrets:/run/ssh-secrets:ro
+        valid_volumes:
+          - /run/ssh-secrets
     extraEnvs:
       - name: ACTIONS_RESULTS_URL
         value: "http://gha-cache.gha-cache.svc.cluster.local:3000/"
       - name: ACTIONS_CACHE_URL
         value: "http://gha-cache.gha-cache.svc.cluster.local:3000/"
       - name: RUNNER_TOOL_CACHE
-        value: "/data/hostedtoolcache"
+        value: "/data/toolcache"
 
   dind:
     registry: docker.io
@@ -81,6 +99,9 @@ statefulset:
       - name: docker-daemon-config
         mountPath: /etc/docker/daemon.json
         subPath: daemon.json
+      - name: runner-ssh
+        mountPath: /run/ssh-secrets
+        readOnly: true
 
 
 init:
