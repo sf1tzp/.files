@@ -1,6 +1,7 @@
 # Traefik Helm chart values
-# Chart: traefik/traefik
-# Docs: https://doc.traefik.io/traefik/routing/providers/kubernetes-gateway/
+# Default Values: https://github.com/traefik/traefik-helm-chart/blob/master/traefik/values.yaml
+image:
+  tag: v3.6.13
 
 # --- Gateway API provider ---
 providers:

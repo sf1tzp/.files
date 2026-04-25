@@ -1,6 +1,5 @@
 # Gitea Actions Runner Helm chart values
-# Chart: gitea-charts/actions
-# Docs: https://gitea.com/gitea/helm-actions
+# Default Values: https://gitea.com/gitea/helm-actions/src/branch/main/values.yaml
 #
 # Prerequisites:
 #   1. Gitea must be running with actions.ENABLED = true
@@ -21,7 +20,7 @@ existingSecretKey: "token"
 
 # --- Runner StatefulSet ---
 statefulset:
-  replicas: 4
+  replicas: 2
   affinity:
     nodeAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -32,30 +31,72 @@ statefulset:
 
   persistence:
     enabled: true
-    size: 5Gi
+    size: 10Gi
 
-  # Mount daemon.json into DinD sidecar for insecure registry support
+  # SSH keys for prod deploys; surfaced into job containers via DinD bind-mount.
+  # The lab CA is baked into our custom DinD image (gitea.zen.lofi/sfi/dind),
+  # so no daemon.json or per-registry configmap is needed here.
   extraVolumes:
-    - name: docker-daemon-config
-      configMap:
-        name: docker-daemon-config
+    - name: runner-ssh
+      secret:
+        secretName: runner-ssh
+        defaultMode: 0400
 
   actRunner:
+    registry: docker.gitea.com
+    repository: act_runner
+    tag: "0.4.1"
+    pullPolicy: IfNotPresent
+    # Disable the built-in cache so runners use the external gha-cache server.
+    # ACTIONS_RESULTS_URL / ACTIONS_CACHE_URL point at the in-cluster Service;
+    # trailing slash on ACTIONS_RESULTS_URL is required by the cache server.
+    #
+    # runner.labels override the registered labels: ubuntu-latest keeps the
+    # upstream catthehacker image; ubuntu-deploy maps to our custom image
+    # (sops/age/just/lab-CA + entrypoint that materializes ~/.ssh from the
+    # runner-ssh volume).
+    #
+    # container.options binds /run/ssh-secrets from the DinD sidecar into every
+    # job container; valid_volumes whitelists the path so the bind is permitted.
     config: |
       log:
         level: info
       cache:
-        enabled: true
+        enabled: false
+      runner:
+        labels:
+          - "ubuntu-latest:docker://catthehacker/ubuntu:act-22.04"
+          - "ubuntu-deploy:docker://gitea.zen.lofi/sfi/action-runner:58714d0"
       container:
         network: bridge
         docker_timeout: 300s
-        options: --add-host=gitea.zen.lofi:10.0.0.6
+        options: --volume /run/ssh-secrets:/run/ssh-secrets:ro
+        valid_volumes:
+          - /run/ssh-secrets
+    extraEnvs:
+      - name: ACTIONS_RESULTS_URL
+        value: "http://gha-cache.gha-cache.svc.cluster.local:3000/"
+      - name: ACTIONS_CACHE_URL
+        value: "http://gha-cache.gha-cache.svc.cluster.local:3000/"
+      - name: RUNNER_TOOL_CACHE
+        value: "/data/toolcache"
 
   dind:
+    registry: gitea.zen.lofi
+    repository: sfi/dind
+    tag: "58714d0"
+    pullPolicy: IfNotPresent
     extraVolumeMounts:
-      - name: docker-daemon-config
-        mountPath: /etc/docker/daemon.json
-        subPath: daemon.json
+      - name: runner-ssh
+        mountPath: /run/ssh-secrets
+        readOnly: true
+
+
+init:
+  image:
+    registry: docker.io
+    repository: busybox
+    tag: "1.37.0"
 
   resources:
     requests:

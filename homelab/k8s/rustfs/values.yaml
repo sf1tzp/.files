@@ -1,0 +1,92 @@
+# RustFS Helm chart values
+# Chart: rustfs/rustfs (helm repo: https://charts.rustfs.com/)
+# Source: https://github.com/rustfs/rustfs/tree/main/helm/rustfs
+
+replicaCount: 1
+
+mode:
+  standalone:
+    enabled: true
+  distributed:
+    enabled: false
+
+image:
+  rustfs:
+    repository: rustfs/rustfs
+    tag: "1.0.0-alpha.76"
+    pullPolicy: IfNotPresent
+
+# Use our SOPS-managed secret. Chart expects keys RUSTFS_ACCESS_KEY and RUSTFS_SECRET_KEY.
+secret:
+  existingSecret: rustfs-credentials
+
+config:
+  rustfs:
+    address: ":9000"
+    console_enable: "true"
+    console_address: ":9001"
+    log_level: "info"
+    region: "us-east-1"
+
+# rustfs writes scratch data to /tmp/rustfs_scanner; the chart's default
+# readOnlyRootFilesystem: true blocks this and the /health probe never passes.
+containerSecurityContext:
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: false
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+
+service:
+  type: ClusterIP
+  endpoint:
+    port: 9000
+  console:
+    port: 9001
+
+# Disable chart-native ingress; we expose via the shared Gateway API HTTPRoute (routes.yaml)
+ingress:
+  enabled: false
+gatewayApi:
+  enabled: false
+
+storageclass:
+  name: local-path
+  dataStorageSize: 50Gi
+  logStorageSize: 1Gi
+
+affinity:
+  podAntiAffinity:
+    enabled: false
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: node-role.kubernetes.io/control-plane
+              operator: In
+              values:
+                - "true"
+
+resources:
+  requests:
+    memory: 256Mi
+    cpu: 100m
+  limits:
+    memory: 1Gi
+
+# The chart's default probes hit /health on the S3 port. Recent rustfs versions
+# route /health through the S3 handler which returns AccessDenied for anonymous
+# requests. Use TCP probes — they still catch crashes without needing auth.
+livenessProbe:
+  enabled: false
+  tcpSocket:
+    port: 9000
+  initialDelaySeconds: 30
+  periodSeconds: 10
+readinessProbe:
+  enabled: false
+  tcpSocket:
+    port: 9000
+  initialDelaySeconds: 10
+  periodSeconds: 5

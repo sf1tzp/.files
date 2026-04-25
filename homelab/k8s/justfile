@@ -1,36 +1,15 @@
-# Kubernetes service deployment
-# Deploys: Traefik (Gateway API), PostgreSQL, pgAdmin, Gitea, Gitea Actions
 
-gateway_api_version := "v1.2.1"
-
-# --- Setup ---
-
-# Add all required Helm repositories
 add-repos:
     helm repo add traefik https://traefik.github.io/charts
     helm repo add bitnami https://charts.bitnami.com/bitnami
     helm repo add gitea-charts https://dl.gitea.com/charts/
     helm repo add jetstack https://charts.jetstack.io
+    helm repo add rustfs https://charts.rustfs.com/
     helm repo update
 
-# Install Gateway API CRDs (standard channel)
-install-gateway-crds:
-    kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/{{ gateway_api_version }}/standard-install.yaml
 
-# Configure CoreDNS to forward .lofi queries to homelab DNS (dnsmasq)
 setup-dns:
     kubectl apply -f coredns-custom.yaml
-
-# --- Secrets (SOPS + age) ---
-
-# Encrypt secrets files (run once after setting real passwords)
-encrypt-secrets:
-    sops -e -i postgres/secrets.yaml
-    sops -e -i gitea/secrets.yaml
-
-# Edit secrets in-place (decrypts, opens $EDITOR, re-encrypts)
-edit-secrets service:
-    sops {{ service }}/secrets.yaml
 
 # --- TLS (cert-manager + step-ca) ---
 
@@ -83,89 +62,54 @@ deploy-gitea:
         --wait
     kubectl apply -f gitea/routes.yaml
 
-# Deploy actions runner (requires a registration token from Gitea admin panel)
+deploy-rustfs:
+    kubectl create namespace rustfs --dry-run=client -o yaml | kubectl apply -f -
+    sops -d rustfs/secrets.yaml | kubectl apply -f -
+    helm upgrade --install rustfs rustfs/rustfs \
+        --namespace rustfs \
+        --values rustfs/values.yaml \
+        --wait
+    kubectl apply -f rustfs/routes.yaml
+    kubectl apply -f rustfs/bucket-job.yaml
+    kubectl wait --for=condition=complete job/rustfs-bucket-init -n rustfs --timeout=120s
+
+deploy-gha-cache:
+    kubectl create namespace gha-cache --dry-run=client -o yaml | kubectl apply -f -
+    sops -d gha-cache/secrets.yaml | kubectl apply -f -
+    helm upgrade --install gha-cache \
+        oci://ghcr.io/falcondev-oss/charts/github-actions-cache-server \
+        --namespace gha-cache \
+        --values gha-cache/values.yaml \
+        --wait
+
+# Deploy Gitea actions runner (requires a registration token from Gitea admin panel)
 deploy-runner token:
     kubectl create namespace gitea-actions --dry-run=client -o yaml | kubectl apply -f -
+    sops -d gitea-actions/secrets.yaml | kubectl apply -f -
     kubectl create secret generic runner-token \
         --namespace gitea-actions \
         --from-literal=token={{ token }} \
         --dry-run=client -o yaml | kubectl apply -f -
-    kubectl apply -f gitea-actions/docker-daemon-config.yaml
     helm upgrade --install gitea-actions gitea-charts/actions \
         --namespace gitea-actions \
         --values gitea-actions/values.yaml \
         --wait
 
-# --- Mirrors ---
-
-# Store GitHub PAT for mirroring private repos
+# Configure GitHub PAT for Gitea access to private repos
 set-github-pat token:
     kubectl create secret generic github-pat \
         --namespace gitea \
         --from-literal=token={{ token }} \
         --dry-run=client -o yaml | kubectl apply -f -
 
-# Create pull mirrors from GitHub repos into Gitea
-mirror github_user +repos:
-    bash gitea/mirror.sh {{ github_user }} {{ repos }}
-
-# List existing mirror repositories
-list-mirrors:
-    @GITEA_USER=$(kubectl get secret gitea-admin -n gitea -o jsonpath='{.data.username}' | base64 -d) && \
-        GITEA_PASS=$(kubectl get secret gitea-admin -n gitea -o jsonpath='{.data.password}' | base64 -d) && \
-        curl -s -u "$GITEA_USER:$GITEA_PASS" \
-            "https://gitea.zen.lofi/api/v1/repos/search?mirror=true&limit=50" | \
-            jq -r '.data[] | "\(.full_name) <- \(.original_url)"'
-
-# Trigger immediate mirror sync for a repo (owner/repo)
-sync-mirror repo:
-    @GITEA_USER=$(kubectl get secret gitea-admin -n gitea -o jsonpath='{.data.username}' | base64 -d) && \
-        GITEA_PASS=$(kubectl get secret gitea-admin -n gitea -o jsonpath='{.data.password}' | base64 -d) && \
-        curl -s -X POST -u "$GITEA_USER:$GITEA_PASS" \
-            "https://gitea.zen.lofi/api/v1/repos/{{ repo }}/mirror-sync" && \
-        echo "Sync triggered for {{ repo }}"
-
-# --- Orchestration ---
-
 # Deploy everything (except actions runner, which needs a token from Gitea)
-deploy-all: add-repos install-gateway-crds setup-dns fetch-step-ca-root deploy-traefik deploy-cert-manager deploy-postgres deploy-gitea
+deploy-all: add-repos setup-dns fetch-step-ca-root deploy-traefik deploy-cert-manager deploy-postgres deploy-rustfs deploy-gha-cache deploy-gitea
     @echo ""
     @echo "All services deployed."
     @echo "Next steps:"
     @echo "  1. Add DNS entries for gitea.lofi and pgadmin.lofi -> any node IP"
     @echo "  2. Get a runner token from Gitea: Site Administration > Runners > Create new Runner"
-    @echo "  3. Run: just deploy-actions <token>"
-
-# --- Status ---
-
-status:
-    @echo "=== Nodes ==="
-    @kubectl get nodes -o wide
-    @echo "\n=== Gateway API ==="
-    @kubectl get gatewayclass,gateway,httproutes -A
-    @echo "\n=== Pods ==="
-    @kubectl get pods -A -l 'app.kubernetes.io/managed-by=Helm'
-    @kubectl get pods -n postgres -l app=pgadmin
-    @echo "\n=== Services ==="
-    @kubectl get svc -A -l 'app.kubernetes.io/managed-by=Helm'
-    @kubectl get svc -n postgres -l app=pgadmin
-
-# --- Logs ---
-
-logs-traefik *ARGS:
-    kubectl logs -n traefik -l app.kubernetes.io/name=traefik {{ ARGS }}
-
-logs-postgres *ARGS:
-    kubectl logs -n postgres -l app.kubernetes.io/name=postgresql {{ ARGS }}
-
-logs-pgadmin *ARGS:
-    kubectl logs -n postgres -l app=pgadmin {{ ARGS }}
-
-logs-gitea *ARGS:
-    kubectl logs -n gitea -l app.kubernetes.io/name=gitea {{ ARGS }}
-
-logs-actions *ARGS:
-    kubectl logs -n gitea-actions -l app.kubernetes.io/name=actions {{ ARGS }}
+    @echo "  3. Run: just deploy-runner <token>"
 
 # --- Teardown ---
 
@@ -174,6 +118,8 @@ destroy-traefik:
     kubectl delete -f traefik/gateway.yaml --ignore-not-found
     helm uninstall traefik --namespace traefik --ignore-not-found
     kubectl delete namespace traefik --ignore-not-found
+    kubectl get crd -o name | grep gateway.networking.k8s.io | xargs kubectl delete
+
 
 [confirm]
 destroy-postgres:
@@ -204,5 +150,17 @@ destroy-cert-manager:
     kubectl delete namespace cert-manager --ignore-not-found
 
 [confirm]
-destroy-all: destroy-gitea destroy-postgres destroy-cert-manager destroy-traefik
-    kubectl delete -f https://github.com/kubernetes-sigs/gateway-api/releases/download/{{ gateway_api_version }}/standard-install.yaml --ignore-not-found
+destroy-rustfs:
+    kubectl delete -f rustfs/routes.yaml --ignore-not-found
+    kubectl delete -f rustfs/bucket-job.yaml --ignore-not-found
+    helm uninstall rustfs --namespace rustfs --ignore-not-found
+    kubectl delete namespace rustfs --ignore-not-found
+
+[confirm]
+destroy-gha-cache:
+    helm uninstall gha-cache --namespace gha-cache --ignore-not-found
+    kubectl delete namespace gha-cache --ignore-not-found
+
+[confirm]
+destroy-all: destroy-gha-cache destroy-rustfs destroy-gitea destroy-postgres destroy-cert-manager destroy-traefik
+

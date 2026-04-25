@@ -55,6 +55,9 @@ let
         address = [ "${address}/24" ];
         gateway = [ "10.0.0.1" ];
         dns = [ "10.0.0.2" "8.8.8.8" ];
+        routes = [
+          { Destination = "10.1.0.0/24"; Gateway = "10.0.0.6"; }
+        ];
       };
 
       # Flannel VXLAN + kubelet metrics
@@ -75,6 +78,8 @@ let
         serverAddr = "https://10.0.0.6:6443";
         tokenFile = "/run/host-secrets/k3s-token";
       };
+
+      security.pki.certificateFiles = [ ../../homelab/k8s/cert-manager/step-ca-root.pem ];
 
       users.users.root.openssh.authorizedKeys.keys = sshKeys;
       services.openssh.enable = true;
@@ -119,6 +124,8 @@ in
   };
 
   networking.firewall.allowedTCPPorts = [ 6443 80 443 ];
+
+  security.pki.certificateFiles = [ ../../homelab/k8s/cert-manager/step-ca-root.pem ];
 
   # ── Monitoring ─────────────────────────────────────────────────────
   services.prometheus.exporters.node = {

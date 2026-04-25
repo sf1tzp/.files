@@ -1,10 +1,10 @@
 # Gitea Helm chart values
-# Chart: gitea-charts/gitea
-# Docs: https://gitea.com/gitea/helm-gitea
+# Default Values: https://gitea.com/gitea/helm-gitea/src/branch/main/values.yaml
 
 # --- Image ---
 image:
   rootless: true
+  tag: "1.25.5"
 
 # --- Disable bundled sub-charts (we deploy postgres separately) ---
 postgresql:
@@ -17,6 +17,9 @@ valkey-cluster:
   enabled: false
 valkey:
   enabled: true
+  image:
+    repository: bitnamilegacy/valkey
+    tag: "8.1.3-debian-12-r3"
 
 # --- Ingress disabled (we use Gateway API HTTPRoutes) ---
 ingress:

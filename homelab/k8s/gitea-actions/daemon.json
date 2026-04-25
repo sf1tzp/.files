@@ -1,0 +1,6 @@
+{
+  "insecure-registries": ["gitea.zen.lofi"],
+  "features": {
+    "containerd-snapshotter": false
+  }
+}

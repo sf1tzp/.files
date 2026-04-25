@@ -6,10 +6,7 @@ auth:
   existingSecret: postgres-credentials
   secretKeys:
     adminPasswordKey: postgres-password
-    userPasswordKey: password
     replicationPasswordKey: replication-password
-  database: gitea
-  username: gitea
 
 primary:
   affinity:
@@ -25,6 +22,31 @@ primary:
     enabled: true
     size: 10Gi
     # storageClass: local-path  # k3s default, no need to specify
+
+  # Exposes GHA_CACHE_PG_PASSWORD to the initdb script below.
+  # Only runs on a fresh cluster init; for the existing cluster use
+  # `just provision-gha-cache-db` to create the role + db manually.
+  extraEnvVarsSecret: postgres-credentials
+  initdb:
+    scripts:
+      01-gitea.sh: |
+        #!/usr/bin/env bash
+        set -e
+        export PGPASSWORD="$POSTGRES_PASSWORD"
+        psql -U postgres -v ON_ERROR_STOP=1 <<SQL
+        CREATE ROLE gitea LOGIN PASSWORD '${GITEA_PG_PASSWORD}';
+        CREATE DATABASE gitea OWNER gitea;
+        GRANT ALL PRIVILEGES ON DATABASE gitea TO gitea;
+        SQL
+      02-gha-cache.sh: |
+        #!/usr/bin/env bash
+        set -e
+        export PGPASSWORD="$POSTGRES_PASSWORD"
+        psql -U postgres -v ON_ERROR_STOP=1 <<SQL
+        CREATE ROLE gha_cache LOGIN PASSWORD '${GHA_CACHE_PG_PASSWORD}';
+        CREATE DATABASE gha_cache OWNER gha_cache;
+        GRANT ALL PRIVILEGES ON DATABASE gha_cache TO gha_cache;
+        SQL
 
   resources:
     requests:

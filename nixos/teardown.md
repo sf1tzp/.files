@@ -12,6 +12,9 @@
   sudo rm -f /var/lib/microvms/k8s-worker-1/k8s-worker-1-var.img
   sudo rm -f /var/lib/microvms/k8s-worker-2/k8s-worker-2-var.img
 
+  # 3a: Wipe local-path PV data on the control-plane host (Destructive!)
+  sudo rm -rf /var/lib/rancher/k3s/storage
+
   # 4. Start control plane first, let it fully bootstrap
   sudo systemctl start k3s
 

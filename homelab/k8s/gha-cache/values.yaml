@@ -1,0 +1,57 @@
+# github-actions-cache-server Helm chart values
+# Chart: oci://ghcr.io/falcondev-oss/charts/github-actions-cache-server
+# Source: https://github.com/falcondev-oss/github-actions-cache-server/blob/master/install/kubernetes/github-actions-cache-server/values.yaml
+#
+# Storage backend: rustfs (in-cluster S3) at rustfs-svc.rustfs.svc.cluster.local:9000
+# Database backend: shared postgres at postgres-postgresql.postgres.svc.cluster.local:5432
+#
+# All sensitive + connection env vars live in the `gha-cache-env` SOPS-managed
+# Secret (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_ENDPOINT_URL, AWS_REGION,
+# STORAGE_S3_BUCKET, DB_POSTGRES_URL). See secrets.yaml.
+
+image:
+  repository: ghcr.io/falcondev-oss/github-actions-cache-server
+  tag: 9.4.6
+  pullPolicy: IfNotPresent
+
+replicaCount: 1
+
+config:
+  # In-cluster URL. Trailing slash is mandatory per upstream docs.
+  apiBaseUrl: "http://gha-cache.gha-cache.svc.cluster.local:3000/"
+  enableDirectDownloads: false
+  cacheCleanupOlderThanDays: 90
+
+  storage:
+    driver: s3
+    # s3.* values come from `existingSecret` (AWS_* env vars)
+
+  db:
+    driver: postgres
+    # DB_POSTGRES_URL comes from `existingSecret`
+
+existingSecret: gha-cache-env
+
+persistentVolumeClaim:
+  enabled: false
+
+service:
+  type: ClusterIP
+  port: 3000
+
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: node-role.kubernetes.io/control-plane
+              operator: In
+              values:
+                - "true"
+
+resources:
+  requests:
+    memory: 128Mi
+    cpu: 50m
+  limits:
+    memory: 512Mi
