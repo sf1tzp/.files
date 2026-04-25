@@ -79,6 +79,8 @@ let
         tokenFile = "/run/host-secrets/k3s-token";
       };
 
+      security.pki.certificateFiles = [ ../../homelab/k8s/cert-manager/step-ca-root.pem ]
+
       users.users.root.openssh.authorizedKeys.keys = sshKeys;
       services.openssh.enable = true;
 
@@ -122,6 +124,8 @@ in
   };
 
   networking.firewall.allowedTCPPorts = [ 6443 80 443 ];
+
+  security.pki.certificateFiles = [ ../../homelab/k8s/cert-manager/step-ca-root.pem ]
 
   # ── Monitoring ─────────────────────────────────────────────────────
   services.prometheus.exporters.node = {
