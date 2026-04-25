@@ -33,19 +33,10 @@ statefulset:
     enabled: true
     size: 10Gi
 
-  # Mount daemon.json and lab CA into DinD sidecar for registry trust.
-  #
-  # daemon.json disables containerd-snapshotter (Docker 29.x default) because
-  # the containerd image store ignores "insecure-registries" — its resolver has
-  # its own TLS config, but dockerd's embedded containerd doesn't expose a way
-  # to set registry cert paths. Disabling the snapshotter falls back to the
-  # classic Docker image store where "insecure-registries" works for our lab CA.
-  # To re-enable: build a custom DinD image that adds the lab CA to the system
-  # trust store before dockerd starts (update-ca-certificates in entrypoint).
+  # SSH keys for prod deploys; surfaced into job containers via DinD bind-mount.
+  # The lab CA is baked into our custom DinD image (gitea.zen.lofi/sfi/dind),
+  # so no daemon.json or per-registry configmap is needed here.
   extraVolumes:
-    - name: docker-daemon-config
-      configMap:
-        name: docker-daemon-config
     - name: runner-ssh
       secret:
         secretName: runner-ssh
@@ -75,11 +66,11 @@ statefulset:
       runner:
         labels:
           - "ubuntu-latest:docker://catthehacker/ubuntu:act-22.04"
-          - "ubuntu-deploy:docker://gitea.zen.lofi/sfi/action-runner-image:c25ef66"
+          - "ubuntu-deploy:docker://gitea.zen.lofi/sfi/action-runner:58714d0"
       container:
         network: bridge
         docker_timeout: 300s
-        options: --add-host=gitea.zen.lofi:10.0.0.6 --volume /run/ssh-secrets:/run/ssh-secrets:ro
+        options: --volume /run/ssh-secrets:/run/ssh-secrets:ro
         valid_volumes:
           - /run/ssh-secrets
     extraEnvs:
@@ -91,14 +82,11 @@ statefulset:
         value: "/data/toolcache"
 
   dind:
-    registry: docker.io
-    repository: docker
-    tag: "29.4.0-dind"
+    registry: gitea.zen.lofi
+    repository: sfi/dind
+    tag: "58714d0"
     pullPolicy: IfNotPresent
     extraVolumeMounts:
-      - name: docker-daemon-config
-        mountPath: /etc/docker/daemon.json
-        subPath: daemon.json
       - name: runner-ssh
         mountPath: /run/ssh-secrets
         readOnly: true

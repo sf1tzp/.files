@@ -90,10 +90,6 @@ deploy-runner token:
         --namespace gitea-actions \
         --from-literal=token={{ token }} \
         --dry-run=client -o yaml | kubectl apply -f -
-    kubectl create configmap docker-daemon-config \
-        --namespace gitea-actions \
-        --from-file=daemon.json=gitea-actions/daemon.json \
-        --dry-run=client -o yaml | kubectl apply -f -
     helm upgrade --install gitea-actions gitea-charts/actions \
         --namespace gitea-actions \
         --values gitea-actions/values.yaml \
