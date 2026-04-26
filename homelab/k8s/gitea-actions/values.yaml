@@ -20,7 +20,7 @@ existingSecretKey: "token"
 
 # --- Runner StatefulSet ---
 statefulset:
-  replicas: 2
+  replicas: 1
   affinity:
     nodeAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
