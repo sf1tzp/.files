@@ -124,10 +124,10 @@ scrape_configs:
         regex: 10.0.0.7:9100
         replacement: k8s-worker-1
         target_label: instance
-      - source_labels: [__address__]
-        regex: 10.0.0.8:9100
-        replacement: k8s-worker-2
-        target_label: instance
+      # - source_labels: [__address__]
+      #   regex: 10.0.0.8:9100
+      #   replacement: k8s-worker-2
+      #   target_label: instance
 
   - job_name: "windows_exporter"
     static_configs:
