@@ -10,8 +10,8 @@ let
   mkWorker = { hostname, address, tapId, mac }: {
     config = {
       microvm = {
-        vcpu = 4;
-        mem = 4096;
+        vcpu = 12;
+        mem = 8192;
         hypervisor = "qemu";
 
         interfaces = [{
@@ -141,11 +141,11 @@ in
       tapId = "vm-w1";
       mac = "02:00:00:00:00:01";
     };
-    k8s-worker-2 = mkWorker {
-      hostname = "k8s-worker-2";
-      address = "10.0.0.8";
-      tapId = "vm-w2";
-      mac = "02:00:00:00:00:02";
-    };
+    # k8s-worker-2 = mkWorker {
+    #   hostname = "k8s-worker-2";
+    #   address = "10.0.0.8";
+    #   tapId = "vm-w2";
+    #   mac = "02:00:00:00:00:02";
+    # };
   };
 }
