@@ -105,30 +105,30 @@ return {
       -- Ensure the servers and tools below are installed
       mason_lspconfig.setup({
         ensure_installed = {
-          "lua_ls",
-          "gopls",
-          "rust_analyzer",
-          "pyright",
+          -- "lua_ls",
+          -- "gopls",
+          -- "rust_analyzer",
+          -- "pyright",
           -- "pylyzer",
-          "html",
-          "cssls",
-          "jsonls",
-          "yamlls",
+          -- "html",
+          -- "cssls",
+          -- "jsonls",
+          -- "yamlls",
         },
-        automatic_installation = true,
+        automatic_installation = false,
       })
 
       -- Install additional tools (formatters, linters, etc)
       mason_tool_installer.setup({
         ensure_installed = {
-          "stylua",
-          "prettier",
-          "eslint_d",
-          "goimports",
-          "shellcheck",
-          "shfmt",
+          -- "stylua",
+          -- "prettier",
+          -- "eslint_d",
+          -- "goimports",
+          -- "shellcheck",
+          -- "shfmt",
         },
-        auto_update = true,
+        auto_update = false,
       })
 
       -- Server-specific settings
