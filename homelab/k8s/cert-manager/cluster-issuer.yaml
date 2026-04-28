@@ -51,6 +51,20 @@ spec:
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
+  name: databasus-tls
+  namespace: traefik
+spec:
+  secretName: databasus-tls
+  issuerRef:
+    name: step-ca
+    kind: ClusterIssuer
+  dnsNames:
+    - databasus.zen.lofi
+
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
   name: rustfs-s3-tls
   namespace: traefik
 spec:

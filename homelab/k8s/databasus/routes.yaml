@@ -12,5 +12,5 @@ spec:
     - databasus.zen.lofi
   rules:
     - backendRefs:
-        - name: databasus-http
-          port: 3000
+        - name: databasus-service
+          port: 4005

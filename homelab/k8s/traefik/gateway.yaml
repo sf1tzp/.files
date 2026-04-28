@@ -51,6 +51,17 @@ spec:
       allowedRoutes:
         namespaces:
           from: All
+    - name: https-databasus
+      port: 8443
+      protocol: HTTPS
+      hostname: databasus.zen.lofi
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: databasus-tls
+      allowedRoutes:
+        namespaces:
+          from: All
     - name: https-rustfs-s3
       port: 8443
       protocol: HTTPS

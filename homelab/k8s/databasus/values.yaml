@@ -1,3 +1,70 @@
-# Default values:https://github.com/databasus/databasus/blob/main/deploy/helm/values.yaml
+# Databasus Helm chart values
+# Chart: oci://ghcr.io/databasus/charts/databasus
+# Source: https://github.com/databasus/databasus/tree/main/deploy/helm
 #
+# S3 backup destinations (rustfs, etc.) are configured through the web UI
+# at databasus.zen.lofi after deployment — the chart has no config values for this.
 
+image:
+  repository: databasus/databasus
+  tag: null
+  pullPolicy: IfNotPresent
+
+replicaCount: 1
+
+service:
+  type: ClusterIP
+  port: 4005
+  targetPort: 4005
+  headless:
+    enabled: true
+
+resources:
+  requests:
+    memory: 512Mi
+    cpu: 250m
+  limits:
+    memory: 1Gi
+
+persistence:
+  enabled: true
+  storageClassName: local-path
+  accessMode: ReadWriteOnce
+  size: 10Gi
+  mountPath: /databasus-data
+
+# Disable chart-native ingress/route; we use our own HTTPRoute (routes.yaml)
+ingress:
+  enabled: false
+route:
+  enabled: false
+
+livenessProbe:
+  enabled: true
+  httpGet:
+    path: /api/v1/system/health
+    port: 4005
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  enabled: true
+  httpGet:
+    path: /api/v1/system/health
+    port: 4005
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: node-role.kubernetes.io/control-plane
+              operator: In
+              values:
+                - "true"
