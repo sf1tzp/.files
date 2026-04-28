@@ -23,10 +23,12 @@
     kubectl
     kubernetes-helm
     k9s
+    kubebuilder
 
     # CLI tools
     bind
     curl
+    gnumake
     htop
     jq
     tmux
