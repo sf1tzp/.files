@@ -32,6 +32,7 @@
     gnumake
     htop
     jq
+    openssl
     tmux
     unzip
     wget
