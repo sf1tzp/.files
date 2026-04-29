@@ -75,7 +75,7 @@ deploy-rustfs:
 
 deploy-databasus:
     kubectl create namespace databasus --dry-run=client -o yaml | kubectl apply -f -
-    # sops -d databasus/secrets.yaml | kubectl apply -f -
+    sops -d databasus/secrets.yaml | kubectl apply -f -
     helm upgrade --install databasus \
         oci://ghcr.io/databasus/charts/databasus \
         --namespace databasus \
