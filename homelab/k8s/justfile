@@ -83,6 +83,19 @@ deploy-databasus:
         --wait
     kubectl apply -f databasus/routes.yaml
 
+build-databasus-operator:
+    cd ~/oss/databasus/operator && make generate manifests
+    cd ~/oss/databasus/operator && make docker-build IMG=databasus-operator:latest
+    docker save databasus-operator:latest | sudo k3s ctr images import -
+
+deploy-databasus-operator: build-databasus-operator
+    cd ~/oss/databasus/operator && make install
+    kubectl kustomize databasus/operator | kubectl apply -f -
+    sops -d databasus/secrets.yaml | kubectl apply -f -
+    kubectl apply -f databasus/storage_s3.yaml
+    kubectl apply -f databasus/notifier_discord.yaml
+    kubectl apply -f databasus/databasebackup_gitea.yaml
+
 deploy-gha-cache:
     kubectl create namespace gha-cache --dry-run=client -o yaml | kubectl apply -f -
     sops -d gha-cache/secrets.yaml | kubectl apply -f -
@@ -167,7 +180,16 @@ destroy-rustfs:
     kubectl delete namespace rustfs --ignore-not-found
 
 [confirm]
+destroy-databasus-operator:
+    kubectl delete -f databasus/databasebackup_gitea.yaml --ignore-not-found
+    kubectl delete -f databasus/notifier_discord.yaml --ignore-not-found
+    kubectl delete -f databasus/storage_s3.yaml --ignore-not-found
+    kubectl kustomize databasus/operator | kubectl delete --ignore-not-found -f -
+    cd ~/oss/databasus/operator && make uninstall
+
+[confirm]
 destroy-databasus:
+    just destroy-databasus-operator 2>/dev/null || true
     kubectl delete -f databasus/routes.yaml --ignore-not-found
     helm uninstall databasus --namespace databasus --ignore-not-found
     kubectl delete namespace databasus --ignore-not-found

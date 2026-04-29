@@ -1,10 +1,10 @@
 apiVersion: databasus.databasus.io/v1alpha1
 kind: Notifier
 metadata:
-  name: discord-monitoring
+  name: operator-discord
   namespace: databasus
 spec:
-  name: Discord Monitoring Channel
+  name: Operator Discord
   type: DISCORD
   discord:
     webhookURLSecretRef:
