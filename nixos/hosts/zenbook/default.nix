@@ -85,17 +85,21 @@
   services.k3s-backup = {
     enable = true;
     passwordFile = config.sops.secrets.restic-password.path;
+    includePatterns = [
+      "*_gitea_gitea-shared-storage"
+      "*_databasus_databasus-storage-databasus-0"
+    ];
     s3Targets = [
       {
         name = "rustfs";
-        repository = "s3:http://s3.zen.lofi/k3s-backup"; # TODO: adjust to your RustFS endpoint
+        repository = "s3:https://s3.zen.lofi/k3s-backup";
         environmentFile = config.sops.secrets.restic-s3-env-rustfs.path;
       }
-      # {
-      #   name = "offsite";
-      #   repository = "s3:https://zen-cluster-backups.us-sea-1.linodeobjects.com"; # TODO: set your offsite S3 endpoint
-      #   environmentFile = config.sops.secrets.restic-s3-env-offsite.path;
-      # }
+      {
+        name = "offsite";
+        repository = "s3:https://us-sea-1.linodeobjects.com/zen-cluster-backups/restic";
+        environmentFile = config.sops.secrets.restic-s3-env-offsite.path;
+      }
     ];
   };
 

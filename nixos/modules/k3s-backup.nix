@@ -43,6 +43,17 @@ in
       description = "Restic forget/prune retention policy flags.";
     };
 
+    includePatterns = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [];
+      description = ''
+        Shell glob patterns matched against PVC directory names.
+        Only directories matching at least one pattern are backed up.
+        When empty, all PVCs under storagePath are included.
+      '';
+      example = [ "*_gitea_gitea-shared-storage" "*_databasus_*" ];
+    };
+
     exclude = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [];
@@ -118,13 +129,20 @@ in
 
     environment.systemPackages = [ pkgs.restic ];
 
-    services.restic.backups = builtins.listToAttrs (map (target: {
+    services.restic.backups = let
+      useInclude = cfg.includePatterns != [];
+      # Build a shell snippet that expands includePatterns globs into matching PVC paths
+      matchScript = lib.concatMapStringsSep "\n"
+        (pat: "for d in ${cfg.storagePath}/${pat}; do [ -d \"$d\" ] && echo \"$d\"; done")
+        cfg.includePatterns;
+    in builtins.listToAttrs (map (target: {
       name = "k3s-pv-${target.name}";
       value = {
         repository = target.repository;
         environmentFile = target.environmentFile;
         passwordFile = if target.passwordFile != null then target.passwordFile else cfg.passwordFile;
-        paths = [ cfg.storagePath ];
+        paths = lib.mkIf (!useInclude) [ cfg.storagePath ];
+        dynamicFilesFrom = lib.mkIf useInclude (toString (pkgs.writeShellScript "k3s-backup-paths" matchScript));
         exclude = cfg.exclude;
         pruneOpts = if target.pruneOpts != null then target.pruneOpts else cfg.pruneOpts;
         timerConfig = if target.timerConfig != null then target.timerConfig else cfg.timerConfig;

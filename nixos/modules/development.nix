@@ -33,6 +33,7 @@
     htop
     jq
     openssl
+    s5cmd
     tmux
     unzip
     wget
