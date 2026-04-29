@@ -24,6 +24,7 @@
     kubernetes-helm
     k9s
     kubebuilder
+    kustomize
 
     # CLI tools
     bind
