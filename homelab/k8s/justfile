@@ -73,6 +73,29 @@ deploy-rustfs:
     kubectl apply -f rustfs/bucket-job.yaml
     kubectl wait --for=condition=complete job/rustfs-bucket-init -n rustfs --timeout=120s
 
+deploy-databasus:
+    kubectl create namespace databasus --dry-run=client -o yaml | kubectl apply -f -
+    sops -d databasus/secrets.yaml | kubectl apply -f -
+    helm upgrade --install databasus \
+        oci://ghcr.io/databasus/charts/databasus \
+        --namespace databasus \
+        --values databasus/values.yaml \
+        --wait
+    kubectl apply -f databasus/routes.yaml
+
+build-databasus-operator:
+    cd ~/oss/databasus/operator && make generate manifests
+    cd ~/oss/databasus/operator && make docker-build IMG=databasus-operator:latest
+    docker save databasus-operator:latest | sudo k3s ctr images import -
+
+deploy-databasus-operator: build-databasus-operator
+    cd ~/oss/databasus/operator && make install
+    kubectl kustomize databasus/operator | kubectl apply -f -
+    sops -d databasus/secrets.yaml | kubectl apply -f -
+    kubectl apply -f databasus/operator/crs/storage-rustfs.yaml
+    kubectl apply -f databasus/operator/crs/notifier-discord.yaml
+    kubectl apply -f databasus/operator/crs/backup-gitea-rustfs.yaml
+
 deploy-gha-cache:
     kubectl create namespace gha-cache --dry-run=client -o yaml | kubectl apply -f -
     sops -d gha-cache/secrets.yaml | kubectl apply -f -
@@ -103,7 +126,7 @@ set-github-pat token:
         --dry-run=client -o yaml | kubectl apply -f -
 
 # Deploy everything (except actions runner, which needs a token from Gitea)
-deploy-all: add-repos setup-dns fetch-step-ca-root deploy-traefik deploy-cert-manager deploy-postgres deploy-rustfs deploy-gha-cache deploy-gitea
+deploy-all: add-repos setup-dns fetch-step-ca-root deploy-traefik deploy-cert-manager deploy-postgres deploy-rustfs deploy-gha-cache deploy-gitea deploy-databasus
     @echo ""
     @echo "All services deployed."
     @echo "Next steps:"
@@ -157,10 +180,25 @@ destroy-rustfs:
     kubectl delete namespace rustfs --ignore-not-found
 
 [confirm]
+destroy-databasus-operator:
+    kubectl delete -f databasus/databasebackup_gitea.yaml --ignore-not-found
+    kubectl delete -f databasus/notifier_discord.yaml --ignore-not-found
+    kubectl delete -f databasus/storage_s3.yaml --ignore-not-found
+    kubectl kustomize databasus/operator | kubectl delete --ignore-not-found -f -
+    cd ~/oss/databasus/operator && make uninstall
+
+[confirm]
+destroy-databasus:
+    just destroy-databasus-operator 2>/dev/null || true
+    kubectl delete -f databasus/routes.yaml --ignore-not-found
+    helm uninstall databasus --namespace databasus --ignore-not-found
+    kubectl delete namespace databasus --ignore-not-found
+
+[confirm]
 destroy-gha-cache:
     helm uninstall gha-cache --namespace gha-cache --ignore-not-found
     kubectl delete namespace gha-cache --ignore-not-found
 
 [confirm]
-destroy-all: destroy-gha-cache destroy-rustfs destroy-gitea destroy-postgres destroy-cert-manager destroy-traefik
+destroy-all: destroy-databasus destroy-gha-cache destroy-rustfs destroy-gitea destroy-postgres destroy-cert-manager destroy-traefik
 

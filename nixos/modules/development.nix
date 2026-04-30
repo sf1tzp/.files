@@ -23,12 +23,17 @@
     kubectl
     kubernetes-helm
     k9s
+    kubebuilder
+    kustomize
 
     # CLI tools
     bind
     curl
+    gnumake
     htop
     jq
+    openssl
+    s5cmd
     tmux
     unzip
     wget

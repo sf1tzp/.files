@@ -198,3 +198,43 @@ Then, from the Ansible controller, re-run `just wireguard` so all VM peers pick 
 - [NixOS k3s module](https://search.nixos.org/options?query=services.k3s)
 - [sops-nix](https://github.com/Mic92/sops-nix)
 - [NixOS options search](https://search.nixos.org/options)
+
+
+---
+
+modules/k3s-backup.nix — a NixOS module that wraps services.restic.backups with these options:
+
+| Option | Description |
+|---|---|
+| services.k3s-backup.enable | Enable/disable the backup system |
+| services.k3s-backup.storagePath | k3s PV path (defaults to /var/lib/rancher/k3s/storage) |
+| services.k3s-backup.passwordFile | Shared restic repo password file (e.g. a sops secret) |
+| services.k3s-backup.timerConfig | Schedule (defaults to every 6 hours) |
+| services.k3s-backup.pruneOpts | Retention policy (7 daily, 4 weekly, 6 monthly) |
+| services.k3s-backup.exclude | Glob patterns to skip |
+| services.k3s-backup.s3Targets | List of S3 endpoints, each with name, repository, environmentFile, and optional per-target overrides for passwordFile, pruneOpts, timerConfig |
+
+Each target generates a restic-backups-k3s-pv-<name> systemd service/timer with initialize = true so repos are auto-created on first run.
+
+Example usage (in your host config or a separate file):
+
+services.k3s-backup = {
+   enable = true;
+   passwordFile = config.sops.secrets.restic-password.path;
+   s3Targets = [
+   {
+      name = "rustfs";
+      repository = "s3:http://rustfs-svc.rustfs.svc.cluster.local:9000/backups";
+      environmentFile = config.sops.secrets.restic-rustfs-env.path;
+   }
+   {
+      name = "offsite";
+      repository = "s3:https://s3.us-west-2.amazonaws.com/homelab-backups";
+      environmentFile = config.sops.secrets.restic-offsite-env.path;
+   }
+   ];
+};
+
+Where each environment file contains:
+AWS_ACCESS_KEY_ID=...
+AWS_SECRET_ACCESS_KEY=...

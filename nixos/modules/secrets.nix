@@ -23,6 +23,22 @@
         mode = "0400";
         owner = "root";
       };
+      restic-password = {
+        # Restic repository encryption password — guard this carefully.
+        # Without it, backups cannot be decrypted.
+        mode = "0400";
+        owner = "root";
+      };
+      restic-s3-env-rustfs = {
+        # AWS_ACCESS_KEY_ID=...\nAWS_SECRET_ACCESS_KEY=...
+        mode = "0400";
+        owner = "root";
+      };
+      restic-s3-env-offsite = {
+        # AWS_ACCESS_KEY_ID=...\nAWS_SECRET_ACCESS_KEY=...
+        mode = "0400";
+        owner = "root";
+      };
     };
   };
 }

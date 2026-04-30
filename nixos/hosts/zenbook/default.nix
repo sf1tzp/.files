@@ -81,6 +81,28 @@
   # Laptop-specific: ignore lid switch when on external power
   services.logind.settings.Login.HandleLidSwitchExternalPower = "ignore";
 
+  # k3s persistent volume backups
+  services.k3s-backup = {
+    enable = true;
+    passwordFile = config.sops.secrets.restic-password.path;
+    includePatterns = [
+      "*_gitea_gitea-shared-storage"
+      "*_databasus_databasus-storage-databasus-0"
+    ];
+    s3Targets = [
+      {
+        name = "rustfs";
+        repository = "s3:https://s3.zen.lofi/k3s-backup";
+        environmentFile = config.sops.secrets.restic-s3-env-rustfs.path;
+      }
+      {
+        name = "offsite";
+        repository = "s3:https://us-sea-1.linodeobjects.com/zen-cluster-backups/restic";
+        environmentFile = config.sops.secrets.restic-s3-env-offsite.path;
+      }
+    ];
+  };
+
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
   # on your system were taken. Keep at the fresh install value.
