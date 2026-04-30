@@ -53,3 +53,14 @@ Note: make sure make channel private if needed
 ```sh
 just deploy-databasus
 ```
+
+
+---
+
+# databasus-operator
+
+I POC'd a database operator which can be built & deployed from my branch https://github.com/sf1tzp/databasus/tree/operator
+
+PR in https://github.com/databasus/databasus/pull/534
+
+Deploy databasus from helm first, build & deploy the operator and custom resources (just deploy-databasus-operator; requires my branch in ~/oss/databasus).
