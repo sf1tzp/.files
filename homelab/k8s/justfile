@@ -92,9 +92,11 @@ deploy-databasus-operator: build-databasus-operator
     cd ~/oss/databasus/operator && make install
     kubectl kustomize databasus/operator | kubectl apply -f -
     sops -d databasus/secrets.yaml | kubectl apply -f -
-    kubectl apply -f databasus/storage_s3.yaml
-    kubectl apply -f databasus/notifier_discord.yaml
-    kubectl apply -f databasus/databasebackup_gitea.yaml
+    kubectl apply -f databasus/operator/CRs/linode_s3_storage.yaml
+    kubectl apply -f databasus/operator/CRs/rustfs_s3_storage.yaml
+    kubectl apply -f databasus/operator/CRs/notifier_discord.yaml
+    kubectl apply -f databasus/operator/CRs/gitea_linode_backup.yaml
+    kubectl apply -f databasus/operator/CRs/gitea_rustfs_backup.yaml
 
 deploy-gha-cache:
     kubectl create namespace gha-cache --dry-run=client -o yaml | kubectl apply -f -
