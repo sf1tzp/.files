@@ -5,6 +5,7 @@ add-repos:
     helm repo add gitea-charts https://dl.gitea.com/charts/
     helm repo add jetstack https://charts.jetstack.io
     helm repo add rustfs https://charts.rustfs.com/
+    helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
     helm repo update
 
 
@@ -96,6 +97,13 @@ deploy-databasus-operator: build-databasus-operator
     kubectl apply -f databasus/operator/crs/notifier-discord.yaml
     kubectl apply -f databasus/operator/crs/backup-gitea-rustfs.yaml
 
+deploy-kube-state-metrics:
+    kubectl create namespace kube-state-metrics --dry-run=client -o yaml | kubectl apply -f -
+    helm upgrade --install kube-state-metrics prometheus-community/kube-state-metrics \
+        --namespace kube-state-metrics \
+        --values kube-state-metrics/values.yaml \
+        --wait
+
 deploy-gha-cache:
     kubectl create namespace gha-cache --dry-run=client -o yaml | kubectl apply -f -
     sops -d gha-cache/secrets.yaml | kubectl apply -f -
@@ -126,7 +134,7 @@ set-github-pat token:
         --dry-run=client -o yaml | kubectl apply -f -
 
 # Deploy everything (except actions runner, which needs a token from Gitea)
-deploy-all: add-repos setup-dns fetch-step-ca-root deploy-traefik deploy-cert-manager deploy-postgres deploy-rustfs deploy-gha-cache deploy-gitea deploy-databasus
+deploy-all: add-repos setup-dns fetch-step-ca-root deploy-traefik deploy-cert-manager deploy-postgres deploy-rustfs deploy-gha-cache deploy-gitea deploy-databasus deploy-kube-state-metrics
     @echo ""
     @echo "All services deployed."
     @echo "Next steps:"
@@ -195,10 +203,15 @@ destroy-databasus:
     kubectl delete namespace databasus --ignore-not-found
 
 [confirm]
+destroy-kube-state-metrics:
+    helm uninstall kube-state-metrics --namespace kube-state-metrics --ignore-not-found
+    kubectl delete namespace kube-state-metrics --ignore-not-found
+
+[confirm]
 destroy-gha-cache:
     helm uninstall gha-cache --namespace gha-cache --ignore-not-found
     kubectl delete namespace gha-cache --ignore-not-found
 
 [confirm]
-destroy-all: destroy-databasus destroy-gha-cache destroy-rustfs destroy-gitea destroy-postgres destroy-cert-manager destroy-traefik
+destroy-all: destroy-databasus destroy-gha-cache destroy-kube-state-metrics destroy-rustfs destroy-gitea destroy-postgres destroy-cert-manager destroy-traefik
 

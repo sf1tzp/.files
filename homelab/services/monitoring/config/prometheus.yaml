@@ -203,6 +203,16 @@ scrape_configs:
       - target_label: __address__
         replacement: 10.0.0.2:9115
 
+  - job_name: "kube_state_metrics"
+    static_configs:
+      - targets:
+          - 10.0.0.6:30080
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: 10.0.0.6:30080
+        replacement: k8s-cluster
+        target_label: instance
+
   - job_name: "ollama_exporter"
     scrape_interval: 15s
     metrics_path: /metrics
