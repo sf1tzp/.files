@@ -40,6 +40,9 @@ wireguard +hosts="all":
 nas:
     ansible-playbook nas/playbook.yaml --inventory ~/.files/homelab/inventory.yaml
 
+backups:
+    ansible-playbook backups/playbook.yaml --inventory ~/.files/homelab/inventory.yaml
+
 resize-disk vm new_disk_size:
     ansible-playbook vms/resize-disk.yaml --inventory ~/.files/homelab/inventory.yaml --extra-vars "target_vm={{ vm }} new_disk_size={{ new_disk_size }}"
 
