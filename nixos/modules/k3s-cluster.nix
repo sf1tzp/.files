@@ -62,7 +62,7 @@ let
 
       # Flannel VXLAN + kubelet metrics
       networking.firewall.allowedUDPPorts = [ 8472 ];
-      networking.firewall.allowedTCPPorts = [ 10250 80 443 ];
+      networking.firewall.allowedTCPPorts = [ 10250 10255 80 443 ];
 
       # Persist /etc/rancher across reboots so the node password survives
       systemd.tmpfiles.rules = [ "d /var/lib/rancher-etc 0700 root root -" ];
@@ -77,6 +77,9 @@ let
         role = "agent";
         serverAddr = "https://10.0.0.6:6443";
         tokenFile = "/run/host-secrets/k3s-token";
+        extraFlags = [
+          "--kubelet-arg=read-only-port=10255"
+        ];
       };
 
       security.pki.certificateFiles = [ ../../homelab/k8s/cert-manager/step-ca-root.pem ];
@@ -120,7 +123,10 @@ in
     role = "server";
     clusterInit = true;
     tokenFile = config.sops.secrets.k3s-token.path;
-    extraFlags = [ "--disable=traefik" ];
+    extraFlags = [
+      "--disable=traefik"
+      "--kubelet-arg=read-only-port=10255"
+    ];
   };
 
   networking.firewall.allowedTCPPorts = [ 6443 80 443 ];
