@@ -1,0 +1,27 @@
+[global]
+server string = %h
+workgroup = WORKGROUP
+server role = standalone server
+map to guest = bad user
+guest account = nobody
+log file = /var/log/samba/log.%m
+max log size = 50
+dns proxy = no
+
+# macOS compatibility (vfs_fruit)
+vfs objects = fruit streams_xattr
+fruit:metadata = stream
+fruit:model = MacSamba
+fruit:posix_rename = yes
+fruit:veto_appledouble = no
+fruit:wipe_intentionally_left_blank_rfork = yes
+fruit:delete_empty_adfiles = yes
+
+[Storage]
+path = /mnt/storage
+comment = Storage
+browseable = yes
+writable = yes
+guest ok = yes
+create mask = 0664
+directory mask = 0775
