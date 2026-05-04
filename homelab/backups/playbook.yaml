@@ -1,0 +1,116 @@
+---
+- name: Configure restic backups
+  hosts: soundship
+  become: true
+
+  vars:
+    backup_dirs:
+      - /mnt/storage
+    backup_schedule: "*-*-* 02:00:00"
+    retention: "--keep-daily 7 --keep-weekly 4 --keep-monthly 6"
+
+  handlers:
+    - name: Reload systemd
+      systemd:
+        daemon_reload: yes
+
+  tasks:
+    - name: Decrypt backup secrets
+      shell: sops --decrypt {{ playbook_dir }}/secrets.yaml
+      register: secrets_raw
+      delegate_to: localhost
+      changed_when: false
+      no_log: true
+
+    - name: Parse backup secrets
+      set_fact:
+        backup_secrets: "{{ secrets_raw.stdout | from_yaml }}"
+      no_log: true
+
+    - name: Install restic
+      apt:
+        name: restic
+        state: present
+        update_cache: yes
+
+    - name: Create /etc/restic directory
+      file:
+        path: /etc/restic
+        state: directory
+        owner: root
+        group: root
+        mode: "0700"
+
+    - name: Write restic password file
+      copy:
+        content: "{{ backup_secrets.restic_password }}"
+        dest: /etc/restic/password
+        owner: root
+        group: root
+        mode: "0400"
+      no_log: true
+
+    - name: Write S3 environment files
+      copy:
+        content: |
+          AWS_ACCESS_KEY_ID={{ item.aws_access_key_id }}
+          AWS_SECRET_ACCESS_KEY={{ item.aws_secret_access_key }}
+        dest: "/etc/restic/env-{{ item.name }}"
+        owner: root
+        group: root
+        mode: "0400"
+      loop: "{{ backup_secrets.destinations }}"
+      no_log: true
+
+    - name: Write backup scripts
+      template:
+        src: templates/restic-backup.sh.j2
+        dest: "/usr/local/bin/restic-backup-{{ item.name }}"
+        owner: root
+        group: root
+        mode: "0755"
+      loop: "{{ backup_secrets.destinations }}"
+
+    - name: Install systemd service units
+      template:
+        src: templates/restic-backup.service.j2
+        dest: "/etc/systemd/system/restic-backup-{{ item.name }}.service"
+        owner: root
+        group: root
+        mode: "0644"
+      loop: "{{ backup_secrets.destinations }}"
+      notify: Reload systemd
+
+    - name: Install systemd timer units
+      template:
+        src: templates/restic-backup.timer.j2
+        dest: "/etc/systemd/system/restic-backup-{{ item.name }}.timer"
+        owner: root
+        group: root
+        mode: "0644"
+      loop: "{{ backup_secrets.destinations }}"
+      notify: Reload systemd
+
+    - name: Flush handlers before enabling timers
+      meta: flush_handlers
+
+    - name: Initialize restic repositories
+      shell: |
+        set -e
+        set -a; source /etc/restic/env-{{ item.name }}; set +a
+        restic --password-file /etc/restic/password \
+               --repo {{ item.repository }} \
+               snapshots > /dev/null 2>&1 \
+        || restic --password-file /etc/restic/password \
+                  --repo {{ item.repository }} \
+                  init
+      loop: "{{ backup_secrets.destinations }}"
+      changed_when: false
+      no_log: true
+
+    - name: Enable and start backup timers
+      systemd:
+        name: "restic-backup-{{ item.name }}.timer"
+        state: started
+        enabled: yes
+      loop: "{{ backup_secrets.destinations }}"
