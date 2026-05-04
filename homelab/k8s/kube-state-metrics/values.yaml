@@ -1,0 +1,5 @@
+# Default Values: https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-state-metrics/values.yaml
+
+service:
+  type: NodePort
+  nodePort: 30080
