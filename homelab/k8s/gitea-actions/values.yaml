@@ -31,7 +31,7 @@ statefulset:
 
   persistence:
     enabled: true
-    size: 10Gi
+    size: 50Gi
 
   # SSH keys for prod deploys; surfaced into job containers via DinD bind-mount.
   # The lab CA is baked into our custom DinD image (gitea.zen.lofi/sfi/dind),
@@ -100,7 +100,8 @@ init:
 
   resources:
     requests:
-      memory: 256Mi
-      cpu: 100m
+      memory: 4Gi
+      cpu: 1
     limits:
-      memory: 1Gi
+      memory: 10Gi
+      cpu: 10
