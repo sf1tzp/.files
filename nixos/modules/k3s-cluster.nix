@@ -41,7 +41,7 @@ let
         volumes = [{
           image = "${hostname}-var.img";
           mountPoint = "/var";
-          size = 10240; # 10 GB
+          size = 256000; # 250 GB
         }];
       };
 
