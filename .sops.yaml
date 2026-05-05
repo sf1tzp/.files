@@ -1,0 +1,12 @@
+creation_rules:
+  - path_regex: (^|/)secrets/.*\.env$
+    age:
+      - age13wdm0n6sh2d48up9e5hha2mtd6px2lr9p0gffmdl0c09g7f0fgdqhtj6fy # soundship
+      - age1rgr7hqdjsu4y3m98z3yw7cfwf9w8q4xdvmrv4jc97na32svm5y2qtpsw9x # devbox
+      - age1qg7umu2tev8057x4qte4g8smua7nqhdhqmrk49pq9xpx6zxc0p3qjurnlh # zenbook
+
+  - path_regex: (^|.*/)secrets/.*\.yaml$
+    age:
+      - age13wdm0n6sh2d48up9e5hha2mtd6px2lr9p0gffmdl0c09g7f0fgdqhtj6fy # soundship
+      - age1rgr7hqdjsu4y3m98z3yw7cfwf9w8q4xdvmrv4jc97na32svm5y2qtpsw9x # devbox
+      - age1qg7umu2tev8057x4qte4g8smua7nqhdhqmrk49pq9xpx6zxc0p3qjurnlh # zenbook
