@@ -1,0 +1,69 @@
+# Renovate Helm chart values
+# Chart: https://docs.renovatebot.com/helm-charts
+# Source: https://github.com/renovatebot/helm-charts
+#
+# Runs as a CronJob that scans gitea.zen.lofi every hour. Per-package schedules
+# (weekly minors, monthly majors) live in sfi/renovate-config/default.json,
+# inherited by every project repo via `extends: ["local>sfi/renovate-config"]`.
+#
+# Bot identity: renovate-bot user; PAT lives in `renovate-env` SOPS Secret
+# (see secrets.yaml). The secret must expose RENOVATE_TOKEN.
+
+cronjob:
+  schedule: "0 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+
+renovate:
+  # Global Renovate config (config.json). The token is injected via env from
+  # the existing `renovate-env` secret below, so it does NOT appear here.
+  config: |
+    {
+      "platform": "gitea",
+      "endpoint": "https://gitea.zen.lofi/api/v1",
+      "gitAuthor": "Renovate Bot <renovate-bot@zen.lofi>",
+      "autodiscover": true,
+      "onboarding": true,
+      "onboardingConfig": {
+        "extends": ["local>sfi/renovate-config"]
+      },
+      "requireConfig": "optional",
+      "binarySource": "install"
+    }
+
+# Pulls RENOVATE_TOKEN (and any other RENOVATE_* env) from this Secret.
+existingSecret: renovate-env
+
+env:
+  LOG_LEVEL: info
+  NODE_EXTRA_CA_CERTS: /etc/ssl/certs/step-ca-root.pem
+
+extraVolumes:
+  - name: step-ca
+    configMap:
+      name: step-ca-root
+extraVolumeMounts:
+  - name: step-ca
+    mountPath: /etc/ssl/certs/step-ca-root.pem
+    subPath: step-ca-root.pem
+    readOnly: true
+
+resources:
+  requests:
+    memory: 512Mi
+    cpu: 100m
+  limits:
+    memory: 2Gi
+    cpu: "1"
+
+# Step-CA root is already trusted cluster-wide; no extra CA bundle needed for
+# gitea.zen.lofi HTTPS calls.
+
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: node-role.kubernetes.io/control-plane
+              operator: DoesNotExist
