@@ -27,7 +27,9 @@ statefulset:
         nodeSelectorTerms:
           - matchExpressions:
               - key: node-role.kubernetes.io/control-plane
-                operator: DoesNotExist
+                operator: In
+                values:
+                  - "true"
 
   resources:
     requests:
