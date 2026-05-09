@@ -11,7 +11,7 @@ let
     config = {
       microvm = {
         vcpu = 12;
-        mem = 12288;
+        mem = 10240;
         hypervisor = "qemu";
 
         interfaces = [{

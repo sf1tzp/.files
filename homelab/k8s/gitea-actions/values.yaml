@@ -29,6 +29,14 @@ statefulset:
               - key: node-role.kubernetes.io/control-plane
                 operator: DoesNotExist
 
+  resources:
+    requests:
+      memory: 4Gi
+      cpu: 1000m
+    limits:
+      memory: 10Gi
+      cpu: 8000m
+
   persistence:
     enabled: true
     size: 50Gi
@@ -66,7 +74,7 @@ statefulset:
       runner:
         labels:
           - "ubuntu-latest:docker://catthehacker/ubuntu:act-22.04"
-          - "ubuntu-deploy:docker://gitea.zen.lofi/sfi/action-runner:58714d0"
+          - "ubuntu-deploy:docker://gitea.zen.lofi/sfi/action-runner:b35a560"
       container:
         network: bridge
         docker_timeout: 300s
@@ -97,11 +105,3 @@ init:
     registry: docker.io
     repository: busybox
     tag: "1.37.0"
-
-  resources:
-    requests:
-      memory: 4Gi
-      cpu: 1000m
-    limits:
-      memory: 10Gi
-      cpu: 8000m
