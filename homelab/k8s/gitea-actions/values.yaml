@@ -92,7 +92,7 @@ statefulset:
   dind:
     registry: gitea.zen.lofi
     repository: sfi/dind
-    tag: "58714d0"
+    tag: 42c5032
     pullPolicy: IfNotPresent
     extraVolumeMounts:
       - name: runner-ssh
