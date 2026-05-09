@@ -20,7 +20,7 @@ existingSecretKey: "token"
 
 # --- Runner StatefulSet ---
 statefulset:
-  replicas: 1
+  replicas: 3
   affinity:
     nodeAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -76,7 +76,7 @@ statefulset:
       runner:
         labels:
           - "ubuntu-latest:docker://catthehacker/ubuntu:act-22.04"
-          - "ubuntu-deploy:docker://gitea.zen.lofi/sfi/action-runner:b35a560"
+          - "ubuntu-deploy:docker://gitea.zen.lofi/sfi/action-runner:14866ff"
       container:
         network: bridge
         docker_timeout: 300s
@@ -94,7 +94,7 @@ statefulset:
   dind:
     registry: gitea.zen.lofi
     repository: sfi/dind
-    tag: 42c5032
+    tag: 14866ff
     pullPolicy: IfNotPresent
     extraVolumeMounts:
       - name: runner-ssh
