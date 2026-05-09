@@ -10,7 +10,7 @@
 # (see secrets.yaml). The secret must expose RENOVATE_TOKEN.
 
 cronjob:
-  schedule: "0 * * * *"
+  schedule: "0/15 * * * *"
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 3
@@ -60,10 +60,10 @@ resources:
 # Step-CA root is already trusted cluster-wide; no extra CA bundle needed for
 # gitea.zen.lofi HTTPS calls.
 
-affinity:
-  nodeAffinity:
-    requiredDuringSchedulingIgnoredDuringExecution:
-      nodeSelectorTerms:
-        - matchExpressions:
-            - key: node-role.kubernetes.io/control-plane
-              operator: DoesNotExist
+nodeSelector:
+  node-role.kubernetes.io/control-plane: ""
+
+tolerations:
+  - key: node-role.kubernetes.io/control-plane
+    operator: Exists
+    effect: NoSchedule

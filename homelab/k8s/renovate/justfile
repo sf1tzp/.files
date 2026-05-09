@@ -2,7 +2,7 @@ run-now:
   kubectl -n renovate create job --from=cronjob/renovate renovate-debug
 
 clean-up-run:
-  kubectl -n renovate delete job renovate-debug
+  kubectl -n renovate delete job renovate-debug || true
 
 test-token repo token:
   #!/bin/bash
