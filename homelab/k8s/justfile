@@ -196,6 +196,11 @@ destroy-cert-manager:
     kubectl delete namespace cert-manager --ignore-not-found
 
 [confirm]
+destroy-renovate:
+    helm uninstall renovate --namespace renovate --ignore-not-found
+    kubectl delete namespace renovate --ignore-not-found
+
+[confirm]
 destroy-rustfs:
     kubectl delete -f rustfs/routes.yaml --ignore-not-found
     kubectl delete -f rustfs/bucket-job.yaml --ignore-not-found
@@ -228,5 +233,5 @@ destroy-gha-cache:
     kubectl delete namespace gha-cache --ignore-not-found
 
 [confirm]
-destroy-all: destroy-databasus destroy-gha-cache destroy-kube-state-metrics destroy-rustfs destroy-gitea destroy-postgres destroy-cert-manager destroy-traefik
+destroy-all: destroy-databasus destroy-gha-cache destroy-kube-state-metrics destroy-rustfs destroy-renovate destroy-gitea destroy-postgres destroy-cert-manager destroy-traefik
 
