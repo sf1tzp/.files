@@ -141,12 +141,12 @@ in
 
   # ── microVM workers ────────────────────────────────────────────────
   microvm.vms = {
-    k8s-worker-1 = mkWorker {
-      hostname = "k8s-worker-1";
-      address = "10.0.0.7";
-      tapId = "vm-w1";
-      mac = "02:00:00:00:00:01";
-    };
+    # k8s-worker-1 = mkWorker {
+    #   hostname = "k8s-worker-1";
+    #   address = "10.0.0.7";
+    #   tapId = "vm-w1";
+    #   mac = "02:00:00:00:00:01";
+    # };
     # k8s-worker-2 = mkWorker {
     #   hostname = "k8s-worker-2";
     #   address = "10.0.0.8";
