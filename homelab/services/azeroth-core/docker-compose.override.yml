@@ -1,0 +1,63 @@
+services:
+  ac-authserver:
+    stdin_open: true
+
+  ac-worldserver:
+    environment:
+      AC_MAP_UPDATE_THREADS: "6"
+      AC_AI_PLAYERBOT_RANDOM_BOT_AUTOLOGIN: "1"
+      AC_AI_PLAYERBOT_MIN_RANDOM_BOTS: "50"
+      AC_AI_PLAYERBOT_MAX_RANDOM_BOTS: "200"
+      AC_UPDATES_ENABLE_DATABASES: "1"
+
+    volumes:
+      - ./modules:/azerothcore/modules
+
+networks:
+  ac-network:
+    driver: bridge
+
+# Full config options available
+# https://github.com/mod-playerbots/mod-playerbots/blob/master/conf/playerbots.conf.dist
+
+# Delete all randombot accounts
+# To apply this, set the number to 1 and run the Worldserver. Once deletion is complete, if you would
+# like to recreate randombots, set the number back to 0 and rerun the Worldserver.
+# AiPlayerbot.DeleteRandomBotAccounts = 0
+
+# Disable randombots when no real players are logged in
+# Default: 0 (randombots will login when server starts)
+# If enabled, randombots will only log in 30 seconds (default) after a real player logs in, and will
+# log out 300 seconds (default) after all real players log out
+# AiPlayerbot.DisabledWithoutRealPlayer = 0
+# AiPlayerbot.DisabledWithoutRealPlayerLoginDelay = 30
+# AiPlayerbot.DisabledWithoutRealPlayerLogoutDelay = 300
+
+
+# Disable randombots being generated with a random level
+# If disabled, every randombot starts on a specified level (but can still level up by killing mobs and questing)
+# AiPlayerbot.DisableRandomLevels = 0
+
+# Set randombots' starting level here if "AiPlayerbot.DisableRandomLevels" enabled
+# AiPlayerbot.RandombotStartingLevel = 1
+
+# Chance randombot has min level on first randomize
+# Default: 0.1 (10%)
+# AiPlayerbot.RandomBotMinLevelChance = 0.1
+
+# Chance randombot has max level on first randomize
+# Default 0.1 (10%)
+# AiPlayerbot.RandomBotMaxLevelChance = 0.1
+
+# Fix the level of randombots (they won't level up)
+# Default: 0 (disabled)
+# AiPlayerbot.RandomBotFixedLevel = 0
+
+# Set RandomBotMaxLevel bots to RandomBotMinLevel
+# Default: 0 (disabled)
+# AiPlayerbot.DowngradeMaxLevelBot = 0
+
+# Set XP rate for random bots (Default: 1.0)
+# Server XP Rate * AiPlayerbot.RandomBotXPRate
+# AiPlayerbot.RandomBotXPRate = 1.0
+
