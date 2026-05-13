@@ -1,0 +1,36 @@
+run-now:
+  kubectl -n renovate create job --from=cronjob/renovate renovate-debug
+
+clean-up-run:
+  kubectl -n renovate delete job renovate-debug || true
+
+test-token repo token:
+  #!/bin/bash
+  BASE=https://gitea.zen.lofi/api/v1
+  H="Authorization: token {{token}}"
+
+  echo '(a) Auth works + identity is the bot'
+  curl -fsS -H "$H" "$BASE/user" | jq '{login, email, id}'
+
+  echo '(b) Autodiscover sees repos (this is what Renovate calls)'
+  curl -fsS -H "$H" "$BASE/repos/search?limit=50" | jq '.data[].full_name'
+
+  echo "(c) Token has write scope on a target repo (read perms only would 403 here)"
+  echo 'expect: { "admin": false, "push": true, "pull": true }'
+  curl -fsS -H "$H" "$BASE/repos/sfi/{{repo}}" | jq '.permissions'
+
+  echo '(d) Can list/create branches (needed for opening PRs)'
+  curl -fsS -H "$H" "$BASE/repos/sfi/{{repo}}/branches" | jq '.[].name' | head
+
+  echo '(e) Can read the central preset'
+  curl -fsS -H "$H" "$BASE/repos/sfi/renovate-config/contents/default.json" \
+    | jq -r .content | base64 -d | jq '.schedule'
+
+  # What the responses tell you:
+  # - 401 on (a) → token string is wrong or expired
+  # - (a) works but (b) returns [] → token is valid but the bot user has no repo access; add renovate-bot as collaborator on each repo (or join an org)
+  # - "push": false on (c) → token's missing write:repository scope, or the bot is only a read collaborator
+  # - 404 on (e) → preset repo path is wrong (check that sfi/renovate-config exists and contains default.json on main)
+  #
+  # If (a)–(e) all pass but Renovate still errors, paste the full loggerErrors block — the failure mode then is usually requireConfig, onboardingConfig, or platform-specific quirks rather than auth.
+

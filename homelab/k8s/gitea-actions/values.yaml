@@ -20,22 +20,24 @@ existingSecretKey: "token"
 
 # --- Runner StatefulSet ---
 statefulset:
-  replicas: 1
+  replicas: 3
   affinity:
     nodeAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
         nodeSelectorTerms:
           - matchExpressions:
               - key: node-role.kubernetes.io/control-plane
-                operator: DoesNotExist
+                operator: In
+                values:
+                  - "true"
 
   resources:
     requests:
-      memory: 4Gi
+      memory: 1Gi
       cpu: 1000m
     limits:
-      memory: 10Gi
-      cpu: 8000m
+      memory: 3Gi
+      cpu: 2000m
 
   persistence:
     enabled: true
@@ -74,7 +76,7 @@ statefulset:
       runner:
         labels:
           - "ubuntu-latest:docker://catthehacker/ubuntu:act-22.04"
-          - "ubuntu-deploy:docker://gitea.zen.lofi/sfi/action-runner:b35a560"
+          - "ubuntu-deploy:docker://gitea.zen.lofi/sfi/action-runner:14866ff"
       container:
         network: bridge
         docker_timeout: 300s
@@ -92,7 +94,7 @@ statefulset:
   dind:
     registry: gitea.zen.lofi
     repository: sfi/dind
-    tag: "58714d0"
+    tag: 14866ff
     pullPolicy: IfNotPresent
     extraVolumeMounts:
       - name: runner-ssh

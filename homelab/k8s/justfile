@@ -6,6 +6,7 @@ add-repos:
     helm repo add jetstack https://charts.jetstack.io
     helm repo add rustfs https://charts.rustfs.com/
     helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+    helm repo add renovate https://docs.renovatebot.com/helm-charts
     helm repo update
 
 
@@ -126,6 +127,20 @@ deploy-runner token:
         --values gitea-actions/values.yaml \
         --wait
 
+# Deploy Renovate (CronJob that scans gitea.zen.lofi hourly).
+# Cadence + grouping rules live in sfi/renovate-config; PAT in renovate/secrets.yaml.
+deploy-renovate:
+    kubectl create namespace renovate --dry-run=client -o yaml | kubectl apply -f -
+    sops -d renovate/secrets.yaml | kubectl apply -f -
+    kubectl -n renovate create configmap step-ca-root \
+    --from-file=step-ca-root.pem=cert-manager/step-ca-root.pem \
+    --dry-run=client -o yaml | kubectl apply -f -
+
+    helm upgrade --install renovate renovate/renovate \
+        --namespace renovate \
+        --values renovate/values.yaml \
+        --wait
+
 # Configure GitHub PAT for Gitea access to private repos
 set-github-pat token:
     kubectl create secret generic github-pat \
@@ -134,7 +149,7 @@ set-github-pat token:
         --dry-run=client -o yaml | kubectl apply -f -
 
 # Deploy everything (except actions runner, which needs a token from Gitea)
-deploy-all: add-repos setup-dns fetch-step-ca-root deploy-traefik deploy-cert-manager deploy-postgres deploy-rustfs deploy-gha-cache deploy-gitea deploy-databasus deploy-kube-state-metrics
+deploy-all: add-repos setup-dns fetch-step-ca-root deploy-traefik deploy-cert-manager deploy-postgres deploy-rustfs deploy-gha-cache deploy-gitea deploy-databasus deploy-kube-state-metrics deploy-renovate
     @echo ""
     @echo "All services deployed."
     @echo "Next steps:"
@@ -181,6 +196,11 @@ destroy-cert-manager:
     kubectl delete namespace cert-manager --ignore-not-found
 
 [confirm]
+destroy-renovate:
+    helm uninstall renovate --namespace renovate --ignore-not-found
+    kubectl delete namespace renovate --ignore-not-found
+
+[confirm]
 destroy-rustfs:
     kubectl delete -f rustfs/routes.yaml --ignore-not-found
     kubectl delete -f rustfs/bucket-job.yaml --ignore-not-found
@@ -213,5 +233,5 @@ destroy-gha-cache:
     kubectl delete namespace gha-cache --ignore-not-found
 
 [confirm]
-destroy-all: destroy-databasus destroy-gha-cache destroy-kube-state-metrics destroy-rustfs destroy-gitea destroy-postgres destroy-cert-manager destroy-traefik
+destroy-all: destroy-databasus destroy-gha-cache destroy-kube-state-metrics destroy-rustfs destroy-renovate destroy-gitea destroy-postgres destroy-cert-manager destroy-traefik
 

@@ -122,7 +122,7 @@ install_glow() {
 }
 
 install_go() {
-	: "${GO_VERSION:="1.19.4"}"
+	: "${GO_VERSION:="1.26.3"}"
 	: "${FORCE_GO_INSTALL:=false}"
 	if ! command -v go &>/dev/null || $FORCE_GO_INSTALL; then
 		sudo rm -rf /usr/local/go
