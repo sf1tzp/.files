@@ -2,7 +2,7 @@
 # shellcheck disable=SC2148,SC2035,SC1083
 # set dot-env load
 
-up: _generate-pgadmin-config
+up:
     nerdctl compose -f postgres-compose.yaml up --env-file ~/.files/homelab/services/postgres/.env --detach
 
 down:
@@ -39,6 +39,16 @@ _generate-pgadmin-config:
             "Port": $port | tonumber ,
             "MaintenanceDB": "postgres",
             "Username": $user,
+            "SSLMode": "prefer",
+            "PassFile": "/pgpass",
+          },
+          "2": {
+            "Name": "Timescale DB",
+            "Group": "Servers",
+            "Host": $timescale_host,
+            "Port": $timescale_port | tonumber ,
+            "MaintenanceDB": "postgres",
+            "Username": $timescale_user,
             "SSLMode": "prefer",
             "PassFile": "/pgpass",
           }
