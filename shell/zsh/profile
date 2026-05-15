@@ -1,5 +1,8 @@
 #!/usr/bin/env zsh
+#
 # shellcheck disable=SC1071
+
+setopt IGNORE_EOF # disable ctrl+d 
 
 alias reload="source $HOME/.zshrc"
 

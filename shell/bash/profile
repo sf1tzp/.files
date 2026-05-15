@@ -110,6 +110,5 @@ if command -v shellcheck &>/dev/null; then
 fi
 
 source $HOME/.files/shell/aliases
-source $HOME/.files/shell/bash/functions
-source $HOME/.files/worktrees.sh
+source $HOME/.files/shell/scripts/worktrees.sh
 
