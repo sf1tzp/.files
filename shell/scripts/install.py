@@ -201,6 +201,15 @@ PROGRAMS = {
             mv step-ca {install_dir}
             """,
     },
+    "tea": {
+        "version": "0.14.1",
+        "url_template": "https://gitea.com/gitea/tea/releases/download/v{version}/tea-{version}-linux-{arch}.xz",
+        "is_amd64": True,
+        "setup_script": """#!/usr/bin/env bash
+            chmod +x tea-{version}-linux-{arch}
+            mv tea-{version}-linux-{arch} {install_dir}/tea
+            """,
+    },
     "uv": {
         "version": "0.6.12",
         "url_template": "https://github.com/astral-sh/uv/releases/download/{version}/uv-{arch}-unknown-linux-musl.tar.gz",
@@ -300,13 +309,16 @@ def install_from_releases(program_list):
 
 def download_and_extract(url, temp_dir):
     filename = os.path.basename(urlparse(url).path)
-    is_tarball = filename.lower().endswith(".tar.gz") or filename.lower().endswith(
-        ".tgz"
-    )
+    lower = filename.lower()
+    is_tarball = lower.endswith(".tar.gz") or lower.endswith(".tgz")
+    is_xz = lower.endswith(".xz")
     download_path = f"{temp_dir}/{filename}"
     subprocess.run(["curl", "-L", "-o", download_path, url], check=True)
     if is_tarball:
         subprocess.run(["tar", "xzvf", download_path, "-C", temp_dir], check=True)
+    elif is_xz:
+        # Decompresses in place, dropping the .xz suffix
+        subprocess.run(["unxz", download_path], check=True)
 
 
 if __name__ == "__main__":

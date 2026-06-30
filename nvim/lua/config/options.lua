@@ -9,7 +9,7 @@ return function()
   vim.opt.signcolumn = "yes"         -- Always show the signcolumn
   vim.opt.scrolloff = 8              -- Minimum screen lines above/below cursor
   vim.opt.sidescrolloff = 8          -- Minimum screen columns left/right of cursor
-  vim.opt.wrap = false               -- Don't wrap long lines
+  vim.opt.wrap = true                -- Wrap long lines
   vim.opt.showbreak = "↪ "           -- String to show at start of wrapped lines
   vim.opt.showtabline = 0            -- Don't show tab line'
   vim.opt.list = true                -- Show invisible characters
