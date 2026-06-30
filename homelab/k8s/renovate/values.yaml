@@ -10,7 +10,7 @@
 # (see secrets.yaml). The secret must expose RENOVATE_TOKEN.
 
 cronjob:
-  schedule: "0/15 * * * *"
+  schedule: "0 0/4 * * *"
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 3
