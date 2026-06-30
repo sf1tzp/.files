@@ -1,0 +1,14 @@
+#!/bin/bash
+set -euo pipefail
+
+set -a
+source /etc/restic/env-{{ item.name }}
+set +a
+
+RESTIC="restic --password-file /etc/restic/password --repo {{ item.repository }}"
+
+$RESTIC snapshots > /dev/null 2>&1 || $RESTIC init
+
+$RESTIC backup {{ backup_dirs | join(' ') }}
+
+$RESTIC forget --prune {{ retention }}

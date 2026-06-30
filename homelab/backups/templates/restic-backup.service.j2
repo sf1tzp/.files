@@ -1,0 +1,8 @@
+[Unit]
+Description=Restic backup ({{ item.name }})
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/restic-backup-{{ item.name }}
