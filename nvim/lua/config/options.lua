@@ -10,7 +10,10 @@ return function()
   vim.opt.scrolloff = 8              -- Minimum screen lines above/below cursor
   vim.opt.sidescrolloff = 8          -- Minimum screen columns left/right of cursor
   vim.opt.wrap = true                -- Wrap long lines
+  vim.opt.linebreak = true           -- Wrap at word boundaries, not mid-word
+  vim.opt.breakindent = true         -- Keep wrapped lines visually indented
   vim.opt.showbreak = "↪ "           -- String to show at start of wrapped lines
+  vim.opt.colorcolumn = "150"        -- Ruler at column 150
   vim.opt.showtabline = 0            -- Don't show tab line'
   vim.opt.list = true                -- Show invisible characters
   vim.opt.listchars = {              -- How to show invisible characters
