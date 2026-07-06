@@ -27,4 +27,10 @@
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+
+  # Graphics stack — required for ROCm on Radeon 680M iGPU
+  hardware.graphics = {
+    enable = true;
+    enable32Bit = true;
+  };
 }

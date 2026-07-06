@@ -39,6 +39,7 @@
           ./modules/k3s-backup.nix
           ./modules/wireguard.nix
           ./modules/s3-utils.nix
+          ./modules/ollama.nix
           microvm.nixosModules.host
           sops-nix.nixosModules.sops
 
