@@ -87,6 +87,14 @@ if which starship &>/dev/null; then
     fi
 fi
 
+# Herdr
+if which herdr &>/dev/null; then
+    if [[ ! -f "$HOME/.config/herdr/config.toml" ]]; then
+        mkdir -p "$HOME/.config/herdr"
+        ln -s "$HOME/.files/shell/config/herdr.toml" "$HOME/.config/herdr/config.toml"
+    fi
+fi
+
 # Updating Clock
 TMOUT=1
 TRAPALRM() {
