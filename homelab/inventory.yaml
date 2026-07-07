@@ -69,27 +69,6 @@ all:
               gpu_passthrough: false
               disk_size: "25G"
 
-        staging-1g:
-          hosts:
-            staging-1g:
-              ansible_host: 10.0.0.21
-              os: "sf1tzp-24.04"
-              vcpus: 1
-              memory: 1
-              disk_size: "25G"
-              gpu_passthrough: false
-
-        staging-v2:
-          hosts:
-            staging-v2:
-              ansible_host: 10.0.0.22
-              ansible_user: steven
-              os: "sf1tzp-24.04"
-              vcpus: 1
-              memory: 1
-              disk_size: "25G"
-              gpu_passthrough: false
-
         staging-web:
           hosts:
             staging-web:
@@ -148,8 +127,6 @@ all:
         devbox: {}
         junktown: {}
         llm-server: {}
-        staging-1g: {}
-        staging-v2: {}
         staging-web: {}
         staging-db: {}
         db2-streetfortress-cloud: {}

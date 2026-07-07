@@ -1,0 +1,68 @@
+---
+- name: Set up NAS on soundship
+  hosts: soundship
+  become: true
+
+  handlers:
+    - name: Restart smbd
+      systemd:
+        name: smbd
+        state: restarted
+
+    - name: Restart avahi-daemon
+      systemd:
+        name: avahi-daemon
+        state: restarted
+
+  tasks:
+    - name: Install NAS packages
+      apt:
+        name:
+          - samba
+          - avahi-daemon
+          - exfatprogs
+        state: present
+        update_cache: yes
+
+    - name: Create storage mount point
+      file:
+        path: /mnt/storage
+        state: directory
+        mode: "0755"
+
+    - name: Mount storage drive persistently
+      mount:
+        path: /mnt/storage
+        src: UUID=670D-7EB0
+        fstype: exfat
+        opts: defaults,uid=nobody,gid=nogroup,umask=0002,nofail
+        state: mounted
+
+    - name: Configure Samba
+      template:
+        src: templates/smb.conf.j2
+        dest: /etc/samba/smb.conf
+        mode: "0644"
+      notify: Restart smbd
+
+    - name: Configure Avahi SMB service announcement
+      template:
+        src: templates/avahi-smb.service.j2
+        dest: /etc/avahi/services/smb.service
+        mode: "0644"
+      notify: Restart avahi-daemon
+
+    - name: Enable and start Samba services
+      systemd:
+        name: "{{ item }}"
+        state: started
+        enabled: yes
+      loop:
+        - smbd
+        - nmbd
+
+    - name: Enable and start Avahi
+      systemd:
+        name: avahi-daemon
+        state: started
+        enabled: yes
