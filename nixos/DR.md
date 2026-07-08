@@ -33,7 +33,7 @@ Every recovery scenario requires some subset of these. Verify what you have befo
 ls -la /home/steven/.config/sops/age/keys.txt
 
 # Sops can decrypt
-sops -d ~/.files/nixos/secrets/cluster.yaml | head -5
+sops -d ~/.files/nixos/secrets/zenbook.yaml | head -5
 
 # Restic password accessible
 sudo cat /run/secrets/restic-password
@@ -498,7 +498,7 @@ sudo -E restic restore latest --target /tmp/restic-test \
 | Worker VM disk | `/var/lib/microvms/k8s-worker-1/k8s-worker-1-var.img` |
 | **Secrets** | |
 | Age key | `/home/steven/.config/sops/age/keys.txt` |
-| Sops secrets file | `~/.files/nixos/secrets/cluster.yaml` |
+| Sops secrets file | `~/.files/nixos/secrets/zenbook.yaml` |
 | Restic password (runtime) | `/run/secrets/restic-password` |
 | S3 env rustfs (runtime) | `/run/secrets/restic-s3-env-rustfs` |
 | S3 env offsite (runtime) | `/run/secrets/restic-s3-env-offsite` |

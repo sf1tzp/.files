@@ -25,6 +25,10 @@
     hyperfine
     jq
     just
+    kubectl
+    kubernetes-helm
+    neovim
+    vim
     pipes-rs
     ripgrep
     starship
@@ -39,6 +43,7 @@
     ".config/fzf.bash".source = ../../shell/bash/fzf.bash;
     ".config/nvim".source = ../../nvim;
     ".config/starship.toml".source = ../../shell/config/starship.toml;
+    ".claude/CLAUDE.md".source = ../../shell/config/CLAUDE.md;
     ".inputrc".source = ../../shell/config/inputrc;
     ".shellcheckrc".source = ../../shell/config/shellcheckrc;
     ".tmux.conf".source = ../../shell/config/tmux.conf;

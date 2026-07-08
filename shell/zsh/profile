@@ -95,6 +95,12 @@ if which herdr &>/dev/null; then
     fi
 fi
 
+# Claude Code global instructions (home-manager manages this on NixOS)
+if [[ ! -f "$HOME/.claude/CLAUDE.md" && -f "$HOME/.files/shell/config/CLAUDE.md" ]]; then
+    mkdir -p "$HOME/.claude"
+    ln -s "$HOME/.files/shell/config/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
+fi
+
 # Updating Clock
 TMOUT=1
 TRAPALRM() {
@@ -157,3 +163,5 @@ if which zoxide &>/dev/null; then
       eval "$(zoxide init --cmd cd zsh)"
     fi
 fi
+
+if [ -e /home/steven/.nix-profile/etc/profile.d/nix.sh ]; then . /home/steven/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer

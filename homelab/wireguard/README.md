@@ -39,7 +39,7 @@ Peers behind dynamic NAT with no fixed endpoint (soundship, devbox, zenbook) omi
    ```sh
    cd nixos
    PRIV=$(wg genkey)
-   sops --set "[\"wireguard-private-key\"] \"$PRIV\"" secrets/cluster.yaml
+   sops --set "[\"wireguard-private-key\"] \"$PRIV\"" secrets/zenbook.yaml
    PUB=$(echo "$PRIV" | wg pubkey)
    jq --arg k "$PUB" '.peers.zenbook.public_key = $k' ../homelab/wireguard/peers.json | sponge ../homelab/wireguard/peers.json
    ```

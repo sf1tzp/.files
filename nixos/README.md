@@ -1,20 +1,22 @@
 # NixOS Configuration
 
-Flake-based NixOS config for the Zenbook, with Home Manager integrated as a NixOS module.
+Flake-based NixOS config for homelab hosts, with Home Manager integrated as a NixOS module. Hosts are built through a shared `mkHost` helper in `flake.nix` that layers opt-in role modules on top of a common base.
 
 ## Structure
 
 ```
 nixos/
-├── flake.nix              # Flake definition, inputs, system composition
+├── flake.nix              # Flake definition, inputs, mkHost helper, host list
 ├── hosts/
 │   └── zenbook/
-│       ├── default.nix    # Host-specific: boot, users, SSH, firewall
+│       ├── default.nix    # Host-specific: boot, hostname, CA trust, backups
 │       └── hardware.nix   # Generated hardware config (disk UUIDs, kernel modules)
 ├── modules/
+│   ├── common.nix         # Shared base: user, SSH, nix settings, locale (every host)
 │   ├── desktop.nix        # GNOME, PipeWire, fonts, Steam, Firefox
 │   ├── development.nix    # Docker, dev tools (go, rust, kubectl, etc.)
-│   └── k3s-cluster.nix    # k3s control plane, microVM workers, bridge networking
+│   ├── k3s-server.nix     # Reusable single-node k3s control plane
+│   └── k3s-cluster.nix    # Zenbook: bridge networking + microVM workers (imports k3s-server)
 └── home/
     └── steven.nix         # Home Manager: user packages, dotfiles, shell config
 ```
@@ -38,18 +40,38 @@ nix flake update ~/.files/nixos
 
 ## Adding Capabilities
 
-To add new roles, create a module in `modules/` and add it to the imports in `flake.nix`:
+To add a new role, create a module in `modules/` and add it to a host's `extraModules` in `flake.nix`:
 
 ```nix
-modules = [
-  ./hosts/zenbook
-  ./modules/desktop.nix
-  ./modules/development.nix
-  ./modules/k3s-cluster.nix
-  # ./modules/monitoring.nix    # <- add new modules here
-  # ...
-];
+nixosConfigurations.zenbook = mkHost {
+  hostname = "zenbook";
+  extraModules = [
+    ./modules/development.nix
+    ./modules/k3s-cluster.nix
+    # ./modules/monitoring.nix    # <- add new modules here
+  ];
+};
 ```
+
+## Adding a Host
+
+Every host gets `modules/common.nix` (shared user/SSH/nix/locale) plus its own
+`hosts/<name>/` directory, wired up via `mkHost`:
+
+```nix
+nixosConfigurations.staging-k3s = mkHost {
+  hostname = "staging-k3s";        # -> ./hosts/staging-k3s/{default.nix,secrets.nix}
+  home = false;                    # headless infra host: skip Home Manager dotfiles
+  extraModules = [
+    ./hosts/staging-k3s/secrets.nix  # per-host sops file + age key source
+    ./modules/k3s-server.nix         # reusable single-node control plane
+  ];
+};
+```
+
+The host's `default.nix` declares its own networking (static IP), hostname, and
+`system.stateVersion`; `hosts/<name>/secrets.nix` points sops at that host's
+encrypted file and age key. `common.nix` supplies everything shared.
 
 ## Network Layout
 

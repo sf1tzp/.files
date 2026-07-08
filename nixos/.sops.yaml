@@ -1,4 +1,14 @@
 creation_rules:
+  # BEGIN ANSIBLE sops rule: staging-k3s
+  - path_regex: secrets/staging-k3s\.yaml$
+    age:
+      - age1rgr7hqdjsu4y3m98z3yw7cfwf9w8q4xdvmrv4jc97na32svm5y2qtpsw9x
+      - age1qg7umu2tev8057x4qte4g8smua7nqhdhqmrk49pq9xpx6zxc0p3qjurnlh
+      - age1z8v4cegrrwcqnq27rn4ul8aqtvug2aklltq0tftdq3h7fr3jt99s3hh00r
+  # END ANSIBLE sops rule: staging-k3s
   - path_regex: secrets/.*\.yaml$
-    age: age1qg7umu2tev8057x4qte4g8smua7nqhdhqmrk49pq9xpx6zxc0p3qjurnlh
+    age:
+      - age1rgr7hqdjsu4y3m98z3yw7cfwf9w8q4xdvmrv4jc97na32svm5y2qtpsw9x # devbox
+      - age1qg7umu2tev8057x4qte4g8smua7nqhdhqmrk49pq9xpx6zxc0p3qjurnlh # zenbook
+      - age1dthf5kp9xkap9q0m4ynaytkx4h2vplc9rz35kgxxq24y4vmd94rqpcu8lj # staging-k3s
 

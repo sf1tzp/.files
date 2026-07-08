@@ -16,6 +16,10 @@ base-images:
 create-linux +hosts:
     ansible-playbook vms/create-linux.yaml --inventory ~/.files/homelab/inventory.yaml --vault-password-file ~/.ansible-password --extra-vars "target_vms={{ hosts }}"
 
+# Build a flake qcow2 and define the VM from it (no cloud-init). Run on soundship.
+create-nixos +hosts:
+    ansible-playbook vms/create-nixos.yaml --inventory ~/.files/homelab/inventory.yaml --extra-vars "target_vms={{ hosts }}"
+
 create-windows:
     ansible-playbook vms/create-windows.yaml
 
@@ -24,6 +28,21 @@ update:
 
 delete +vms:
     ansible-playbook vms/delete.yaml --extra-vars vm_names="{{ vms }}"
+
+# Pull a NixOS k3s node's kubeconfig to ~/.kube/<host>.config (server URL
+# rewritten from 127.0.0.1 to the node's LAN IP). Needs --write-kubeconfig-mode
+# 0644 on the node (k3s-server.nix) so no sudo is required.
+#   just fetch-kubeconfig staging-k3s
+#   KUBECONFIG=~/.kube/staging-k3s.config kubectl get nodes
+fetch-kubeconfig host:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    ip=$(ansible-inventory -i ~/.files/homelab/inventory.yaml --host "{{host}}" | jq -r .ansible_host)
+    mkdir -p ~/.kube
+    ssh "steven@${ip}" cat /etc/rancher/k3s/k3s.yaml \
+      | sed "s#https://127\.0\.0\.1:6443#https://${ip}:6443#" > ~/.kube/{{host}}.config
+    chmod 600 ~/.kube/{{host}}.config
+    echo "Wrote ~/.kube/{{host}}.config — KUBECONFIG=~/.kube/{{host}}.config kubectl get nodes"
 
 decrypt-vm-password:
     ansible-playbook vms/decrypt-vm-password.yaml --vault-password-file ~/.ansible-password

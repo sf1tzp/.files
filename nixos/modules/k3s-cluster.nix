@@ -1,4 +1,5 @@
-# k3s cluster: control plane, microVM worker nodes, bridge networking
+# Zenbook-specific k3s wiring: bridge networking + microVM worker nodes.
+# The reusable single-node control plane lives in ./k3s-server.nix.
 { config, pkgs, ... }:
 
 let
@@ -97,6 +98,8 @@ let
   };
 in
 {
+  imports = [ ./k3s-server.nix ];
+
   # ── Bridge networking ──────────────────────────────────────────────
   # Keep NetworkManager away from the bridged ethernet interface
   # (NM continues to manage WiFi for desktop use)
@@ -116,28 +119,6 @@ in
 
   # Trust bridge and VM tap traffic
   networking.firewall.trustedInterfaces = [ "br0" ];
-
-  # ── k3s control plane ──────────────────────────────────────────────
-  services.k3s = {
-    enable = true;
-    role = "server";
-    clusterInit = true;
-    tokenFile = config.sops.secrets.k3s-token.path;
-    extraFlags = [
-      "--disable=traefik"
-      "--kubelet-arg=read-only-port=10255"
-    ];
-  };
-
-  networking.firewall.allowedTCPPorts = [ 6443 80 443 ];
-
-  security.pki.certificateFiles = [ ../../homelab/k8s/cert-manager/step-ca-root.pem ];
-
-  # ── Monitoring ─────────────────────────────────────────────────────
-  services.prometheus.exporters.node = {
-    enable = true;
-    openFirewall = true; # opens port 9100
-  };
 
   # ── microVM workers ────────────────────────────────────────────────
   microvm.vms = {

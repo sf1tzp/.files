@@ -1,25 +1,17 @@
-# Secrets management via sops-nix
-{ config, pkgs, ... }:
+# sops-nix wiring for zenbook: decrypts secrets/zenbook.yaml with a standalone
+# user age key. Secret declarations here are the zenbook-only ones; k3s-token is
+# declared by modules/k3s-server.nix.
+{ ... }:
 
 {
-  environment.systemPackages = with pkgs; [
-    sops
-    age
-    ssh-to-age
-  ];
-
   sops = {
-    defaultSopsFile = ../secrets/cluster.yaml;
+    defaultSopsFile = ../../secrets/zenbook.yaml;
 
-    age.sshKeyPaths = [];          # Don't derive from SSH host keys
+    age.sshKeyPaths = [ ]; # Don't derive from SSH host keys
     age.keyFile = "/home/steven/.config/sops/age/keys.txt";
 
     secrets = {
-      k3s-token = {
-        # Available at /run/secrets/k3s-token after activation
-      };
       wireguard-private-key = {
-        # Available at /run/secrets/wireguard-private-key after activation
         mode = "0400";
         owner = "root";
       };

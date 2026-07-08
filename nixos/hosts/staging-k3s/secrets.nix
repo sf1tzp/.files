@@ -1,0 +1,21 @@
+# sops-nix wiring for staging-k3s: decrypts secrets/staging-k3s.yaml with the
+# age key derived from this host's SSH ed25519 host key (see the age-recipient
+# step in homelab/vms/create-nixos.yaml). k3s-token is declared by
+# modules/k3s-server.nix; wireguard-private-key (declared below) is consumed by
+# modules/wireguard.nix.
+#
+# Note: the host key is generated on first boot, so a freshly rebuilt/recreated
+# VM gets a new key — re-derive the recipient and re-encrypt if that happens.
+{ ... }:
+
+{
+  sops = {
+    defaultSopsFile = ../../secrets/staging-k3s.yaml;
+    age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+
+    secrets.wireguard-private-key = {
+      mode = "0400";
+      owner = "root";
+    };
+  };
+}

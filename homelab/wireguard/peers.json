@@ -22,6 +22,11 @@
       "wg_endpoint_ip": "10.0.0.32",
       "public_key": "kfEEvsKXb/CVG+Byp2WK6jBxjIXKcKi17rxAMqdqIGk="
     },
+    "staging-k3s": {
+      "wg_vpn_ip": "10.1.0.13",
+      "wg_endpoint_ip": "10.0.0.40",
+      "public_key": "IN+Pa+00qs+0rD6v7csWojl30bblmodo2IJHpq7XhWk="
+    },
     "db2-streetfortress-cloud": {
       "wg_vpn_ip": "10.1.0.51",
       "wg_endpoint_ip": "db2.streetfortress.cloud",

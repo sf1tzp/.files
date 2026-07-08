@@ -112,17 +112,18 @@ activation time. Encrypted files live in the repo; decrypted secrets appear at
 
 1. The zenbook's SSH host key (`/etc/ssh/ssh_host_ed25519_key`) is converted to
    an age key. The public half is in `.sops.yaml` as the encryption recipient.
-2. `secrets/cluster.yaml` is encrypted with `sops` using that age key. It
+2. `secrets/zenbook.yaml` is encrypted with `sops` using that age key. It
    contains `k3s-token` (and any future secrets).
-3. On `nixos-rebuild switch`, sops-nix decrypts `cluster.yaml` and writes each
+3. On `nixos-rebuild switch`, sops-nix decrypts `zenbook.yaml` and writes each
    key as a file under `/run/secrets/`.
-4. `modules/secrets.nix` declares which secrets to extract and makes their paths
-   available to other modules via `config.sops.secrets.<name>.path`.
+4. `hosts/zenbook/secrets.nix` declares which secrets to extract and makes their
+   paths available to other modules via `config.sops.secrets.<name>.path`
+   (`k3s-token` itself is declared in `modules/k3s-server.nix`).
 
 ### k3s token flow
 
 ```
-secrets/cluster.yaml (encrypted, in git)
+secrets/zenbook.yaml (encrypted, in git)
   ↓  sops-nix decrypts at activation
 /run/secrets/k3s-token (on host)
   ├── k3s server reads via config.sops.secrets.k3s-token.path
@@ -134,15 +135,15 @@ secrets/cluster.yaml (encrypted, in git)
 
 ```bash
 # Edit secrets (opens $EDITOR with decrypted yaml, re-encrypts on save)
-sops nixos/secrets/cluster.yaml
+sops nixos/secrets/zenbook.yaml
 
-# Add a new secret: add the key in cluster.yaml, then declare it in secrets.nix:
+# Add a new secret: add the key in zenbook.yaml, then declare it in hosts/zenbook/secrets.nix:
 #   sops.secrets.my-new-secret = {};
 # It will appear at /run/secrets/my-new-secret after rebuild.
 
 # If the host SSH key changes, re-derive the age key and update .sops.yaml:
 cat /etc/ssh/ssh_host_ed25519_key.pub | ssh-to-age
-sops updatekeys secrets/cluster.yaml
+sops updatekeys secrets/zenbook.yaml
 ```
 
 ---
@@ -174,7 +175,7 @@ Bootstrap:
 nix-shell -p wireguard-tools moreutils # get wg and sponge commands for the steps below:
 cd /home/steven/.files/nixos
 PRIV=$(wg genkey)
-sops --set "[\"wireguard-private-key\"] \"$PRIV\"" secrets/cluster.yaml
+sops --set "[\"wireguard-private-key\"] \"$PRIV\"" secrets/zenbook.yaml
 PUB=$(echo "$PRIV" | wg pubkey)
 jq --arg k "$PUB" '.peers.zenbook.public_key = $k' ../homelab/wireguard/peers.json | sponge ../homelab/wireguard/peers.json
 sudo nixos-rebuild switch --flake .#zenbook
