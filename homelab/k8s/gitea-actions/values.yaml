@@ -52,14 +52,20 @@ statefulset:
         secretName: runner-ssh
         defaultMode: 0400
 
-  actRunner:
+  # Chart 0.1.1 renamed this key from actRunner to runner (and rebranded the
+  # image from act_runner to "runner" 1.x); values under the old key are
+  # silently ignored and the chart falls back to its default config.
+  runner:
     registry: docker.gitea.com
-    repository: act_runner
-    tag: "0.4.1"
+    repository: runner
+    tag: "1.0.4"
     pullPolicy: IfNotPresent
-    # Disable the built-in cache so runners use the external gha-cache server.
-    # ACTIONS_RESULTS_URL / ACTIONS_CACHE_URL point at the in-cluster Service;
-    # trailing slash on ACTIONS_RESULTS_URL is required by the cache server.
+    # cache: the runner's EMBEDDED cache server, persisted on the runner PVC
+    # (/data). The runner advertises its URL to job containers and proxies
+    # the modern actions/cache v2 protocol. Note the external falcondev
+    # gha-cache server cannot be used from Gitea jobs: v9 dropped the v1
+    # cache API, and the v2 protocol rides ACTIONS_RESULTS_URL, which the
+    # gitea runner force-points at the gitea instance for artifact uploads.
     #
     # runner.labels override the registered labels: ubuntu-latest keeps the
     # upstream catthehacker image; ubuntu-deploy maps to our custom image
@@ -72,7 +78,8 @@ statefulset:
       log:
         level: info
       cache:
-        enabled: false
+        enabled: true
+        dir: /data/actcache
       runner:
         labels:
           - "ubuntu-latest:docker://catthehacker/ubuntu:act-22.04"
@@ -80,16 +87,9 @@ statefulset:
       container:
         network: bridge
         docker_timeout: 300s
-        options: --volume /run/ssh-secrets:/run/ssh-secrets:ro
+        options: --volume /run/ssh-secrets:/run/ssh-secrets:ro --add-host=host.docker.internal:host-gateway
         valid_volumes:
           - /run/ssh-secrets
-    extraEnvs:
-      - name: ACTIONS_RESULTS_URL
-        value: "http://gha-cache.gha-cache.svc.cluster.local:3000/"
-      - name: ACTIONS_CACHE_URL
-        value: "http://gha-cache.gha-cache.svc.cluster.local:3000/"
-      - name: RUNNER_TOOL_CACHE
-        value: "/data/toolcache"
 
   dind:
     registry: gitea.zen.lofi

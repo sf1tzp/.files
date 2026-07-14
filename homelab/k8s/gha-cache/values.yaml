@@ -16,6 +16,11 @@ image:
 
 replicaCount: 1
 
+# Without this the chart names the Service gha-cache-github-actions-cache-server,
+# while every consumer (runner envs, apiBaseUrl below) references gha-cache — a
+# mismatch that left the cache server unreachable since deployment.
+fullnameOverride: gha-cache
+
 config:
   # In-cluster URL. Trailing slash is mandatory per upstream docs.
   apiBaseUrl: "http://gha-cache.gha-cache.svc.cluster.local:3000/"
