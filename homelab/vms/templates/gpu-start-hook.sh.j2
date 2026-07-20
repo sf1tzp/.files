@@ -1,11 +1,16 @@
 #!/bin/bash
 set -x
 
-# Load NVIDIA kernel modules (no effect if already loaded, consider removing)
-modprobe -r nvidia
-modprobe -r nvidia_uvm
-modprobe -r nvidia_modeset
+# Stop the persistence daemon first — it keeps the GPU initialized and will
+# make the module unload (and the nodedev-detach below) hang otherwise.
+systemctl stop nvidia-persistenced 2>/dev/null || true
+
+# Unload NVIDIA kernel modules in dependency order (dependents first, nvidia
+# last), otherwise the first removal fails while its sub-modules are loaded.
 modprobe -r nvidia_drm
+modprobe -r nvidia_modeset
+modprobe -r nvidia_uvm
+modprobe -r nvidia
 
 # Unbind VTconsoles
 echo 0 > /sys/class/vtconsole/vtcon0/bind
