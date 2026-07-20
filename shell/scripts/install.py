@@ -133,6 +133,20 @@ PROGRAMS = {
             mv kubectl {install_dir}
         """
     },
+    "kubectx": {
+        "version": "0.11.0",
+        "url_template": "https://github.com/ahmetb/kubectx/releases/download/v{version}/kubectx_v{version}_linux_{arch}.tar.gz",
+        "setup_script": """#!/usr/bin/env bash
+            mv kubectx {install_dir}
+        """,
+    },
+    "kubens": {
+        "version": "0.11.0",
+        "url_template": "https://github.com/ahmetb/kubectx/releases/download/v{version}/kubens_v{version}_linux_{arch}.tar.gz",
+        "setup_script": """#!/usr/bin/env bash
+            mv kubens {install_dir}
+        """,
+    },
     "nerdctl": {
         "version": "2.0.3",
         "url_template": "https://github.com/containerd/nerdctl/releases/download/v{version}/nerdctl-full-{version}-linux-{arch}.tar.gz",

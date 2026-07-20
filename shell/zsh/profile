@@ -143,6 +143,7 @@ zvm_after_init_commands+=('
 ')
 
 if which kubectl &>/dev/null; then
+    export KUBECONFIG=~/.kube/config$(fd -t f --glob '*.config' ~/.kube | sed 's/^/:/' | tr -d '\n')
     source "$HOME/.files/shell/k8s/k8s.sh"
 fi
 
