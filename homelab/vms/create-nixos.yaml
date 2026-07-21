@@ -13,7 +13,7 @@
 #   1. Generate an ed25519 SSH host key (once; persisted OUT OF GIT on soundship
 #      under ~/.local/share/nixos-provisioning/<host>/, reused on re-runs).
 #   2. Derive its age recipient (ssh-to-age) and add a per-host rule to
-#      nixos/.sops.yaml (encrypt to devbox + zenbook + this VM).
+#      nixos/.sops.yaml (encrypt to soundship +devbox + zenbook + this VM).
 #   3. Generate k3s-token (+ wireguard-private-key when the host has a
 #      wg_vpn_ip) and write the encrypted nixos/secrets/<host>.yaml.
 #   4. When wireguard is in play, add the peer (public key + IPs) to
@@ -43,11 +43,16 @@
   hosts: localhost
   vars:
     libvirt_images: /var/lib/libvirt/images
-    nixos_flake: "{{ lookup('env', 'HOME') }}/.files/nixos"
-    repo_root: "{{ lookup('env', 'HOME') }}/.files"
-    sops_config: "{{ lookup('env', 'HOME') }}/.files/nixos/.sops.yaml"
-    secrets_dir: "{{ lookup('env', 'HOME') }}/.files/nixos/secrets"
-    peers_file: "{{ lookup('env', 'HOME') }}/.files/homelab/wireguard/peers.json"
+    # All git-tracked paths are derived from the playbook's own location
+    # (<repo>/homelab/vms), so this operates on the checkout it's invoked from —
+    # e.g. a worktree on a feature branch, not a fixed ~/.files. Phase A writes
+    # the generated secrets/sops/peers here and Phase B builds the flake here,
+    # keeping both halves on the same branch.
+    repo_root: "{{ playbook_dir | dirname | dirname }}"
+    nixos_flake: "{{ repo_root }}/nixos"
+    sops_config: "{{ repo_root }}/nixos/.sops.yaml"
+    secrets_dir: "{{ repo_root }}/nixos/secrets"
+    peers_file: "{{ repo_root }}/homelab/wireguard/peers.json"
 
     # Private host keys (and wg private keys) live here, never in git. Losing
     # this dir means regenerate + reprovision — fine for staging.
@@ -57,8 +62,9 @@
     # cluster operators can read/rotate. These are the devbox + zenbook keys
     # already in nixos/.sops.yaml.
     admin_age_recipients:
-      - age1rgr7hqdjsu4y3m98z3yw7cfwf9w8q4xdvmrv4jc97na32svm5y2qtpsw9x  # devbox
-      - age1qg7umu2tev8057x4qte4g8smua7nqhdhqmrk49pq9xpx6zxc0p3qjurnlh  # zenbook
+      - age1rgr7hqdjsu4y3m98z3yw7cfwf9w8q4xdvmrv4jc97na32svm5y2qtpsw9x # devbox
+      - age1qg7umu2tev8057x4qte4g8smua7nqhdhqmrk49pq9xpx6zxc0p3qjurnlh # zenbook
+      - age13wdm0n6sh2d48up9e5hha2mtd6px2lr9p0gffmdl0c09g7f0fgdqhtj6fy # soundship
 
     # ssh-to-age / guestfish aren't on PATH; run them from nixpkgs. We inject the
     # host key with guestfish (not virt-customize): libguestfs OS-inspection
@@ -72,15 +78,42 @@
     # (ext4, label `nixos`). Verify with: virt-filesystems -a <img> --all --long
     nixos_root_dev: /dev/sda3
 
+    # Defaults for the inventory-driven host config (templates/host-*.nix.j2).
+    # Any of these can be overridden per host in inventory.yaml with the key
+    # named in the `hostvars[...]` lookups above (lan_prefix, lan_gateway,
+    # lan_dns, nixos_state_version, k3s_cluster_init).
     default_vm_spec:
       vcpus: 2
       memory: 4
       disk_size: 40G
+      lan_prefix: 24
+      lan_gateway: "10.0.0.1"
+      lan_dns: ["10.0.0.2", "8.8.8.8"]
+      state_version: "25.11"
+      cluster_init: true
 
   tasks:
     - name: Parse target VMs from command line
       set_fact:
         target_vm_list: "{{ target_vms.split() if target_vms is defined else [] }}"
+        # Initialise unconditionally: the accumulator loop below is `when`-gated,
+        # so if it matches nothing it never runs. Without this, vm_specs stays
+        # undefined and every later task fails with a cryptic "'vm_specs' is
+        # undefined" instead of the clear error we raise next.
+        vm_specs: []
+
+    - name: Fail clearly when a requested target is not a NixOS host
+      # Catches typos and hosts that live in another inventory group — otherwise
+      # they're silently filtered out by the `when` below, leaving vm_specs empty.
+      assert:
+        that: target_vm_list | difference(groups['nixos'] | default([])) | length == 0
+        fail_msg: >-
+          Unknown target host(s):
+          {{ target_vm_list | difference(groups['nixos'] | default([])) | join(', ') }}.
+          Available NixOS hosts: {{ groups['nixos'] | default([]) | join(', ') | default('(none)', true) }}.
+          Pass one of those, e.g. `just create-nixos staging-k3s`.
+        success_msg: >-
+          Targets: {{ target_vm_list | join(', ') | default('(all NixOS hosts)', true) }}
 
     - name: Build VM specs from inventory
       set_fact:
@@ -94,7 +127,12 @@
               'disk_size': hostvars[item]['disk_size'] | default(default_vm_spec.disk_size),
               'flake_attr': hostvars[item]['nixos_flake_attr'] | default(item + '-qcow'),
               'wg_vpn_ip': hostvars[item]['wg_vpn_ip'] | default(omit),
-              'wg_endpoint_ip': hostvars[item]['wg_endpoint_ip'] | default(omit)
+              'wg_endpoint_ip': hostvars[item]['wg_endpoint_ip'] | default(omit),
+              'lan_prefix': hostvars[item]['lan_prefix'] | default(default_vm_spec.lan_prefix),
+              'lan_gateway': hostvars[item]['lan_gateway'] | default(default_vm_spec.lan_gateway),
+              'lan_dns': hostvars[item]['lan_dns'] | default(default_vm_spec.lan_dns),
+              'state_version': hostvars[item]['nixos_state_version'] | default(default_vm_spec.state_version),
+              'cluster_init': hostvars[item]['k3s_cluster_init'] | default(default_vm_spec.cluster_init)
             }]
           }}
       loop: "{{ groups['nixos'] }}"
@@ -252,15 +290,51 @@
       loop_control:
         label: "peer for {{ item.hostname }}"
 
+    - name: Ensure the host's NixOS config directory exists
+      file:
+        path: "{{ repo_root }}/nixos/hosts/{{ item.hostname }}"
+        state: directory
+        mode: "0755"
+      with_items: "{{ vm_specs }}"
+      loop_control:
+        label: "nixos/hosts/{{ item.hostname }}"
+
+    # Renders the host config from templates/host-*.nix.j2 using this host's
+    # inventory vars (IP, mesh membership, overrides). force: false means
+    # ABSENT-only — existing files (hand-tuned after the first run) are left
+    # untouched, so inventory seeds a host and you refine it in-tree afterwards.
+    - name: Scaffold the host's default.nix from the inventory-driven template
+      template:
+        src: templates/host-default.nix.j2
+        dest: "{{ repo_root }}/nixos/hosts/{{ item.hostname }}/default.nix"
+        force: false
+        mode: "0644"
+      with_items: "{{ vm_specs }}"
+      loop_control:
+        label: "default.nix for {{ item.hostname }}"
+
+    - name: Scaffold the host's secrets.nix from the inventory-driven template
+      template:
+        src: templates/host-secrets.nix.j2
+        dest: "{{ repo_root }}/nixos/hosts/{{ item.hostname }}/secrets.nix"
+        force: false
+        mode: "0644"
+      with_items: "{{ vm_specs }}"
+      loop_control:
+        label: "secrets.nix for {{ item.hostname }}"
+
     - name: Stage generated files so the flake build can see them
-      # Nix flakes only read git-tracked/staged files — untracked secrets are
-      # silently ignored. Stage (don't commit); you review + commit yourself.
+      # Nix flakes only read git-tracked/staged files — untracked secrets and
+      # host configs are silently ignored. Stage (don't commit); you review +
+      # commit yourself. The flake auto-discovers hosts/<name>, so no flake edit
+      # is needed per host.
       command:
         cmd: >-
           git add --
           nixos/.sops.yaml
           homelab/wireguard/peers.json
           {{ vm_specs | map(attribute='hostname') | map('regex_replace', '^(.*)$', 'nixos/secrets/\1.yaml') | join(' ') }}
+          {{ vm_specs | map(attribute='hostname') | map('regex_replace', '^(.*)$', 'nixos/hosts/\1') | join(' ') }}
         chdir: "{{ repo_root }}"
       changed_when: false
 

@@ -30,19 +30,9 @@
       lib = nixpkgs.lib;
       system = "x86_64-linux";
 
-      # Role modules for the staging-k3s VM, shared between its nixosConfigurations
-      # entry (for later `nixos-rebuild --target-host`) and its bootable image.
-      stagingK3sModules = [
-        ./hosts/staging-k3s/secrets.nix
-        ./modules/k3s-server.nix
-        ./modules/wireguard.nix
-        ./modules/dotfiles.nix  # clone ~/.files from the internal gitea over TLS
-                                # (lab CA already trusted via k3s-server.nix)
-      ];
-
       # Home Manager wired in as a NixOS module, so one nixos-rebuild updates the
       # system and steven's dotfiles together. Shared between mkHost (below) and
-      # the staging-k3s qcow package build (which doesn't go through mkHost).
+      # the auto-discovered qcow VM builds.
       homeManagerModules = [
         home-manager.nixosModules.home-manager
         {
@@ -68,45 +58,68 @@
             sops-nix.nixosModules.sops
           ] ++ lib.optionals home homeManagerModules ++ extraModules;
         };
-    in {
-      nixosConfigurations.zenbook = mkHost {
-        hostname = "zenbook";
-        extraModules = [
-          # Role modules - add/remove as needed
-          # ./modules/desktop.nix
-          ./modules/development.nix
-          ./hosts/zenbook/secrets.nix
-          ./modules/k3s-cluster.nix
-          ./modules/k3s-backup.nix
-          ./modules/wireguard.nix
-          ./modules/wireguard-lan-gateway.nix
-          ./modules/s3-utils.nix
-          microvm.nixosModules.host
-        ];
+
+      # qcow VM hosts are self-describing: each hosts/<name>/default.nix imports
+      # its own role modules (./secrets.nix, k3s-server, wireguard, dotfiles),
+      # so the module set here is uniform — common base + the host dir + sops +
+      # Home Manager. That uniformity is what lets the flake auto-discover hosts:
+      # a new dir under ./hosts (scaffolded from inventory by create-nixos.yaml)
+      # needs no edit here.
+      #
+      # Physical / bespoke hosts (their own hardware.nix, non-VM module set) are
+      # listed here and configured explicitly below instead of auto-discovered.
+      physicalHosts = [ "zenbook" ];
+      vmHosts = lib.attrNames (lib.filterAttrs
+        (name: type: type == "directory" && !(lib.elem name physicalHosts))
+        (builtins.readDir ./hosts));
+
+      # Uniform module set for an auto-discovered qcow VM host.
+      vmModules = hostname: [
+        ./modules/common.nix
+        ./hosts/${hostname}
+        sops-nix.nixosModules.sops
+      ] ++ homeManagerModules;
+
+      # nixosConfigurations entry (for later `nixos-rebuild --target-host`).
+      mkVm = hostname: lib.nixosSystem {
+        inherit system;
+        specialArgs = { inherit inputs; };
+        modules = vmModules hostname;
       };
 
-      # Single-node k3s VM for Soundship (libvirt). See hosts/staging-k3s.
-      # Home Manager is on: steven gets the full dotfiles here, and ~/.files is
-      # cloned from the internal gitea at runtime (modules/dotfiles.nix).
-      nixosConfigurations.staging-k3s = mkHost {
-        hostname = "staging-k3s";
-        extraModules = stagingK3sModules;
-      };
-
-      # Bootable qcow2 image for the above, built via nixos-generators. Runs on
-      # any x86_64 Nix host (e.g. Soundship itself — no NixOS required):
-      #   nix build .#staging-k3s-qcow    ->  result/nixos.qcow2
-      # Module list mirrors mkHost (common + host dir + sops + Home Manager),
-      # plus the qcow format.
-      packages.${system}.staging-k3s-qcow = nixos-generators.nixosGenerate {
+      # Bootable qcow2 image, built via nixos-generators. Runs on any x86_64 Nix
+      # host (e.g. Soundship itself — no NixOS required):
+      #   nix build .#<hostname>-qcow   ->  result/nixos.qcow2
+      # Built by homelab/vms/create-nixos.yaml for each targeted host.
+      mkVmQcow = hostname: nixos-generators.nixosGenerate {
         inherit system;
         specialArgs = { inherit inputs; };
         format = "qcow";
-        modules = [
-          ./modules/common.nix
-          ./hosts/staging-k3s
-          sops-nix.nixosModules.sops
-        ] ++ stagingK3sModules ++ homeManagerModules;
+        modules = vmModules hostname;
       };
+    in {
+      nixosConfigurations = {
+        zenbook = mkHost {
+          hostname = "zenbook";
+          extraModules = [
+            # Role modules - add/remove as needed
+            # ./modules/desktop.nix
+            ./modules/development.nix
+            ./hosts/zenbook/secrets.nix
+            ./modules/k3s-cluster.nix
+            ./modules/k3s-backup.nix
+            ./modules/wireguard.nix
+            ./modules/wireguard-lan-gateway.nix
+            ./modules/s3-utils.nix
+            microvm.nixosModules.host
+          ];
+        };
+      } // lib.genAttrs vmHosts mkVm;
+
+      # One `<host>-qcow` package per auto-discovered VM host.
+      packages.${system} = lib.listToAttrs (map (hostname: {
+        name = "${hostname}-qcow";
+        value = mkVmQcow hostname;
+      }) vmHosts);
     };
 }

@@ -22,18 +22,6 @@ all:
               wg_vpn_ip: 10.1.0.3
               logging_endpoint_ip: 10.0.0.2
 
-        junktown:
-          hosts:
-            junktown:
-              ansible_host: 10.0.0.5
-              os: "ubuntu-server-24.04"
-              ansible_user: deployer
-              vcpus: 8
-              memory: 24
-              disk_size: "150G"
-              gpu_passthrough: false
-              wg_vpn_ip: 10.1.0.5
-
         llm-server:
           hosts:
             llm-server:
@@ -197,3 +185,10 @@ all:
           # wireguard-private-key into secrets/staging-k3s.yaml.
           wg_vpn_ip: 10.1.0.13
           wg_endpoint_ip: 10.0.0.40
+        luxor:
+          ansible_host: 10.0.0.5
+          vcpus: 4
+          memory: 8
+          disk_size: "40G"
+          wg_vpn_ip: 10.1.0.5
+          wg_endpoint_ip: 10.0.0.5

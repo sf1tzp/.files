@@ -14,17 +14,17 @@ base-images:
     ansible-playbook vms/base-images.yaml
 
 create-linux +hosts:
-    ansible-playbook vms/create-linux.yaml --inventory ~/.files/homelab/inventory.yaml --vault-password-file ~/.ansible-password --extra-vars "target_vms={{ hosts }}"
+    ansible-playbook vms/create-linux.yaml --inventory inventory.yaml --vault-password-file ~/.ansible-password --extra-vars "target_vms={{ hosts }}"
 
 # Build a flake qcow2 and define the VM from it (no cloud-init). Run on soundship.
 create-nixos +hosts:
-    ansible-playbook vms/create-nixos.yaml --inventory ~/.files/homelab/inventory.yaml --extra-vars "target_vms={{ hosts }}"
+    ansible-playbook vms/create-nixos.yaml --inventory inventory.yaml --extra-vars "target_vms={{ hosts }}"
 
 create-windows:
     ansible-playbook vms/create-windows.yaml
 
 update:
-    ansible-playbook vms/update.yaml --inventory ~/.files/homelab/inventory.yaml
+    ansible-playbook vms/update.yaml --inventory inventory.yaml
 
 delete +vms:
     ansible-playbook vms/delete.yaml --extra-vars vm_names="{{ vms }}"
@@ -37,7 +37,7 @@ delete +vms:
 fetch-kubeconfig host:
     #!/usr/bin/env bash
     set -euo pipefail
-    ip=$(ansible-inventory -i ~/.files/homelab/inventory.yaml --host "{{host}}" | jq -r .ansible_host)
+    ip=$(ansible-inventory -i inventory.yaml --host "{{host}}" | jq -r .ansible_host)
     mkdir -p ~/.kube
     ssh "steven@${ip}" cat /etc/rancher/k3s/k3s.yaml \
       | sed "s#https://127\.0\.0\.1:6443#https://${ip}:6443#" > ~/.kube/{{host}}.config
@@ -48,16 +48,16 @@ decrypt-vm-password:
     ansible-playbook vms/decrypt-vm-password.yaml --vault-password-file ~/.ansible-password
 
 set-up +hosts:
-    ansible-playbook vms/set-up.yaml --inventory ~/.files/homelab/inventory.yaml --limit "{{ hosts }}"
+    ansible-playbook vms/set-up.yaml --inventory inventory.yaml --limit "{{ hosts }}"
 
 bootstrap +hosts:
-    ansible-playbook vms/bootstrap-deployer.yaml --inventory ~/.files/homelab/inventory.yaml --limit "{{ hosts }}"
+    ansible-playbook vms/bootstrap-deployer.yaml --inventory inventory.yaml --limit "{{ hosts }}"
 
 wireguard +hosts="all":
-    ansible-playbook wireguard/playbook.yaml --inventory ~/.files/homelab/inventory.yaml --limit "{{ hosts }}" --vault-password-file ~/.ansible-password
+    ansible-playbook wireguard/playbook.yaml --inventory inventory.yaml --limit "{{ hosts }}" --vault-password-file ~/.ansible-password
 
 resize-disk vm new_disk_size:
-    ansible-playbook vms/resize-disk.yaml --inventory ~/.files/homelab/inventory.yaml --extra-vars "target_vm={{ vm }} new_disk_size={{ new_disk_size }}"
+    ansible-playbook vms/resize-disk.yaml --inventory inventory.yaml --extra-vars "target_vm={{ vm }} new_disk_size={{ new_disk_size }}"
 
 eject-cloud-init-io vm:
     virsh detach-disk {{ vm }} hda --live --config

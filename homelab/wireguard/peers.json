@@ -36,6 +36,11 @@
       "wg_vpn_ip": "10.1.0.52",
       "wg_endpoint_ip": "web2.streetfortress.cloud",
       "public_key": "5A3rjmLZyxZ6OW/5R9X9LmpYAWgF112o7sjx4Q1ZkFo="
+    },
+    "luxor": {
+      "wg_vpn_ip": "10.1.0.5",
+      "wg_endpoint_ip": "10.0.0.5",
+      "public_key": "eG2ppSDgD96+sBolpL6050g2p1RucGn7BR5GQLc5chU="
     }
   },
   "clients": {
