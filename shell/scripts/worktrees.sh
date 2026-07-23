@@ -2,35 +2,80 @@
 
 : "${WORKTREE_DIR:="$HOME/worktrees"}"
 
+# List local and remote branches (deduped, remote prefix stripped) in fzf.
+# Prints the selection - or, if the typed query matches nothing, the query
+# itself so callers can create a branch with that name. Fails on cancel.
+function _select_branch() {
+    local header="${1:-Select a branch, or type a new name}"
+    local out ret
+    out=$(command git branch -a --format='%(refname:short)' |
+        command sed 's#^origin/##' |
+        command grep -vx 'origin' |
+        sort -u |
+        fzf --print-query --ansi --reverse \
+            --border --height=60% \
+            --header="$header" \
+            --prompt="Branch: ")
+    ret=$?
+    if [[ $ret -eq 130 ]]; then
+        return 1
+    fi
+
+    local query selection
+    query=$(command head -1 <<< "$out")
+    selection=$(command sed -n '2p' <<< "$out")
+    if [[ -n $selection ]]; then
+        echo "$selection"
+    elif [[ -n $query ]]; then
+        echo "$query"
+    else
+        echo "No branch selected" >&2
+        return 1
+    fi
+}
+
+# Make sure a local branch exists for the given name and is attached to its
+# remote counterpart when origin has one; otherwise branch off current HEAD.
+function _ensure_local_branch() {
+    local branch_name="$1"
+    if command git show-ref --verify --quiet "refs/heads/$branch_name"; then
+        if command git show-ref --verify --quiet "refs/remotes/origin/$branch_name" &&
+            [[ -z $(command git for-each-ref --format='%(upstream)' "refs/heads/$branch_name") ]]; then
+            command git branch --set-upstream-to="origin/$branch_name" "$branch_name"
+        fi
+    elif command git show-ref --verify --quiet "refs/remotes/origin/$branch_name"; then
+        command git branch --track "$branch_name" "origin/$branch_name"
+    else
+        echo "Creating new branch $branch_name"
+        command git branch "$branch_name"
+    fi
+}
+
+# fzf-checkout a local or remote branch (with tracking), or a typed new name.
+function checkout_branch() {
+    local branch_name
+    branch_name=$(_select_branch) || return 1
+    _ensure_local_branch "$branch_name" || return 1
+    command git checkout "$branch_name"
+}
+
 function create_worktree() {
-    repo=$(basename "$(command git rev-parse --show-toplevel)")
-    if [[ -z $repo ]]; then
+    # Resolve the repo name from the main worktree so this also works when
+    # run from inside another worktree.
+    local main_wt repo
+    main_wt=$(command git worktree list --porcelain 2>/dev/null |
+        command head -1 | command awk '{ print $2 }')
+    if [[ -z $main_wt ]]; then
         echo "Not in a git repository"
         return 1
-    elif [[ $repo == *$WORKTREE_DIR* ]]; then
-        echo "Already in a worktree, please run from the original repository location"
-        return 1
     fi
+    repo=$(basename "$main_wt")
 
-    branch_name=$(command git branch -a |
-        fzf --ansi --reverse \
-        --border --height=60% \
-        --header="Select a branch" \
-        --prompt="Search: " |
-        sed 's/^[ *+]*//' )
+    command git fetch --prune || echo "Fetch failed; continuing with local refs"
 
-    if [[ -z $branch_name ]]; then
-        echo "No branch selected"
-        return 1
-    fi
-
-    # If branch_name is a remote branch, create a local branch pointing to it (if one does not already exist)
-    if [[ $branch_name == remotes/origin/* ]]; then
-        branch_name=${branch_name#remotes/origin/}
-        if ! command git branch | command grep -q "$branch_name"; then
-            command git fetch origin "$branch_name:$branch_name"
-        fi
-    fi
+    local branch_name
+    branch_name=$(_select_branch) || return 1
+    _ensure_local_branch "$branch_name" || return 1
 
     local wt_path="$WORKTREE_DIR/$repo/$branch_name"
 
@@ -39,7 +84,7 @@ function create_worktree() {
         builtin cd "$wt_path"
     else
         echo "Creating worktree $branch_name at $wt_path"
-        command git worktree add "$wt_path" "$branch_name"
+        command git worktree add "$wt_path" "$branch_name" || return 1
         builtin cd "$wt_path"
         command git submodule update --init
     fi
@@ -152,11 +197,13 @@ function prune_worktrees() {
     # that is fed by a pipe/here-string would steal the user's keystrokes from
     # the loop's stdin, so gather matches first, then prompt with a free stdin.
     # (Detached worktrees have no branch line and are skipped.)
+    # NB: not named `path` - in zsh that is tied to $PATH, and localizing
+    # it empties the search path for the rest of the function.
     local -a to_remove
-    local branch path
-    while IFS=$'\t' read -r branch path; do
+    local branch wt_path
+    while IFS=$'\t' read -r branch wt_path; do
         [[ -z $branch ]] && continue
-        [[ -n ${merged_set[$branch]} ]] && to_remove+=("$branch"$'\t'"$path")
+        [[ -n ${merged_set[$branch]} ]] && to_remove+=("$branch"$'\t'"$wt_path")
     done < <(git -C "$toplevel" worktree list --porcelain |
         awk '
             $1=="worktree" { path=$2 }
@@ -171,11 +218,11 @@ function prune_worktrees() {
     local entry reply
     for entry in "${to_remove[@]}"; do
         branch=${entry%%$'\t'*}
-        path=${entry#*$'\t'}
-        printf "Branch '%s' is merged. Remove worktree %s? (y/N) " "$branch" "$path"
+        wt_path=${entry#*$'\t'}
+        printf "Branch '%s' is merged. Remove worktree %s? (y/N) " "$branch" "$wt_path"
         read -r reply
         if [[ $reply == [yY] ]]; then
-            _remove_worktree_at "$path"
+            _remove_worktree_at "$wt_path"
         else
             echo "Skipping $branch"
         fi
@@ -192,7 +239,8 @@ function goto_worktree_repo() {
     fi
 }
 
-alias gct='command git fetch; create_worktree'
+alias branches='checkout_branch'
+alias gct='create_worktree'
 alias worktrees='goto_worktree'
 alias wt='goto_worktree'
 alias rmwt='remove_worktree'

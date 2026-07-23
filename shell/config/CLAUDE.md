@@ -9,7 +9,6 @@ Applies across all repositories and machines. (Source of truth:
 - Create one with: `git worktree add ~/worktrees/<repo>/<branch> -b <branch>`.
 
 ## Committing & pushing
-Check the remote first: `git remote get-url origin`.
 - **`gitea.zen.lofi` repos** — commit and push as work progresses. Do NOT wait
   for confirmation. Prefer clear, incremental commits.
 - **Any other remote (e.g. `github.com`)** — default behavior: stage changes and
@@ -18,3 +17,6 @@ Check the remote first: `git remote get-url origin`.
 ## Pull requests
 - On `gitea.zen.lofi` repos, open a PR early with the `tea` CLI and keep it
   updated as the branch evolves (`tea pr create`, `tea pr list`, ...).
+- Update the PR description when pushing commits so that reviewers can see
+  the current state up front.
+

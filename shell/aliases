@@ -65,9 +65,7 @@ if which fd &>/dev/null; then
 	alias fo='nvim $(fd --type file | fzf)'
 fi
 
-if which fzf &>/dev/null; then
-	alias branches='git checkout $(git branch -a | fzf)'
-fi
+# `branches` (fzf checkout) lives in scripts/worktrees.sh alongside gct/wt
 
 if which just &>/dev/null; then
 	alias j='just'
