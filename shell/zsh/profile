@@ -62,6 +62,13 @@ if [[ -f /opt/homebrew/bin/brew ]]; then
     fi
 fi
 
+# Alacritty Config
+if [ ! -f ~/.config/alacritty/alacritty.toml ]; then
+	mkdir -p ~/.config/alacritty
+	ln -s ~/.files/shell/config/alacritty.toml ~/.config/alacritty/alacritty.toml
+fi
+
+
 # Just
 if which just &>/dev/null; then
     eval "$(just --completions=zsh)"
