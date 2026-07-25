@@ -68,6 +68,37 @@ if [ ! -f ~/.config/alacritty/alacritty.toml ]; then
 	ln -s ~/.files/shell/config/alacritty.toml ~/.config/alacritty/alacritty.toml
 fi
 
+# Sync Alacritty theme with the OS appearance (alacritty-theme-switch).
+# Runs per shell startup; Alacritty live-reloads its config, so opening a
+# new terminal after an OS light/dark switch updates all open windows.
+_alacritty_sync_os_theme() {
+    local light="everforest_light.toml" dark="everforest_dark.toml" desired=""
+    case "$(uname -s)" in
+    Darwin)
+        if defaults read -g AppleInterfaceStyle &>/dev/null; then
+            desired=$dark
+        else
+            desired=$light
+        fi
+        ;;
+    Linux)
+        if which gsettings &>/dev/null; then
+            case "$(gsettings get org.gnome.desktop.interface color-scheme 2>/dev/null)" in
+            *dark*) desired=$dark ;;
+            *) desired=$light ;;
+            esac
+        fi
+        ;;
+    esac
+    [[ -z "$desired" ]] && return
+    # ats rewrites the config on every run; skip if already active
+    grep -q "themes/$desired" ~/.config/alacritty/alacritty.toml 2>/dev/null && return
+    ats --select "$desired" &>/dev/null
+}
+if which ats &>/dev/null; then
+    _alacritty_sync_os_theme &!
+fi
+
 
 # Just
 if which just &>/dev/null; then
