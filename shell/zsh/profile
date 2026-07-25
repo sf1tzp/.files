@@ -108,6 +108,12 @@ if [[ ! -f "$HOME/.claude/CLAUDE.md" && -f "$HOME/.files/shell/config/CLAUDE.md"
     ln -s "$HOME/.files/shell/config/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
 fi
 
+# Claude Code personal skills (home-manager manages this on NixOS)
+if [[ ! -e "$HOME/.claude/skills" && -d "$HOME/.files/shell/config/claude-skills" ]]; then
+    mkdir -p "$HOME/.claude"
+    ln -s "$HOME/.files/shell/config/claude-skills" "$HOME/.claude/skills"
+fi
+
 # Updating Clock
 TMOUT=1
 TRAPALRM() {

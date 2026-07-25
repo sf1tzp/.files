@@ -44,6 +44,7 @@
     ".config/nvim".source = ../../nvim;
     ".config/starship.toml".source = ../../shell/config/starship.toml;
     ".claude/CLAUDE.md".source = ../../shell/config/CLAUDE.md;
+    ".claude/skills".source = ../../shell/config/claude-skills;
     ".inputrc".source = ../../shell/config/inputrc;
     ".shellcheckrc".source = ../../shell/config/shellcheckrc;
     ".tmux.conf".source = ../../shell/config/tmux.conf;
