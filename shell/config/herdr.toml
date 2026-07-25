@@ -102,12 +102,13 @@ reload_config = "prefix+r"
 # cycle_pane_next = "prefix+tab"
 # cycle_pane_previous = "prefix+shift+tab"
 # last_pane = ""          # optional, unset by default; bind e.g. "prefix+tab" for global back-and-forth
-# Match tmux: `bind | split-window -h` (side-by-side / left-right)
-#         and `bind - split-window -v` (stacked / top-bottom).
-# NB: `|` (shift+backslash) is not in herdr's list of documented punctuation
-# keys — if your terminal doesn't register it, fall back to e.g. "prefix+v".
-split_vertical = "prefix+|"
-split_horizontal = "prefix+minus"
+# The tmux-style split keys (prefix+| / prefix+minus) are bound below as
+# [[keys.command]] entries pointing at the pane-orientation-switcher plugin's
+# zoom-aware splits (unzoom instead of hiding a new pane behind the zoom).
+# The built-ins must be unset here: built-in user bindings register before
+# custom commands and would otherwise win the key.
+split_vertical = ""
+split_horizontal = ""
 # close_pane = "prefix+x"
 # zoom = "prefix+z"       # legacy alias: fullscreen
 # tmux resizes with prefix+h/j/k/l; herdr instead uses a resize mode where
@@ -158,6 +159,31 @@ key = "ctrl+l"
 type = "plugin_action"
 command = "willfish.herdr-navigator.right"
 description = "navigate right"
+
+# Pane orientation switcher (sf1tzp.herdr-pane-orientation-switcher).
+# prefix+o takes the key from the open_notification_target default
+# (user bindings displace defaults silently).
+[[keys.command]]
+key = "prefix+o"
+type = "plugin_action"
+command = "sf1tzp.herdr-pane-orientation-switcher.toggle"
+description = "toggle split orientation"
+
+# Zoom-aware splits on the tmux-style keys (see split_vertical/_horizontal
+# above): while zoomed they leave zoom mode instead of adding a hidden pane.
+# NB: `|` (shift+backslash) is not in herdr's list of documented punctuation
+# keys — if your terminal doesn't register it, fall back to e.g. "prefix+v".
+[[keys.command]]
+key = "prefix+|"
+type = "plugin_action"
+command = "sf1tzp.herdr-pane-orientation-switcher.split-right"
+description = "split right (side-by-side)"
+
+[[keys.command]]
+key = "prefix+minus"
+type = "plugin_action"
+command = "sf1tzp.herdr-pane-orientation-switcher.split-down"
+description = "split down (stacked)"
 
 # Legacy indexed shortcut config is still parsed for compatibility.
 # Prefer switch_tab, switch_workspace, and focus_agent for new configs.
