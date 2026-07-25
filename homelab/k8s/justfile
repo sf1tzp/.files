@@ -127,6 +127,12 @@ deploy-runner token:
         --values gitea-actions/values.yaml \
         --wait
 
+upgrade-runner:
+    helm upgrade --install gitea-actions gitea-charts/actions \
+        --namespace gitea-actions \
+        --values gitea-actions/values.yaml \
+        --wait
+
 # Deploy Renovate (CronJob that scans gitea.zen.lofi hourly).
 # Cadence + grouping rules live in sfi/renovate-config; PAT in renovate/secrets.yaml.
 deploy-renovate:
