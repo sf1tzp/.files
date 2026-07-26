@@ -39,15 +39,24 @@
       "*_databasus_databasus-storage-databasus-0"
     ];
     s3Targets = [
+      # Daily backups, alternated 12h apart so the targets never run together
       {
         name = "rustfs";
         repository = "s3:https://s3.zen.lofi/k3s-backup";
         environmentFile = config.sops.secrets.restic-s3-env-rustfs.path;
+        timerConfig = {
+          OnCalendar = "*-*-* 07:00:00";
+          Persistent = "true";
+        };
       }
       {
         name = "offsite";
         repository = "s3:https://us-sea-1.linodeobjects.com/zen-cluster-backups/restic";
         environmentFile = config.sops.secrets.restic-s3-env-offsite.path;
+        timerConfig = {
+          OnCalendar = "*-*-* 19:00:00";
+          Persistent = "true";
+        };
       }
     ];
   };

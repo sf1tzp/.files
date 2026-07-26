@@ -2,7 +2,7 @@
 # Chart: https://docs.renovatebot.com/helm-charts
 # Source: https://github.com/renovatebot/helm-charts
 #
-# Runs as a CronJob that scans gitea.zen.lofi every hour. Per-package schedules
+# Runs as a CronJob that scans gitea.zen.lofi daily at 08:00. Per-package schedules
 # (weekly minors, monthly majors) live in sfi/renovate-config/default.json,
 # inherited by every project repo via `extends: ["local>sfi/renovate-config"]`.
 #
@@ -10,7 +10,7 @@
 # (see secrets.yaml). The secret must expose RENOVATE_TOKEN.
 
 cronjob:
-  schedule: "0 0/4 * * *"
+  schedule: "0 8 * * *"
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 3
