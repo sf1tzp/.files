@@ -1,6 +1,13 @@
 # Home Manager configuration for steven
-{ config, pkgs, ... }:
+{ config, pkgs, lib, inputs, ... }:
 
+let
+  herdr = inputs.herdr.packages.${pkgs.stdenv.hostPlatform.system}.default;
+  herdrPlugins = [
+    "willfish/herdr-navigator"
+    "sf1tzp/herdr-pane-orientation-switcher"
+  ];
+in
 {
   home.username = "steven";
   home.homeDirectory = "/home/steven";
@@ -35,7 +42,22 @@
     uv
     yq
     zoxide
+  ] ++ [
+    herdr
   ];
+
+  # herdr plugins are imperative state (git checkouts under
+  # ~/.config/herdr/plugins), so install any missing ones at activation.
+  # Failures (e.g. offline rebuild) warn instead of aborting the switch.
+  home.activation.herdrPlugins = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    herdrInstalled="$(${herdr}/bin/herdr plugin list 2>/dev/null || true)"
+    for plugin in ${lib.escapeShellArgs herdrPlugins}; do
+      if [[ "$herdrInstalled" != *"$plugin"* ]]; then
+        run ${herdr}/bin/herdr plugin install "$plugin" --yes \
+          || echo "warning: failed to install herdr plugin $plugin"
+      fi
+    done
+  '';
 
   # Dotfiles managed by Home Manager
   home.file = {
