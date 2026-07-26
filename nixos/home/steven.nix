@@ -70,7 +70,7 @@ in
     ".inputrc".source = ../../shell/config/inputrc;
     ".shellcheckrc".source = ../../shell/config/shellcheckrc;
     ".tmux.conf".source = ../../shell/config/tmux.conf;
-
+    ".config/herdr/config.toml".source = ../../shell/config/herdr.toml;
   };
 
   home.sessionVariables = {
