@@ -134,8 +134,19 @@ function _remove_worktree_at() {
         builtin cd "$main_wt"
     fi
 
+    # git refuses to remove worktrees with initialized submodules, and --force
+    # bypasses the dirty-tree check along with that refusal. Do the clean
+    # check ourselves, then force past just the submodule complaint.
+    local dirty
+    dirty=$(command git -C "$wt_path" status --porcelain --ignore-submodules=none)
+    if [[ -n $dirty ]]; then
+        echo "Worktree at $wt_path has local changes; not removing:"
+        echo "$dirty"
+        return 1
+    fi
+
     echo "Removing worktree at $wt_path"
-    command git -C "$main_wt" worktree remove "$wt_path"
+    command git -C "$main_wt" worktree remove --force "$wt_path"
 }
 
 function remove_worktree() {
