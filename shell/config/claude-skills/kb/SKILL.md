@@ -33,6 +33,32 @@ If placement is ambiguous (a testing technique with security implications, a
 component with config-management concerns), pick the directory matching the
 *primary lens of the document you're writing* and `[[link]]` to the others.
 
+## Note granularity (zettelkasten semantics)
+
+The knowledge base is a zettelkasten-style graph. The retrieval question it
+serves — especially for `coding-practices/` — is *"didn't we implement XYZ
+before? What did we do, and what contextual information informed it?"* That
+question shapes the rules:
+
+- **One note per pattern, titled by the problem** — not per technology.
+  `swiftui-drag-drop-transferable.md`, not a section buried in `swiftui.md`.
+  A technology-titled doc is allowed as an *orientation* note (what the stack
+  is, how it maps to what we know) that links out to its pattern notes; it
+  must not accrete every pattern into one long document.
+- **Split on provenance.** When a section of a note develops its own
+  provenance — proven in a different project, for a different reason — split
+  it into its own note and link it. Until then, don't split; premature
+  scattering creates the link-maintenance overhead it's meant to avoid.
+- **Constraints before code** in coding-practice notes. Paradigms explain why
+  and how; a coding-practice note records *decisions plus the constraints
+  that forced them* (API shape, missing transactionality, trust requirements).
+  The constraints are what transfer to the next project; the code is residue.
+- **Link economy, three tiers.** Discovery is `kb-map.txt` (generated, free).
+  Curation is the per-directory README table (one hook line per doc — the
+  hub). Inline `[[links]]` are sparse: only where reading one note genuinely
+  calls for another. Do not maintain a dense mesh; a link earns its place
+  like a sentence does.
+
 ## Document shape
 
 **Voice, tone, and article structure are defined in
