@@ -91,9 +91,12 @@ Model documents: `security/supply-chain.md`,
 3. **Update the directory `README.md`** table with the doc and a one-line
    hook (the READMEs remain the curated per-directory index; `kb-map.txt` is
    the generated whole-tree listing).
-4. **Commit and push as work progresses** — captains-log lives on the
-   internal gitea, so the standard incremental-commit convention applies.
-   The pre-commit hook regenerates `kb-map.txt` automatically.
+4. **Branch, commit, and open a PR** — main is guarded on gitea (since
+   2026-07-30); direct pushes to it are rejected. Work on a branch
+   (worktree under `~/worktrees/captains-log/<branch>` per convention, or a
+   plain branch for a small doc), commit incrementally as work progresses,
+   and open the PR early with `tea pr create`. The pre-commit hook
+   regenerates `kb-map.txt` automatically.
 
 ## Lightweight capture
 
