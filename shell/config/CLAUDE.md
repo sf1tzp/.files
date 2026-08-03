@@ -21,6 +21,16 @@ Applies across all repositories and machines. (Source of truth:
   say so and offer to write it up — the `kb` skill has the conventions.
   Raise it at a natural pause or wrap-up, not mid-task.
 
+## Gitea issues & milestones
+- Label issues on creation with scoped labels: exactly one `type/*` (bug,
+  feature, ux, docs, chore, planning), any relevant `area/*`, and at most one
+  `priority/*` (high/medium/low). Priority is assigned by Steven, not inferred.
+- Roadmap phases are milestones, each anchored by an umbrella `type/planning`
+  issue. Milestones cannot depend on each other; encode ordering as issue
+  dependencies (blocked-by) between the umbrella issues.
+- Gitea's Projects/kanban feature has no API (as of 1.25) — don't build
+  tracking on it. Labels + milestones are the queryable source of truth.
+
 ## Pull requests
 - **Internal repos (`gitea.zen.lofi`)** — open a PR early with the `tea` CLI
   and keep it updated as the branch evolves (`tea pr create`, `tea pr list`,
