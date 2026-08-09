@@ -113,3 +113,7 @@ fi
 
 # ex activates a weird vim mode which takes over normal editing in the terminal
 alias ex=''
+
+# project naming due diligence (registry availability funnel)
+alias name-check="$HOME/.files/shell/scripts/name-check.py"
+alias name-gen="$HOME/.files/shell/scripts/name-gen.py"
