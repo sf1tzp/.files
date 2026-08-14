@@ -83,7 +83,7 @@ statefulset:
       runner:
         labels:
           - "ubuntu-latest:docker://catthehacker/ubuntu:act-22.04"
-          - "ubuntu-deploy:docker://gitea.zen.lofi/sfi/action-runner:14866ff"
+          - "ubuntu-deploy:docker://gitea.zen.lofi/sfi/action-runner:81fc571"
       container:
         network: bridge
         docker_timeout: 300s
