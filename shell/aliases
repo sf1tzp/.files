@@ -28,6 +28,40 @@ alias udo='sudo'
 alias mc='mv'
 
 # command specific aliases
+if which alacritty &>/dev/null && which fzf &>/dev/null; then
+	# Pick a theme for the current alacritty window only, live-previewing as
+	# you scroll. Applied over IPC (alacritty msg config), so the global config
+	# and the OS-synced theme (_alacritty_sync_os_theme in zsh/profile) are
+	# untouched. IPC overrides survive config reloads: a themed window stops
+	# following OS light/dark switches until reset.
+	function theme() {
+		if [ -z "$ALACRITTY_WINDOW_ID" ]; then
+			echo "theme: not running inside an alacritty window" >&2
+			return 1
+		fi
+		local dir="$HOME/.config/alacritty/themes"
+		local reset='(reset to global theme)'
+		local current="$_ALACRITTY_WINDOW_THEME"
+		local choice
+		choice=$( (echo "$reset"; command ls "$dir" | sed 's/\.toml$//') | fzf \
+			--prompt='window theme> ' \
+			--bind "focus:execute-silent([ {} = \"$reset\" ] && alacritty msg config -r || alacritty msg config \"\$(cat $dir/{}.toml)\")")
+		if [ "$choice" = "$reset" ]; then
+			alacritty msg config -r
+			_ALACRITTY_WINDOW_THEME=""
+		elif [ -n "$choice" ]; then
+			alacritty msg config "$(command cat "$dir/$choice.toml")"
+			_ALACRITTY_WINDOW_THEME="$choice"
+		elif [ -n "$current" ]; then
+			# aborted: restore the previous per-window pick
+			alacritty msg config "$(command cat "$dir/$current.toml")"
+		else
+			# aborted: drop whatever the preview applied
+			alacritty msg config -r
+		fi
+	}
+fi
+
 if which bat &>/dev/null; then
 	alias cat='bat -p --paging=never'
 	function bat_in_language() {
