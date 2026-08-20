@@ -151,3 +151,6 @@ alias ex=''
 # project naming due diligence (registry availability funnel)
 alias name-check="$HOME/.files/shell/scripts/name-check.py"
 alias name-gen="$HOME/.files/shell/scripts/name-gen.py"
+
+# local cleanup after a remote repo rename (remote URL, dirs, worktrees, claude)
+alias rename-repo="$HOME/.files/shell/scripts/rename-repo.sh"
