@@ -69,7 +69,7 @@ PROGRAMS = {
             """,
     },
     "fastfetch": {
-        "version": "2.40.3",
+        "version": "2.67.1",
         "url_template": "https://github.com/fastfetch-cli/fastfetch/releases/download/{version}/fastfetch-linux-{arch}.tar.gz",
         "is_amd64": True,
         "setup_script": """#!/usr/bin/env bash
@@ -82,7 +82,7 @@ PROGRAMS = {
         "url_template": "https://github.com/sharkdp/fd/releases/download/v{version}/fd-v{version}-{arch}-unknown-linux-musl.tar.gz",
         "package_name": "fd-find",
         "setup_script": """#!/usr/bin/env bash
-            mv fd-v10.2.0-{arch}-unknown-linux-musl/fd {install_dir}
+            mv fd-v{version}-{arch}-unknown-linux-musl/fd {install_dir}
             """,
     },
     "fnm": {
@@ -92,6 +92,13 @@ PROGRAMS = {
             unzip fnm-linux.zip
             chmod +x fnm
             mv fnm {install_dir}
+            """,
+    },
+    "glow": {
+        "version": "3.0.0",
+        "url_template": "https://github.com/charmbracelet/glow/releases/download/v{version}/glow_{version}_Linux_x86_64.tar.gz",
+        "setup_script": """#!/usr/bin/env bash
+            mv glow_{version}_Linux_{arch}/glow {install_dir}
             """,
     },
     "helm": {
