@@ -145,6 +145,13 @@ if [[ ! -e "$HOME/.claude/skills" && -d "$HOME/.files/shell/config/claude-skills
     ln -s "$HOME/.files/shell/config/claude-skills" "$HOME/.claude/skills"
 fi
 
+# Claude Code shared settings — merged, not symlinked (Claude Code's atomic
+# writes replace symlinks; see the sync script). All hosts, NixOS included:
+# the target must stay a writable regular file.
+if [[ -x "$HOME/.files/shell/scripts/claude-settings-sync.sh" ]]; then
+    "$HOME/.files/shell/scripts/claude-settings-sync.sh"
+fi
+
 # Updating Clock
 TMOUT=1
 TRAPALRM() {

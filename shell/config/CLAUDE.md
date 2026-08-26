@@ -40,3 +40,37 @@ Applies across all repositories and machines. (Source of truth:
   draft) without an explicit go-ahead in the current session. Branch pushes
   are fine; a PR is the publish step, and Steven vets branch contents first.
 
+## Guardrails
+Hard lines, every host and repo. Anything needing a per-repo exception
+doesn't belong here.
+- **No publish steps to public/external services without an explicit
+  same-session go-ahead** — PRs, issues, releases, package registry pushes.
+  Generalizes the PR rule above: pushing a branch is work-in-progress;
+  anything that notifies people or gets indexed is a publish step.
+- **No force-pushes or history rewrites on shared branches** (main, or any
+  branch with an open PR). Own unvetted feature branches are fair game.
+- **Mirrors make gitea ops public-facing.** The gitea→GitHub mirrors
+  replicate branch deletions and history changes on their own schedule;
+  treat destructive git operations on mirrored repos accordingly.
+- **No licensed binary assets in mirrored repos** — fonts especially
+  (Palm Springs, Morganite). Brand assets live in `~/.sfi/brand-assets`
+  and are injected at build/render time, never committed.
+- **Branch-guarded mains** (`.files`, `captains-log`): changes land via
+  branch + PR, never a direct push to main.
+
+## Machines
+Same conventions everywhere; capabilities differ. Check `hostname` before
+machine-dependent work.
+- **macbook-air** — primary Mac-app dev machine. Full Xcode; the only host
+  where the `verify` and `capture` skills auto-run.
+- **macmini** — always-on Mac, Command Line Tools only. Compile checks and
+  `swift test` are fine (CLT framework flags are documented in the app's
+  Package.swift); never auto-run `verify`/`capture` or other heavy
+  interactive work — explicit ask only.
+- **zen** — homelab server (hosts `gitea.zen.lofi`). Has a Swift toolchain
+  for pre-flighting core packages only; not an app-dev machine.
+- **devbox** — primary Linux dev machine: services, IAC, website codebases
+  (Go/Rust/frontend toolchains).
+- **soundship** — Linux host with kubectl access to the `luxor` cluster;
+  treat cluster-touching commands as production operations.
+
