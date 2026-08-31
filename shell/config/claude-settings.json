@@ -1,0 +1,62 @@
+{
+  "env": {
+    "DISABLE_AUTOUPDATER": "1"
+  },
+  "includeCoAuthoredBy": false,
+  "model": "claude-fable-5[1m]",
+  "effortLevel": "high",
+  "theme": "dark",
+  "tui": "fullscreen",
+  "awaySummaryEnabled": false,
+  "skipWorkflowUsageWarning": true,
+  "skipAutoPermissionPrompt": true,
+  "useAutoModeDuringPlan": false,
+  "permissions": {
+    "defaultMode": "auto",
+    "ask": [
+      "Bash(gh pr create*)",
+      "Bash(gh release*)",
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(ssh web2.streetfortress.cloud*)",
+      "Bash(ssh db2.streetfortress.cloud*)",
+      "Bash(ssh 10.1.0.51*)",
+      "Bash(ssh 10.1.0.52*)"
+    ],
+    "deny": [
+      "Read(/etc/wireguard/**)",
+      "Edit(/etc/wireguard/**)",
+      "Bash(cat /etc/wireguard/*)",
+      "Bash(sudo cat /etc/wireguard/*)"
+    ]
+  },
+  "autoMode": {
+    "soft_deny": [
+      "$defaults",
+      "Publish steps on public/external services: PRs, issues, or releases on github.com, package registry pushes — Steven vets content before anything publishes",
+      "Force-pushes or history rewrites on shared branches (main, or any branch with an open PR)",
+      "SSH or remote command execution on the production VPS hosts — web2/db2.streetfortress.cloud, mesh IPs 10.1.0.51 and 10.1.0.52 — in any spelling (hostname, IP, ssh alias, ansible limit), including read-only checks",
+      "Reading, printing, or editing rendered WireGuard configs or key material (/etc/wireguard/*, PrivateKey values, wg genkey output) by any means — cat, grep, sed, tee, redirection, sudo; change the Ansible template and re-run the playbook instead"
+    ]
+  },
+  "enabledPlugins": {
+    "swift-lsp@claude-plugins-official": true,
+    "gopls-lsp@claude-plugins-official": true,
+    "rust-analyzer-lsp@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": true
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -x \"$HOME/.claude/hooks/herdr-agent-state.sh\" ] && bash \"$HOME/.claude/hooks/herdr-agent-state.sh\" session || true",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
