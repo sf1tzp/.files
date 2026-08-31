@@ -7,6 +7,18 @@ all:
           ansible_host: 10.0.0.2
           wg_vpn_ip: 10.1.0.1
           logging_endpoint_ip: 10.0.0.2 # Self-hosted logging
+          # Mesh→LAN inference forward (symbology#166, deployments#79): LM
+          # Studio serves LLM + embeddings on 11434 from the win11 VM, which
+          # is LAN-only and deliberately NOT a mesh peer (personal machine
+          # stays outside the production trust boundary). Mesh peers reach it
+          # at 10.1.0.1:11434. Local inference is best-effort by policy —
+          # workers fall back to outsourced LLM calls (symbology#146). Flip
+          # dest to 10.0.0.4 when llm-server runs instead of win11, then
+          # `just wireguard soundship`.
+          wg_forwards:
+            - port: 11434
+              dest: 10.0.0.99
+              oif: br0
 
     vms:
       children:

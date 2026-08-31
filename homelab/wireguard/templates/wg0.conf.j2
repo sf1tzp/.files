@@ -10,6 +10,31 @@ SaveConfig = false
 # Uncomment to proxy requests to other hosts on the network
 # PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -A FORWARD -o wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 # PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -D FORWARD -o wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+{% if wg_forwards is defined %}
+
+# Mesh→LAN service forwards (wg_forwards in inventory.yaml). DNAT rewrites the
+# destination of packets arriving on the tunnel for this host's mesh IP to a
+# LAN backend that is not itself a mesh peer. The MASQUERADE is load-bearing:
+# the backend has no route to 10.1.0.0/24, so replies must appear to come from
+# this host's LAN address or they'd be sent to the default gateway and die.
+# MSS clamp keeps forwarded TCP under the tunnel MTU — without it, backends on
+# a 1500-MTU LAN emit segments the tunnel silently drops (same failure mode as
+# deployments nixos/modules/wireguard-lan-gateway.nix documents).
+# PreDown deletes are || true: wg-quick hooks run under set -e, and a restart
+# across a config change runs the new PreDown against an interface the old
+# config brought up — a failed -D would abort teardown, orphan wg0, and wedge
+# the unit on "wg0 already exists".
+{% for f in wg_forwards %}
+PostUp = iptables -t nat -A PREROUTING -i %i -p tcp -d {{ peers_data.peers[inventory_hostname].wg_vpn_ip }} --dport {{ f.port }} -j DNAT --to-destination {{ f.dest }}
+PostUp = iptables -t nat -A POSTROUTING -o {{ f.oif }} -p tcp -d {{ f.dest }} --dport {{ f.port }} -j MASQUERADE
+PreDown = iptables -t nat -D PREROUTING -i %i -p tcp -d {{ peers_data.peers[inventory_hostname].wg_vpn_ip }} --dport {{ f.port }} -j DNAT --to-destination {{ f.dest }} || true
+PreDown = iptables -t nat -D POSTROUTING -o {{ f.oif }} -p tcp -d {{ f.dest }} --dport {{ f.port }} -j MASQUERADE || true
+{% endfor %}
+PostUp = iptables -t mangle -A FORWARD -i %i -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+PostUp = iptables -t mangle -A FORWARD -o %i -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+PreDown = iptables -t mangle -D FORWARD -i %i -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu || true
+PreDown = iptables -t mangle -D FORWARD -o %i -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu || true
+{% endif %}
 
 # Mesh peers
 {% for host, p in peers_data.peers.items() if host != inventory_hostname %}
