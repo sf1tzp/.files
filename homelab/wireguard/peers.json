@@ -27,6 +27,11 @@
       "wg_endpoint_ip": "10.0.0.40",
       "public_key": "IN+Pa+00qs+0rD6v7csWojl30bblmodo2IJHpq7XhWk="
     },
+    "production-test": {
+      "wg_vpn_ip": "10.1.0.14",
+      "wg_endpoint_ip": "10.0.0.44",
+      "public_key": "sFMny2qkGK0b4ypGeqDo4mWbWsUy4/HU+rQq/qLfDzY="
+    },
     "db2-streetfortress-cloud": {
       "wg_vpn_ip": "10.1.0.51",
       "wg_endpoint_ip": "db2.streetfortress.cloud",
