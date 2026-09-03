@@ -185,16 +185,21 @@ scrape_configs:
   - job_name: "k8s_node_exporter"
     static_configs:
       - targets:
-          - 10.0.0.6:9100
-          - 10.0.0.40:9100
+          - 10.1.0.5:9100
+          - 10.1.0.6:9100
+          - 10.1.0.13:9100
           - 10.1.0.14:9100
     relabel_configs:
       - source_labels: [__address__]
-        regex: 10.0.0.6:9100
+        regex: 10.1.0.5:9100
+        replacement: luxor
+        target_label: instance
+      - source_labels: [__address__]
+        regex: 10.1.0.6:9100
         replacement: zenbook
         target_label: instance
       - source_labels: [__address__]
-        regex: 10.0.0.40:9100
+        regex: 10.1.0.13:9100
         replacement: staging-k3s
         target_label: instance
       - source_labels: [__address__]
@@ -206,16 +211,21 @@ scrape_configs:
     metrics_path: /metrics/cadvisor
     static_configs:
       - targets:
-          - 10.0.0.6:10255
-          - 10.0.0.40:10255
+          - 10.1.0.5:10255
+          - 10.1.0.6:10255
+          - 10.1.0.13:10255
           - 10.1.0.14:10255
     relabel_configs:
       - source_labels: [__address__]
-        regex: 10.0.0.6:10255
+        regex: 10.1.0.5:10255
+        replacement: luxor
+        target_label: instance
+      - source_labels: [__address__]
+        regex: 10.1.0.6:10255
         replacement: zenbook
         target_label: instance
       - source_labels: [__address__]
-        regex: 10.0.0.40:10255
+        regex: 10.1.0.13:10255
         replacement: staging-k3s
         target_label: instance
       - source_labels: [__address__]
@@ -226,16 +236,21 @@ scrape_configs:
   - job_name: "kube_state_metrics"
     static_configs:
       - targets:
-          - 10.0.0.6:30080
-          - 10.0.0.40:30080
+          - 10.1.0.5:30080
+          - 10.1.0.6:30080
+          - 10.1.0.13:30080
           - 10.1.0.14:30080
     relabel_configs:
       - source_labels: [__address__]
-        regex: 10.0.0.6:30080
+        regex: 10.1.0.5:30080
+        replacement: luxor
+        target_label: instance
+      - source_labels: [__address__]
+        regex: 10.1.0.6:30080
         replacement: zenbook
         target_label: instance
       - source_labels: [__address__]
-        regex: 10.0.0.40:30080
+        regex: 10.1.0.13:30080
         replacement: staging-k3s
         target_label: instance
       - source_labels: [__address__]
