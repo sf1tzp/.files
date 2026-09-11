@@ -36,6 +36,11 @@ Applies across all repositories and machines. (Source of truth:
   and keep it updated as the branch evolves (`tea pr create`, `tea pr list`,
   ...). Update the PR description when pushing commits so that reviewers can
   see the current state up front.
+- **No stacked PRs on gitea.** Squash-merge re-applies the base branch's
+  hunks, landing duplicate blocks on main (deployments #163/#164 broke nix
+  eval this way), and gitea neither displays the stack nor rebases the
+  follow-up when its base merges. If a change depends on an open PR, wait
+  for the base to merge and branch from main — or fold both into one PR.
 - **Public/external remotes (e.g. `github.com`)** — never open a PR (even a
   draft) without an explicit go-ahead in the current session. Branch pushes
   are fine; a PR is the publish step, and Steven vets branch contents first.

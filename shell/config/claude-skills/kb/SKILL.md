@@ -28,10 +28,30 @@ stale against the working tree.
 | `components/`        | Open source component operations (postgres, redis, etc) |
 | `observability/`     | Logging patterns, metrics, the four golden signals      |
 | `security/`          | Host configs, supply chain, network isolation           |
+| `projects/`          | Publication pages for streetfortress.com/showcase       |
 
 If placement is ambiguous (a testing technique with security implications, a
 component with config-management concerns), pick the directory matching the
 *primary lens of the document you're writing* and `[[link]]` to the others.
+
+## Per-directory tone (2026-09-11 contract)
+
+The general voice rules apply everywhere, but the audience — and therefore
+the register — shifts by directory:
+
+- `paradigms/` — the high-level **why and how** of system design.
+- `components/` — **SFI-ops-focused what/where/how handbooks**: they orient
+  *us* during ops work (`components/grafana-loki.md` is the model), not
+  general upstream reference.
+- `projects/` — **marketing surface**: proud, polished project descriptors
+  that build the company image on streetfortress.com/showcase. No roadmap
+  framing, no tech-debt or honest-state sections, no hedging about
+  migrations in progress — state capabilities as achieved facts. Hype
+  through confident, concrete capability; Apple/Anthropic-caliber prose,
+  never buzzwords. The "honest trade-offs" rule below is for the internal
+  directories, where the audience is ops — it does not apply here.
+  (First applied in captains-log PR #46: forts.md, the sfi-platform.md
+  rewrite — the old page read "roadmappy", which undercuts a showcase.)
 
 ## Note granularity (zettelkasten semantics)
 
