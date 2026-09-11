@@ -46,6 +46,11 @@
       "wg_vpn_ip": "10.1.0.5",
       "wg_endpoint_ip": "10.0.0.5",
       "public_key": "eG2ppSDgD96+sBolpL6050g2p1RucGn7BR5GQLc5chU="
+    },
+    "web3": {
+      "wg_vpn_ip": "10.1.0.53",
+      "wg_endpoint_ip": "web3.streetfortress.cloud",
+      "public_key": "BACMx0XfflIyB6WU6Py5ACKUQoL0CXM9OJ0f/1aUeiA="
     }
   },
   "clients": {
