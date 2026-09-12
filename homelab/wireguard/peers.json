@@ -41,7 +41,12 @@
       "wg_vpn_ip": "10.1.0.15",
       "wg_endpoint_ip": "10.0.0.41",
       "public_key": "lBSypvDNKPFP2dfdyXx/6BNBV2eXR3DNCx1irioQVVo="
-    }
+    },
+    "sfi-prod-439bf72": {
+      "wg_vpn_ip": "10.1.0.54",
+      "wg_endpoint_ip": "sfi-prod-439bf72.streetfortress.cloud",
+      "public_key": "IPQJS+lwiAeaqJCi+IdTEwqOr2oVjWq/8p2+n8wp4nE="
+     }
   },
   "clients": {
     "macbook-air": {
