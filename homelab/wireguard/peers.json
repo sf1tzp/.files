@@ -12,25 +12,10 @@
       "wg_vpn_ip": "10.1.0.6",
       "public_key": "VBGldmEDBk0t17q2HotN77vK3eB8c5zzwBXT7J0UtFU="
     },
-    "staging-web": {
-      "wg_vpn_ip": "10.1.0.11",
-      "wg_endpoint_ip": "10.0.0.31",
-      "public_key": "DVqcHiaMz9kw76EamhHNgtrbQrvuRa8xCxx8mqZEWBM="
-    },
-    "staging-db": {
-      "wg_vpn_ip": "10.1.0.12",
-      "wg_endpoint_ip": "10.0.0.32",
-      "public_key": "kfEEvsKXb/CVG+Byp2WK6jBxjIXKcKi17rxAMqdqIGk="
-    },
     "staging-k3s": {
       "wg_vpn_ip": "10.1.0.13",
       "wg_endpoint_ip": "10.0.0.40",
       "public_key": "IN+Pa+00qs+0rD6v7csWojl30bblmodo2IJHpq7XhWk="
-    },
-    "production-test": {
-      "wg_vpn_ip": "10.1.0.14",
-      "wg_endpoint_ip": "10.0.0.44",
-      "public_key": "sFMny2qkGK0b4ypGeqDo4mWbWsUy4/HU+rQq/qLfDzY="
     },
     "db2-streetfortress-cloud": {
       "wg_vpn_ip": "10.1.0.51",
@@ -51,6 +36,11 @@
       "wg_vpn_ip": "10.1.0.53",
       "wg_endpoint_ip": "web3.streetfortress.cloud",
       "public_key": "BACMx0XfflIyB6WU6Py5ACKUQoL0CXM9OJ0f/1aUeiA="
+    },
+    "sfi-fort-e33e2d5": {
+      "wg_vpn_ip": "10.1.0.15",
+      "wg_endpoint_ip": "10.0.0.41",
+      "public_key": "lBSypvDNKPFP2dfdyXx/6BNBV2eXR3DNCx1irioQVVo="
     }
   },
   "clients": {
