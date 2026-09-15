@@ -66,34 +66,6 @@
       loop_control:
         label: "Created {{ item.hostname }} OS Disk Image"
 
-    - name: Create GPU passthrough hook directories
-      become: false
-      file:
-        path: "/etc/libvirt/hooks/qemu.d/{{ item.0.hostname }}/{{ item.1 }}"
-        state: directory
-        mode: "755"
-      with_nested:
-        - "{{ vms_to_create }}"
-        - ["prepare/begin", "release/end"]
-      loop_control:
-        label: "Created {{ item.0.hostname }} {{ item.1 }} hook directory"
-      when: item.0.gpu_passthrough | default(false)
-
-    - name: Render GPU passthrough hook scripts
-      become: false
-      template:
-        src: "templates/{{ template_name }}.j2"
-        dest: "/etc/libvirt/hooks/qemu.d/{{ item.0.hostname }}/{{ item.1 }}/{{ template_name }}"
-        mode: "755"
-      with_nested:
-        - "{{ vms_to_create }}"
-        - ["prepare/begin", "release/end"]
-      loop_control:
-        label: "Wrote {{ item.0.hostname }} hook {{ item.1 }}/{{ template_name }}"
-      vars:
-        template_name: "{{ 'gpu-start-hook.sh' if item.1 == 'prepare/begin' else 'gpu-stop-hook.sh' }}"
-      when: item.0.gpu_passthrough | default(false)
-
     - name: Define virtual machines
       become: false
       virt:

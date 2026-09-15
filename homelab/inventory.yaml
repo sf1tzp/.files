@@ -34,19 +34,6 @@ all:
               wg_vpn_ip: 10.1.0.3
               logging_endpoint_ip: 10.0.0.2
 
-        llm-server:
-          hosts:
-            llm-server:
-              ansible_host: 10.0.0.4
-              os: "ubuntu-server-24.04"
-              vcpus: 4
-              memory: 8
-              disk_size: "150G"
-              gpu_passthrough: true
-              gpu_domain: "0x0000"
-              gpu_bus: "0x01"
-              gpu_slot: "0x00"
-              logging_endpoint_ip: 10.0.0.2
 
         custom-image-builder:
           hosts:
@@ -138,16 +125,11 @@ all:
               wg_endpoint_ip: web2.streetfortress.cloud
               logging_endpoint_ip: 10.1.0.1
 
-    nvidia:
-      children:
-        llm-server: {}
-
     containerd:
       children:
         hypervisor: {}
         devbox: {}
         junktown: {}
-        llm-server: {}
         staging-1g: {}
         staging-v2: {}
         staging-web: {}
@@ -160,7 +142,6 @@ all:
         hypervisor: {}
         devbox: {}
         junktown: {}
-        llm-server: {}
         staging-web: {}
         staging-db: {}
         db2-streetfortress-cloud: {}
