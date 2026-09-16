@@ -31,6 +31,16 @@
         mode = "0400";
         owner = "root";
       };
+      restic-s3-env-b2 = {
+        # AWS_ACCESS_KEY_ID=...\nAWS_SECRET_ACCESS_KEY=...
+        # The B2 application key for this host: both backup buckets,
+        # namePrefix zenbook/, and NO deleteFiles. sops-nix materializes
+        # only what is declared here, so this line and the value in
+        # secrets/zenbook.yaml must land together — a declared-but-absent
+        # key fails activation.
+        mode = "0400";
+        owner = "root";
+      };
     };
   };
 }

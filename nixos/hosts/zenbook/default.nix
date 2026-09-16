@@ -58,6 +58,37 @@
           Persistent = "true";
         };
       }
+      # Backblaze B2 — the fleet's offsite destination (deployments #47).
+      # Runs ALONGSIDE the Linode target, not instead of it: the migration
+      # is a re-upload rather than a copy (upload to B2 is free, reading
+      # 371 GB back out of Linode is not), and the parallel period is
+      # itself the validation. The Linode target and its bucket go once B2
+      # has a full retention window and a restore has been spot-checked.
+      #
+      # `sfi-pv-backups/zenbook` follows the fleet convention — bucket by
+      # data class, host in the prefix — so the same bucket holds every
+      # fort's repo and luxor's central pruner can reap this one too.
+      {
+        name = "b2";
+        repository = "s3:https://s3.us-west-004.backblazeb2.com/sfi-pv-backups/zenbook";
+        environmentFile = config.sops.secrets.restic-s3-env-b2.path;
+        # NO PRUNING HERE, deliberately. zenbook's B2 credential holds no
+        # deleteFiles — the same posture every fort's key has, so a
+        # compromised host cannot erase the offsite copy — and `restic
+        # forget --prune` removes pack files, so a prune it cannot perform
+        # would fail the unit every cycle. Retention for this repo belongs
+        # to luxor's `prune` identity, the one delete-capable credential in
+        # the fleet (deployments: nixos/modules/pv-prune.nix). The two
+        # older targets keep the module's default pruneOpts: their
+        # credentials can delete, and nothing central reaps them.
+        pruneOpts = [ ];
+        # 13:00 keeps the three targets six hours apart (07 / 13 / 19) so
+        # they never read the same PVCs at once.
+        timerConfig = {
+          OnCalendar = "*-*-* 13:00:00";
+          Persistent = "true";
+        };
+      }
     ];
   };
 
