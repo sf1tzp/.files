@@ -115,6 +115,16 @@ function goto_worktree() {
     fi
 }
 
+# $WORKTREE_DIR, absolute and with symlinks resolved - the only directory
+# these functions are ever allowed to delete from.
+function _worktree_root() {
+    if [[ -d "$WORKTREE_DIR" ]]; then
+        (builtin cd "$WORKTREE_DIR" && pwd -P)
+    else
+        echo "$WORKTREE_DIR"
+    fi
+}
+
 # Remove a single worktree by absolute path, running git from the main worktree
 # so we never try to remove the tree git is currently sitting in.
 function _remove_worktree_at() {
@@ -122,6 +132,18 @@ function _remove_worktree_at() {
 
     if [[ ! -d "$wt_path" ]]; then
         echo "Worktree not found: $wt_path"
+        return 1
+    fi
+
+    # The primary checkout is itself a worktree as far as `git worktree list`
+    # is concerned, so a caller can hand us the repo we work out of. Nothing
+    # outside $WORKTREE_DIR is ours to delete - compare resolved paths so a
+    # symlinked $HOME can't smuggle one past the check.
+    local root real
+    root=$(_worktree_root)
+    real=$(builtin cd "$wt_path" && pwd -P)
+    if [[ "$real" != "$root"/* ]]; then
+        echo "Refusing to remove $wt_path: outside $root"
         return 1
     fi
 
@@ -211,9 +233,14 @@ function prune_worktrees() {
     # NB: not named `path` - in zsh that is tied to $PATH, and localizing
     # it empties the search path for the rest of the function.
     local -a to_remove
-    local branch wt_path
+    local branch wt_path root
+    root=$(_worktree_root)
     while IFS=$'\t' read -r branch wt_path; do
         [[ -z $branch ]] && continue
+        # Skip the primary checkout and anything else living outside
+        # $WORKTREE_DIR; it is not a worktree we created and not ours to
+        # offer up for deletion, however merged its branch looks.
+        [[ "$wt_path" == "$root"/* ]] || continue
         [[ -n ${merged_set[$branch]} ]] && to_remove+=("$branch"$'\t'"$wt_path")
     done < <(git -C "$toplevel" worktree list --porcelain |
         awk '
