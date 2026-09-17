@@ -32,15 +32,15 @@
       "wg_endpoint_ip": "10.0.0.5",
       "public_key": "eG2ppSDgD96+sBolpL6050g2p1RucGn7BR5GQLc5chU="
     },
-    "web3": {
-      "wg_vpn_ip": "10.1.0.53",
-      "wg_endpoint_ip": "web3.streetfortress.cloud",
-      "public_key": "BACMx0XfflIyB6WU6Py5ACKUQoL0CXM9OJ0f/1aUeiA="
-    },
     "sfi-fort-e33e2d5": {
       "wg_vpn_ip": "10.1.0.15",
       "wg_endpoint_ip": "10.0.0.41",
       "public_key": "lBSypvDNKPFP2dfdyXx/6BNBV2eXR3DNCx1irioQVVo="
+    },
+    "sfi-fort-d54d5b3": {
+	      "wg_vpn_ip": "10.1.0.16",
+	      "wg_endpoint_ip": "10.0.0.42",
+	      "public_key": "bn/7RqCgaK/3Boolryuf4wUK4VqIcDZ5g8t+NdNITyI="
     },
     "sfi-prod-439bf72": {
       "wg_vpn_ip": "10.1.0.54",
