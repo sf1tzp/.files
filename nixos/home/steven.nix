@@ -63,6 +63,9 @@ in
   home.file = {
     ".config/alacritty/alacritty.toml".source = ../../shell/config/alacritty.toml;
     ".config/fzf.bash".source = ../../shell/bash/fzf.bash;
+    # Read before ~/.gitconfig, which keeps this host's identity and wins
+    # any overlap - see the header in shell/config/gitconfig.
+    ".config/git/config".source = ../../shell/config/gitconfig;
     ".config/nvim".source = ../../nvim;
     ".config/starship.toml".source = ../../shell/config/starship.toml;
     ".claude/CLAUDE.md".source = ../../shell/config/CLAUDE.md;

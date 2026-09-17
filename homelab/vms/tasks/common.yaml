@@ -73,6 +73,16 @@
     force: yes
   tags: tmux
 
+# git reads this before ~/.gitconfig, so the host keeps its own identity
+# there and still wins any overlap.
+- name: Create a sym link for ~/.config/git/config
+  file:
+    src: ~/.files/shell/config/gitconfig
+    dest: ~/.config/git/config
+    state: link
+    force: yes
+  tags: git
+
 - name: Install fzf
   git:
     repo: https://github.com/junegunn/fzf.git

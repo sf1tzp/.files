@@ -1,0 +1,27 @@
+# Shared, machine-independent git settings.
+#
+# Linked to ~/.config/git/config, which git reads *before* ~/.gitconfig.
+# Anything host-specific - identity above all - stays in ~/.gitconfig and
+# still wins, so this file can be identical on every machine.
+
+[init]
+	defaultBranch = main
+
+[push]
+	# A new branch's first `git push` creates origin/<same name> and adopts
+	# it as the upstream; no -u needed.
+	autoSetupRemote = true
+
+[branch]
+	# Inherit an upstream only when the new branch's NAME matches the
+	# remote-tracking ref it started from. Git's default ("true") takes the
+	# upstream from ANY remote-tracking start point, so
+	#
+	#     git worktree add ~/worktrees/repo/feature -b feature origin/main
+	#
+	# leaves `feature` tracking origin/main: [branch "feature"] gets
+	# merge = refs/heads/main, `git pull` merges main into the branch, and
+	# `git status` reports ahead/behind against main instead of its own
+	# remote. With "simple" that start point sets nothing, and
+	# push.autoSetupRemote above fills in the right upstream on first push.
+	autoSetupMerge = simple
