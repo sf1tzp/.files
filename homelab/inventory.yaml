@@ -161,11 +161,11 @@ all:
         staging-1g: {}
         staging-v2: {}
 
-    # NixOS VMs: created via `just create-nixos` from flake-built images.
+    # NixOS hosts: raised by the fort CLI in the deployments repo (`fort
+    # provision`), configured declaratively there (deployments nixos/).
     # Deliberately NOT in `vms`/`containerd`/`monitoring` — those apply
-    # apt-based setup. These hosts are configured declaratively in nixos/.
-    # ansible_host MUST match the static IP baked into the host's nixos config
-    # (hosts/<name>/default.nix).
+    # apt-based setup. ansible_host MUST match the static IP in the host's
+    # nixos config (deployments nixos/hosts/<name>/default.nix).
     nixos:
       hosts:
         staging-k3s:
@@ -173,9 +173,8 @@ all:
           vcpus: 4
           memory: 8
           disk_size: "40G"
-          # On the WireGuard mesh: create-nixos.yaml keys off wg_vpn_ip to
-          # generate the wg key, register the peer, and bake
-          # wireguard-private-key into secrets/staging-k3s.yaml.
+          # On the WireGuard mesh; the peer entry is deployments'
+          # wireguard/peers.json, mirrored here for the ubuntu members.
           wg_vpn_ip: 10.1.0.13
           wg_endpoint_ip: 10.0.0.40
         luxor:

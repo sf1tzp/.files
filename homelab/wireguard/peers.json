@@ -8,10 +8,6 @@
       "wg_vpn_ip": "10.1.0.3",
       "public_key": "vNlWuO2Hz1vNYTGPpctq56Vw2LIlktIxLRHjAerLIUI="
     },
-    "zenbook": {
-      "wg_vpn_ip": "10.1.0.6",
-      "public_key": "VBGldmEDBk0t17q2HotN77vK3eB8c5zzwBXT7J0UtFU="
-    },
     "staging-k3s": {
       "wg_vpn_ip": "10.1.0.13",
       "wg_endpoint_ip": "10.0.0.40",
@@ -38,15 +34,20 @@
       "public_key": "lBSypvDNKPFP2dfdyXx/6BNBV2eXR3DNCx1irioQVVo="
     },
     "sfi-fort-d54d5b3": {
-	      "wg_vpn_ip": "10.1.0.16",
-	      "wg_endpoint_ip": "10.0.0.42",
-	      "public_key": "bn/7RqCgaK/3Boolryuf4wUK4VqIcDZ5g8t+NdNITyI="
+      "wg_vpn_ip": "10.1.0.16",
+      "wg_endpoint_ip": "10.0.0.42",
+      "public_key": "bn/7RqCgaK/3Boolryuf4wUK4VqIcDZ5g8t+NdNITyI="
     },
     "sfi-prod-439bf72": {
       "wg_vpn_ip": "10.1.0.54",
       "wg_endpoint_ip": "sfi-prod-439bf72.streetfortress.cloud",
       "public_key": "IPQJS+lwiAeaqJCi+IdTEwqOr2oVjWq/8p2+n8wp4nE="
-     }
+    },
+    "sfi-fort-zenbook": {
+      "wg_vpn_ip": "10.1.0.4",
+      "wg_endpoint_ip": "10.0.0.4",
+      "public_key": "+1TndN1ZqLbO8lEhATB/fi/iYFOTEQoikGmnVBemdGk="
+    }
   },
   "clients": {
     "macbook-air": {

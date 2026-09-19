@@ -16,10 +16,6 @@ base-images:
 create-linux +hosts:
     ansible-playbook vms/create-linux.yaml --inventory inventory.yaml --vault-password-file ~/.ansible-password --extra-vars "target_vms={{ hosts }}"
 
-# Build a flake qcow2 and define the VM from it (no cloud-init). Run on soundship.
-create-nixos +hosts:
-    ansible-playbook vms/create-nixos.yaml --inventory inventory.yaml --extra-vars "target_vms={{ hosts }}"
-
 create-windows:
     ansible-playbook vms/create-windows.yaml
 

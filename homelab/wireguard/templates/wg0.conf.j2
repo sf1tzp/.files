@@ -19,7 +19,7 @@ SaveConfig = false
 # this host's LAN address or they'd be sent to the default gateway and die.
 # MSS clamp keeps forwarded TCP under the tunnel MTU — without it, backends on
 # a 1500-MTU LAN emit segments the tunnel silently drops (same failure mode as
-# deployments nixos/modules/wireguard-lan-gateway.nix documents).
+# the zenbook-era wireguard-lan-gateway.nix in deployments documented).
 # PreDown deletes are || true: wg-quick hooks run under set -e, and a restart
 # across a config change runs the new PreDown against an interface the old
 # config brought up — a failed -D would abort teardown, orphan wg0, and wedge
