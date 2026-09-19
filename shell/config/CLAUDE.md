@@ -25,9 +25,12 @@ Applies across all repositories and machines. (Source of truth:
 - Label issues on creation with scoped labels: exactly one `type/*` (bug,
   feature, ux, docs, chore, planning), any relevant `area/*`, and at most one
   `priority/*` (high/medium/low). Infer an initial priority from sequencing.
-- Roadmap phases are milestones, each anchored by an umbrella `type/planning`
-  issue. Milestones cannot depend on each other; encode ordering as issue
-  dependencies (blocked-by) between the umbrella issues.
+- Roadmap phases are milestones; the phase narrative lives in the milestone
+  description. Umbrella issues are retired (2026-09, captains-log#52) — don't
+  create them. Cross-milestone ordering lives as dependency arrows on the
+  milestone tasks in the planning vault (dotpm); the gitea-dotpm sync treats
+  task dependencies as vault-owned and never overwrites them. Intra-milestone
+  ordering stays as gitea issue dependencies (blocked-by).
 - Gitea's Projects/kanban feature has no API (as of 1.25) — don't build
   tracking on it. Labels + milestones are the queryable source of truth.
 
