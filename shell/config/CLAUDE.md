@@ -34,6 +34,24 @@ Applies across all repositories and machines. (Source of truth:
 - Gitea's Projects/kanban feature has no API (as of 1.25) — don't build
   tracking on it. Labels + milestones are the queryable source of truth.
 
+## Project management principles
+The oversight loop behind captains-log#52 (gitea → dotpm vault mirror).
+- **Milestones are promises; backlog is everything else.** Hand-manage only
+  membership and dates. If an issue doesn't gate the milestone's headline
+  outcome, it stays backlog — that's what keeps due dates honest.
+- **Never manage status by hand.** It derives from reality via the sync:
+  PR opens → in-progress, live closing keyword → review, issue closed →
+  done. If a board card looks wrong, fix the world, not the card.
+- **Weekly ritual** (the `/ritual` skill in captains-log starts it): on the
+  all-projects Gantt ask four questions — past due or at risk? stuck in
+  review? unmilestoned but priority/high? dates contradicting priorities?
+  Leave every date honest; surface decisions, not lists.
+- **`priority/high` means "do next", fleet-wide, kept rare.** No priority
+  label is a valid state: backlog, sequenced later.
+- **Narrative lives in milestone descriptions** (append decisions there);
+  mechanics go through the agent. Views are for seeing, gitea is the
+  record, the agent is the hands.
+
 ## Pull requests
 - **Internal repos (`gitea.zen.lofi`)** — open a PR early with the `tea` CLI
   and keep it updated as the branch evolves (`tea pr create`, `tea pr list`,
