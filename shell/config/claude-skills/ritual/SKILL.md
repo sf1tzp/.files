@@ -98,39 +98,10 @@ tea api -X PATCH repos/sfi/<repo>/issues/<N> -d '{"due_date": "YYYY-MM-DDT23:59:
 
 ## Sequencing a milestone
 
-Making the Gantt bars show the order. **End dates live in Gitea, start
-dates in the vault** — the sync mirrors `due` and blocked-by arrows one way
-and never touches `start`; the Gantt draws an arrow only between dated
-rows.
-
-1. **Decide the order** before touching dates. Structural items first —
-   anything that changes entitlements, provisioning profiles, the store
-   location, or deletes code others would otherwise touch — so profiles
-   regenerate once and later UI work lands on the simplified surface.
-   Independent UI items go in between; the verification gate is last; the
-   submission or release is the terminal item. Say which dates moved and
-   why; a date that can't be honest gets moved, not squeezed.
-2. **Gitea: due dates and arrows.**
-   ```sh
-   tea api -X PATCH repos/sfi/<repo>/issues/<N> -d '{"due_date": "YYYY-MM-DDT23:59:59Z"}'
-   tea api -X POST repos/sfi/<repo>/issues/<N>/dependencies \
-     -d '{"owner": "sfi", "repo": "<repo>", "index": <blocker>}'
-   ```
-   The terminal item should be blocked by every structural item so its
-   arrow set reflects the real gate.
-3. **Mirror:** `npm run sync -- --stream "<Project>" --full` so dues and
-   arrows reach the vault (the launchd steady pass usually has new issues
-   mirrored already; the full pass settles the rest).
-4. **Vault: start dates.**
-   ```sh
-   cd ~/code/gitea-dotpm-sync
-   npm run set-start -- sfi/<repo>#<N> YYYY-MM-DD [sfi/<repo>#<M> YYYY-MM-DD ...]
-   ```
-   Chain starts to the predecessor's due; stagger independent items in the
-   order you'd pick them up. A start the mirror defaulted (the day the
-   task was created) is noise and should be replaced.
-5. **Commit and push `planning/`.** Nested repo, unprotected main by
-   design — direct push is correct.
+The first schedule for a milestone — order, due dates and arrows in Gitea,
+start dates in the vault — is its own skill: `/sequence`. It ships a helper
+(`apply-schedule.py`) that applies a plan file end to end. The ritual only
+re-dates what `/sequence` laid down.
 
 ## Conventions that bind the ritual
 
