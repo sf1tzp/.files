@@ -84,12 +84,15 @@ doesn't belong here.
   and are injected at build/render time, never committed.
 - **Branch-guarded mains** (`.files`, `captains-log`): changes land via
   branch + PR, never a direct push to main.
-- **Production VPS are hands-off** — `web2.streetfortress.cloud` and
-  `db2.streetfortress.cloud` (mesh 10.1.0.52/.51) are the production boxes.
-  No SSH or remote command execution on them without an explicit same-session
-  go-ahead, including "harmless" read-only checks. They're slated for k3s
-  reprovisioning with SSH access removed; don't build workflows that assume
-  shell access to them.
+- **Production forts are hands-off** — `sfi-prod-439bf72` (Linode, mesh
+  10.1.0.54) is the production box; web2 and db2 are decommissioned
+  (deployments#340). No SSH or remote command execution on it without an
+  explicit same-session go-ahead, including "harmless" read-only checks and
+  the `sfi-*` ops verbs. Its state is read through the sanctioned paths:
+  the `ops-ro` kubeconfig context on devbox (`kubectl --context
+  sfi-prod-439bf72`, the built-in view role) and central monitoring on luxor
+  (thanos-query, grafana.luxor.lofi). Changes go through git — the fort's
+  tree in sfi/deployments lands via PR and reconciles on its own.
 - **WireGuard private keys stay unread.** Rendered configs
   (`/etc/wireguard/*.conf`) contain `PrivateKey` — never read, print, grep,
   or edit them, even with sudo, even for an unrelated line. Config changes go
