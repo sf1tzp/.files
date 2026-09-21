@@ -42,10 +42,11 @@ The oversight loop behind captains-log#52 (gitea → dotpm vault mirror).
 - **Never manage status by hand.** It derives from reality via the sync:
   PR opens → in-progress, live closing keyword → review, issue closed →
   done. If a board card looks wrong, fix the world, not the card.
-- **Weekly ritual** (the `/ritual` skill in captains-log starts it): on the
-  all-projects Gantt ask four questions — past due or at risk? stuck in
-  review? unmilestoned but priority/high? dates contradicting priorities?
-  Leave every date honest; surface decisions, not lists.
+- **Weekly ritual** (the global `/ritual` skill starts it, and holds the
+  milestone-sequencing mechanics): on the all-projects Gantt ask four
+  questions — past due or at risk? stuck in review? unmilestoned but
+  priority/high? dates contradicting priorities? Leave every date honest;
+  surface decisions, not lists.
 - **`priority/high` means "do next", fleet-wide, kept rare.** No priority
   label is a valid state: backlog, sequenced later.
 - **Narrative lives in milestone descriptions** (append decisions there);
