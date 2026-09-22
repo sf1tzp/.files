@@ -34,6 +34,11 @@ if [[ -d ~/go/bin/ ]]; then
     export PATH=$PATH:/go/bin
 fi
 
+# Gotea
+if [[ -d "$HOME/gotea/bin" ]]; then
+    export PATH="$PATH:$HOME/gotea/bin"
+fi
+
 # if [[ -d .venv ]]; then
 #     source .venv/bin/activate
 # fi
