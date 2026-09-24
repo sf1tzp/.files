@@ -125,6 +125,14 @@ deployments#413/#414/#418; the long form is deployments'
   transcript to the PR; the fort keeps nothing. Continue a task with
   `herdr --remote sfi-dev` or `claude --resume <id>` from a pane in its
   workspace.
+- **Scouting (`scout`)**: `gotea scout owner/repo "the question"` is the
+  other half — a session with no issue behind it, sent to look and expected
+  back with *issues*, not a PR (a fix smaller than the issue describing it
+  is allowed: file the issue, rename the branch to `issue-<n>`, then PR).
+  The workspace is labelled `scout:<owner/repo>@<stamp>`, there is no
+  `PICKUP_TASK` and so no transcript, and the sweep closes it a day after
+  the agent goes quiet — the filed issues are the only record. The `scout`
+  skill is the standing instruction.
 
 ## Machines
 Same conventions everywhere; capabilities differ. Check `hostname` before
