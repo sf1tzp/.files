@@ -30,6 +30,9 @@ and gitea token). You can push branches and open, edit and comment on issues
 and PRs on every repo the `sfi-agentic-dev` team reaches. You cannot push
 `main`, approve or merge a PR, or publish to anything outside gitea — those
 fail structurally, so do not work around a refusal; say what needed a teammate.
+The one exception is `sfi/knowledge`, whose `main` is unguarded by design
+(captains-log#60): a push there succeeds, and the `kb` skill tells you to
+make one.
 
 ## The loop
 
