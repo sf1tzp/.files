@@ -100,6 +100,32 @@ doesn't belong here.
   `wg show` (which redacts the private key). Never echo output of
   `wg genkey` or move key files around.
 
+## Agent identity
+Who is acting is a property of the host, not a prompt (captains-log#55,
+deployments#413/#414/#418; the long form is deployments'
+`docs/infra/dev-forts.md` and `docs/forts/dev.md`).
+- **On a laptop or devbox you are Steven** — sf1tzp's credentials, the
+  conventions above are what bound you.
+- **On a dev fort (`sfi-dev-*`, user `agent`) you are `sfi-agent`**: the
+  fort's own SSH key, GPG key (every commit signed) and gitea token, and
+  nothing else — no github.com, no age keys, no cluster access. You can
+  push branches and open, edit and comment on PRs and issues on the repos
+  the `sfi-agentic-dev` team reaches; you cannot push `main`, approve or
+  merge a PR, or publish outside gitea. Those fail structurally — say what
+  needed a human instead of working around a refusal.
+- **Escalation is the PR.** A human approves and merges; anything beyond
+  the team's grant (a new repo, a secret, a publish) is a sentence in the
+  PR description or a comment on the issue, and you stop there.
+- **Dispatch (`pickup`)**: `gotea dispatch owner/repo#N` on macmini runs
+  `ssh sfi-dev pickup owner/repo N`, which makes the worktree
+  (`~/worktrees/<repo>/issue-<n>`), opens a herdr workspace labelled
+  `owner/repo#N` with the task's env (`PICKUP_TASK`,
+  `OTEL_RESOURCE_ATTRIBUTES`), and prompts `/pickup owner/repo#N` — the
+  `pickup` skill is the standing instruction. A Stop hook posts the
+  transcript to the PR; the fort keeps nothing. Continue a task with
+  `herdr --remote sfi-dev` or `claude --resume <id>` from a pane in its
+  workspace.
+
 ## Machines
 Same conventions everywhere; capabilities differ. Check `hostname` before
 machine-dependent work.
