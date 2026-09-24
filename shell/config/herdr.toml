@@ -250,6 +250,22 @@ description = "split down (stacked)"
 # Accepts: hex (#89b4fa), named colors (cyan, blue, magenta), or rgb(r,g,b)
 # accent = "cyan"
 
+# The agent sidebar's rows. The default layout is
+#   [["state_icon", "machine", "workspace", "tab"], ["agent"]]
+# and this adds one token to the second row: $pickup, which a dev fort's Stop
+# hook reports on a dispatched pane (pickup-transcript, sfi/deployments
+# nixos/home/agent.nix). It reads "!<n>" once the task's branch has an open PR
+# and "no PR" while it has none. herdr's state icon comes from its own screen
+# detection, so a dispatch that stopped at a blocker and a dispatch that
+# opened a PR are both `done` — the same blue dot. This is the half that tells
+# them apart: near-white and bold for the one that made nothing, dim for the
+# one that did. A pane with no token drawn is not a dispatch.
+[ui.sidebar.agents]
+rows = [
+  ["state_icon", "machine", "workspace", "tab"],
+  ["agent", { token = "$pickup", rules = [{ equals = "no PR", fg = "#e5e9f0", bold = true }, { starts_with = "!", fg = "#8fbcbb", dim = true }] }],
+]
+
 # Background notification popup delivery
 [ui.toast]
 # off = disable pop-up notifications
