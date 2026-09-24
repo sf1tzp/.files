@@ -47,6 +47,9 @@ fail structurally, so do not work around a refusal; say what needed a teammate.
    - **Why before how.** The first paragraph is the problem and why it matters;
      the mechanism comes after. Quote the question you were sent with, so a
      reader knows where the issue came from.
+   - **In Simplified Technical English** — short active sentences, one idea
+     each, the same word for the same thing. The rules are in *The prose*
+     below.
    - **Labels on creation**: exactly one `type/*`, any relevant `area/*`, and
      at most one `priority/*` — inferred from sequencing, and `priority/high`
      means "do next", fleet-wide, so it stays rare. No label is a valid state.
@@ -103,6 +106,40 @@ fail structurally, so do not work around a refusal; say what needed a teammate.
    unfiled and why. That message is what `herdr --remote sfi-dev` shows on the
    workspace — and the workspace is swept, so nothing that lives only there is
    a record.
+
+## The prose
+
+The issue body is the deliverable, so write it in **Simplified Technical
+English** (ASD-STE100) — the controlled English of aircraft maintenance
+manuals. A human reads these as a queue and decides what to sequence: STE
+makes an issue answerable in one pass, and it leaves a vague claim nowhere to
+hide. Full STE needs the approved-word dictionary, which the fort does not
+have, so apply the rules that need no lookup:
+
+- **One idea per sentence.** 20 words at most in an instruction, 25 in a
+  description; six sentences at most in a paragraph.
+- **Active voice, simple tense, named actor.** "The sync overwrites the
+  dependency", not "the dependency is overwritten", not "would end up
+  overwritten".
+- **No `-ing` verb form** as a noun or a modifier: "to parse the label", not
+  "label parsing", not "when parsing labels".
+- **Imperative for steps**, one step per sentence.
+- **The same word for the same thing**, every time. A synonym reached for
+  variety reads as a second thing.
+- **Common words in one meaning.** No idiom, no metaphor: "after", not
+  "following"; "start", not "kick off". Keep the articles — STE is not
+  telegram style.
+- **Three nouns at most in a row.** Break a longer cluster with a
+  preposition: "the timeout of the mirror sync", not "mirror sync timeout
+  value".
+- **State a negative plainly**: "This does not change the vault." Do not bury
+  it in a subordinate clause.
+- **"must" for a requirement, "can" for an option** — not "shall", not
+  "should".
+
+This governs what you file in gitea — issue bodies, comments, and the PR
+description of a trivial fix. Your commit messages and your last message to the
+workspace are ordinary prose.
 
 ## Do not
 
