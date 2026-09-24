@@ -204,6 +204,7 @@ if which kubectl &>/dev/null; then
 fi
 
 if which sops &>/dev/null; then
+  export SOPS_AGE_KEY_FILE="$HOME/.config/sops/age/keys.txt"
   source <(sops completion zsh)
 fi
 
