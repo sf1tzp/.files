@@ -20,7 +20,7 @@ the only credentials here are the fort's own (`sfi-agent`'s SSH key, GPG key
 and gitea token). You can push branches and open, edit and comment on PRs and
 issues on every repo the `sfi-agentic-dev` team reaches. You cannot push
 `main`, approve or merge a PR, or publish to anything outside gitea — those
-fail structurally, so do not work around a refusal; say what needed a human.
+fail structurally, so do not work around a refusal; say what needed a teammate.
 
 ## The loop
 
@@ -42,11 +42,19 @@ fail structurally, so do not work around a refusal; say what needed a human.
    description first, so it must say what the branch is now, not what it
    was at the first push. Say `Closes #<n>` (or `Refs #<n>` when the issue
    is bigger than the PR).
+
+   **One keyword per issue.** Gitea matches a closing keyword only where it
+   sits immediately before the reference, so `Closes #49 and #51` closes #49
+   and quietly leaves #51 open (sfi/gotea#50 did exactly that). Write each
+   one out — `Closes #49. Closes #51.` — and keep them in the description:
+   it is also what the gitea→dotpm sync reads to move an issue to *review*,
+   so a reference the keyword missed is both an issue nobody closes and a
+   status that never moves.
 5. **Stop when it is a PR** — one that passes the checks and whose
    description stands on its own. Do not wait for review, and do not merge:
-   the PR waits for a human, by branch protection.
+   the PR waits for a teammate, by branch protection.
 6. **Report** — your last message names the PR link and what, if anything,
-   needs a human decision. That message is what `herdr --remote sfi-dev`
+   needs a teammate's decision. That message is what `herdr --remote sfi-dev`
    shows on the workspace.
 
 ## What happens after you stop
@@ -57,7 +65,7 @@ fail structurally, so do not work around a refusal; say what needed a human.
   so that comment is the record. If the PR shows no such comment after you
   finish, run `pickup-transcript <session-id>` yourself; the session id is
   in `~/.claude/projects/…`.
-- **Continuation** is a human's: `claude --resume <session-id>` from a pane
+- **Continuation** is a teammate's: `claude --resume <session-id>` from a pane
   in this workspace keeps the task's attribution. A fresh dispatch of the
   same issue reports this workspace instead of opening another.
 
