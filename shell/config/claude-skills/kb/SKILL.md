@@ -7,7 +7,8 @@ description: Write or update a Street Fortress knowledge-base document in the sf
 
 The knowledge base is the `sfi/knowledge` repo. It documents the **why** and
 then the **how** of technical topics encountered at SFI, and a weekly job
-revises it into the public handbook (sfi/deployments#511), so the bar is
+revises it into the public handbook `sfi/handbook` (sfi/deployments#511),
+so the bar is
 "insightful reference," not "notes dump": a reader should come away
 understanding why the technique exists, when to reach for it, and how to apply
 it — with the trade-offs stated honestly.
@@ -125,8 +126,8 @@ Model documents: `security/supply-chain.md`,
    for agents as well as humans, and this is the one repo where the standing
    "you cannot push main" rule does not apply. Write for an internal reader:
    work-item references, `.lofi` hosts, gitea links and mesh addresses belong
-   in these documents. Nothing here is public — the weekly job's PR on the
-   public handbook repo is where a human reads prose before a stranger does.
+   in these documents. Nothing here is public — the weekly job's PR on
+   `sfi/handbook` is where a human reads prose before a stranger does.
 
 ## Lightweight capture
 

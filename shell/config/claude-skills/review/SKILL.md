@@ -35,7 +35,10 @@ team reaches. You cannot push `main`, approve or merge a PR, or publish to
 anything outside gitea — those fail structurally, so do not work around a
 refusal; say what needed a teammate. **You cannot approve**: the repo policy
 whitelists approvals to `sf1tzp`. Your comment must claim nothing that reads
-like one.
+like one. The one exception to `main` is `sfi/knowledge`, whose `main` is
+unguarded by design (captains-log#60) — but your output here is still the
+comment. Write a KB doc only if the thread asks for one, and say in the
+comment that you did.
 
 ## The loop
 
@@ -59,7 +62,10 @@ like one.
    branch *was* at the first push is itself an answer worth giving.
 3. **Orient, then look properly.** The repo's `README` and `CLAUDE.md`, then
    the code the thread points at, then what the thread references — the issues
-   and PRs it links, and the ones that link it. You are in a worktree of your
+   and PRs it links, and the ones that link it. **`sfi/knowledge` is part of
+   that read**: `kb-map.txt` lists what it covers, and a doc there often
+   answers *why* where the thread only argues *what*. The `kb` skill says
+   where the repo is on this host. You are in a worktree of your
    own, so building and running the repo's checks is free; keep scratch files
    in `/tmp`, not in the tree. A claim you can test, test.
 4. **Post one comment** — the deliverable:

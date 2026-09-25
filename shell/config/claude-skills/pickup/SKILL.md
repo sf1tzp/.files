@@ -34,7 +34,10 @@ make one.
 2. **Work on the branch you are on.** Do not switch branches or make another
    worktree. Follow the repo's `CLAUDE.md` and the working conventions in
    `~/.claude/CLAUDE.md` (tree-shaped change descriptions, no stacked PRs,
-   and the rest). Run the repo's checks before you push (`fort check --all`
+   and the rest). **Check `sfi/knowledge` for the subsystem you are about to
+   change** — `kb-map.txt` lists the coverage, and a doc there tells you why
+   the current shape was chosen. Cite it in the PR when it explains a
+   constraint you kept. Run the repo's checks before you push (`fort check --all`
    here in deployments, `npm test`, `just test`, whatever the repo says).
 3. **Commit and push as you go** — clear, incremental commits; the branch is
    cheap to amend until it is reviewed. Commits are signed with the fort's

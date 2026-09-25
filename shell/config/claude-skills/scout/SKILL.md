@@ -42,6 +42,11 @@ make one.
    already an issue, say so, add what you learned as a comment on it, and stop.
 2. **Orient** — the repo's `README` and `CLAUDE.md`, then the code the question
    points at. Follow the working conventions in `~/.claude/CLAUDE.md`.
+   **Read the knowledge base as well.** `sfi/knowledge` says why things are the
+   way they are, which the code cannot; `kb-map.txt` there lists what it
+   covers, and the `kb` skill says where the repo is on this host. A decision
+   already written up is context to quote in the issue, not a defect to file
+   against.
 3. **Look properly.** Read the code, run the repo's checks and tests, reproduce
    what the question describes. You are in a worktree of your own, so building
    and running is free; keep scratch files in `/tmp`, not in the tree.

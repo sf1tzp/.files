@@ -13,13 +13,24 @@ Applies across all repositories and machines. (Source of truth:
   wait for confirmation. Prefer clear, incremental commits. This applies to
   all remotes: branch work is cheap to amend or abandon before it's vetted.
 
-## Knowledge base (captains-log)
-- `~/captains-log/knowledge/` documents the *why* and *how* of technical topics
-  encountered at SFI; it backs the expertise graph on streetfortress.com.
+## Knowledge base (sfi/knowledge)
+- `sfi/knowledge` documents the *why* and *how* of technical topics
+  encountered at SFI. It is a repo of its own (captains-log#60), checked out
+  two ways: nested in the vault on a laptop (`~/captains-log/knowledge`,
+  gitignored by the parent like `planning/`), standalone on a fort
+  (`~/src/sfi/knowledge`). The `kb` skill resolves the root either way — no
+  path is right in both, so don't hardcode one.
+- **Read it before you conclude something is undocumented.** `kb-map.txt` in
+  that repo lists the current coverage. A decision already written up there is
+  context to quote, not a gap to rediscover.
+- **Its `main` is unguarded on purpose** — commit and push straight to it, no
+  branch, no PR, agents included. That is the one exception to the branch
+  rules above, and it is safe because nothing there is public: the guard on
+  public prose lives in `sfi/handbook`, which a weekly job writes from this
+  KB and a human reviews.
 - When a session digs into a notable technique, pattern, or tool that isn't
-  documented there yet (check the listing in `~/captains-log/kb-map.txt`),
-  say so and offer to write it up — the `kb` skill has the conventions.
-  Raise it at a natural pause or wrap-up, not mid-task.
+  there yet, say so and offer to write it up — the `kb` skill has the
+  conventions. Raise it at a natural pause or wrap-up, not mid-task.
 
 ## Gitea issues & milestones
 - Label issues on creation with scoped labels: exactly one `type/*` (bug,
