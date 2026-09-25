@@ -67,6 +67,57 @@ The oversight loop behind captains-log#52 (gitea → dotpm vault mirror).
   draft) without an explicit go-ahead in the current session. Branch pushes
   are fine; a PR is the publish step, and Steven vets branch contents first.
 
+## Prose that lands in gitea (Simplified Technical English)
+Issue bodies, issue and PR comments, PR descriptions and milestone
+descriptions are read as a queue by a human who decides what to sequence, so
+write them in **Simplified Technical English** (ASD-STE100), the controlled
+English of aircraft maintenance manuals. It makes the text answerable in one
+pass, and it leaves a vague claim nowhere to hide. Full STE needs the
+approved-word dictionary, which no host here has, so apply the rules that
+need no lookup:
+- **One idea per sentence.** 20 words at most in an instruction, 25 in a
+  description; six sentences at most in a paragraph.
+- **Active voice, simple tense, named actor.** "The sync overwrites the
+  dependency", not "the dependency is overwritten", not "would end up
+  overwritten".
+- **No `-ing` verb form** as a noun or a modifier: "to parse the label", not
+  "label parsing", not "when parsing labels".
+- **Imperative for steps**, one step per sentence.
+- **The same word for the same thing**, every time. A synonym reached for
+  variety reads as a second thing.
+- **Common words in one meaning.** No idiom, no metaphor: "after", not
+  "following"; "start", not "kick off". Keep the articles — STE is not
+  telegram style.
+- **Three nouns at most in a row.** Break a longer cluster with a
+  preposition: "the timeout of the mirror sync", not "mirror sync timeout
+  value".
+- **State a negative plainly**: "This does not change the vault." Do not bury
+  it in a subordinate clause.
+- **"must" for a requirement, "can" for an option** — not "shall", not
+  "should".
+
+STE is the sentences, not the shape — a tree-shaped change description stays
+tree-shaped (below). Commit messages, knowledge-base documents and messages
+to the person in the session are ordinary prose.
+
+## Describe tree changes as a tree
+A change that spans several directories reads as a shape, and a flat file
+list hides it. Lead the PR description (and the commit body, for a
+multi-directory change) with the tree, one line per entry, marked:
+
+```
+● new        file or directory this change creates
+○ appended   existing file this change adds lines to; never a rewrite —
+             if a file is rewritten, say so in words
+◆ seeded     generated output, not hand-written; regenerate, never hand-edit
+✗ removed    file or directory this change deletes
+```
+
+A short "what/why" follows the name, and a directory the reader will wonder
+about is listed as ○ "untouched". The marks are stable — `fort add`'s
+post-add report prints this shape and deployments' golden-tree tests compare
+it. Repo-specific readings of the marks live in that repo's `CLAUDE.md`.
+
 ## Guardrails
 Hard lines, every host and repo. Anything needing a per-repo exception
 doesn't belong here.

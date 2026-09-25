@@ -63,33 +63,10 @@ make one.
 
 ## The prose
 
-The reviewer reads the description before the diff, so write it — and every
-comment you leave on the issue — in **Simplified Technical English**
-(ASD-STE100), the controlled English of aircraft maintenance manuals. It makes
-the description answerable in one pass, and it leaves a vague claim nowhere to
-hide. Full STE needs the approved-word dictionary, which the fort does not
-have, so apply the rules that need no lookup:
-
-- **One idea per sentence.** 20 words at most in an instruction, 25 in a
-  description; six sentences at most in a paragraph.
-- **Active voice, simple tense, named actor.** "The sync overwrites the
-  dependency", not "the dependency is overwritten", not "would end up
-  overwritten".
-- **No `-ing` verb form** as a noun or a modifier: "to parse the label", not
-  "label parsing", not "when parsing labels".
-- **Imperative for steps**, one step per sentence.
-- **The same word for the same thing**, every time. A synonym reached for
-  variety reads as a second thing.
-- **Common words in one meaning.** No idiom, no metaphor: "after", not
-  "following"; "start", not "kick off". Keep the articles — STE is not
-  telegram style.
-- **Three nouns at most in a row.** Break a longer cluster with a
-  preposition: "the timeout of the mirror sync", not "mirror sync timeout
-  value".
-- **State a negative plainly**: "This does not change the vault." Do not bury
-  it in a subordinate clause.
-- **"must" for a requirement, "can" for an option** — not "shall", not
-  "should".
+What you write into gitea — the PR description, and every comment you leave
+on the issue — follows the **Simplified Technical English** rules in
+`~/.claude/CLAUDE.md`. The reviewer reads the description before the diff, so
+it must be answerable in one pass, with nowhere for a vague claim to hide.
 
 STE is the sentences, not the shape: a tree-shaped change description, where
 the repo asks for one, stays tree-shaped. Your commit messages and your last

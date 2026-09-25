@@ -112,37 +112,14 @@ make one.
 
 ## The prose
 
-The issue body is the deliverable, so write it in **Simplified Technical
-English** (ASD-STE100) — the controlled English of aircraft maintenance
-manuals. A human reads these as a queue and decides what to sequence: STE
-makes an issue answerable in one pass, and it leaves a vague claim nowhere to
-hide. Full STE needs the approved-word dictionary, which the fort does not
-have, so apply the rules that need no lookup:
-
-- **One idea per sentence.** 20 words at most in an instruction, 25 in a
-  description; six sentences at most in a paragraph.
-- **Active voice, simple tense, named actor.** "The sync overwrites the
-  dependency", not "the dependency is overwritten", not "would end up
-  overwritten".
-- **No `-ing` verb form** as a noun or a modifier: "to parse the label", not
-  "label parsing", not "when parsing labels".
-- **Imperative for steps**, one step per sentence.
-- **The same word for the same thing**, every time. A synonym reached for
-  variety reads as a second thing.
-- **Common words in one meaning.** No idiom, no metaphor: "after", not
-  "following"; "start", not "kick off". Keep the articles — STE is not
-  telegram style.
-- **Three nouns at most in a row.** Break a longer cluster with a
-  preposition: "the timeout of the mirror sync", not "mirror sync timeout
-  value".
-- **State a negative plainly**: "This does not change the vault." Do not bury
-  it in a subordinate clause.
-- **"must" for a requirement, "can" for an option** — not "shall", not
-  "should".
+The issue body is the deliverable, and a human reads the haul as a queue to
+decide what to sequence. Write it in the **Simplified Technical English**
+described in `~/.claude/CLAUDE.md`: it makes an issue answerable in one pass,
+and it leaves a vague claim nowhere to hide.
 
 This governs what you file in gitea — issue bodies, comments, and the PR
-description of a trivial fix. Your commit messages and your last message to the
-workspace are ordinary prose.
+description of a trivial fix. Your commit messages and your last message to
+the workspace are ordinary prose.
 
 ## Do not
 
