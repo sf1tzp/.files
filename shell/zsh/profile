@@ -62,6 +62,18 @@ if [[ -f /opt/homebrew/bin/brew ]]; then
     fi
 fi
 
+# nix-darwin (darwin/): the system profile wins over Homebrew, and zplug
+# comes from nixpkgs. Absent on every other host, so nothing changes there.
+if [[ -d /run/current-system/sw/bin ]]; then
+    export PATH="/run/current-system/sw/bin:/etc/profiles/per-user/$USER/bin:$PATH"
+    # zplug's install (init.zsh) is in the store, read-only; its plugins
+    # and cache go to the default ~/.zplug (shell/zsh/zplug reads both).
+    if [[ -f /run/current-system/sw/share/zplug/init.zsh ]]; then
+        export ZPLUG_ROOT="/run/current-system/sw/share/zplug"
+        unset ZPLUG_HOME
+    fi
+fi
+
 # Just
 if which just &>/dev/null; then
     eval "$(just --completions=zsh)"

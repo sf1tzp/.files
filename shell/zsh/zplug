@@ -1,9 +1,12 @@
 #!/usr/bin/env zsh
 export ZPLUG_HOME=${ZPLUG_HOME:=$HOME/.zplug}
+# ZPLUG_ROOT: where zplug itself is installed when that is not ZPLUG_HOME
+# (nixpkgs puts init.zsh in the store; plugins still go to ZPLUG_HOME).
+export ZPLUG_ROOT=${ZPLUG_ROOT:=$ZPLUG_HOME}
 
 # echo "zplug home is $ZPLUG_HOME"
 
-source $ZPLUG_HOME/init.zsh
+source $ZPLUG_ROOT/init.zsh
 
 zplug "jeffreytse/zsh-vi-mode"
 # Must load fzf.zsh after vimode plugin is initialized
