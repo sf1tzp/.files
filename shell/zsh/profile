@@ -34,6 +34,11 @@ if [[ -d ~/go/bin/ ]]; then
     export PATH=$PATH:/go/bin
 fi
 
+# nix
+if [[ -d /nix/var/nix/profiles/default/bin/ ]]; then
+    export PATH="$PATH:/nix/var/nix/profiles/default/bin"
+fi
+
 # Gotea
 if [[ -d "$HOME/gotea/bin" ]]; then
     export PATH="$PATH:$HOME/gotea/bin"
