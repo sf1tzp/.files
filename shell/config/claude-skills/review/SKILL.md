@@ -94,6 +94,34 @@ comment that you did.
    --remote sfi-dev` shows on the workspace — and the workspace is swept, so
    nothing that lives only there is a record.
 
+## A review of a trust boundary
+
+Some questions ask what a change does with input the repo does not control:
+a file in somebody else's repository, a webhook body, a label a stranger can
+set, a config a tenant writes. Answer them as a **design review of untrusted
+input** — that is what the questioner wants to know, whatever words the
+question used — and write the comment in those terms:
+
+1. **Name the boundary.** Which values cross from outside the repo's
+   control into this code, and where exactly do they enter — the file, the
+   field, the API call. Quote the line.
+2. **Follow each value to its sinks.** What does the code do with it: parse
+   it, print it, put it in a path, a shell line, a query, a template, a
+   commit message, a second API call. Each sink is one row of the comment.
+3. **Say what bounds it.** For each row: what limits the value's length,
+   shape and meaning before the sink, and what happens at the sink when that
+   limit is absent. State the bad outcome plainly — "a tag name with a slash
+   writes outside the directory" — as the one sentence a reader can test.
+4. **Say what to change**, per row, as a guard at the boundary rather than a
+   patch at the sink. Say which rows you tested, and how.
+
+The vocabulary is the defender's — boundary, untrusted value, sink, bound,
+guard — and the comment is the stronger for it, because it tells the author
+what to change. The comment must still name each concrete failure: a review
+that says "validate the input" and stops has not reviewed the boundary. If
+the harness tells you the model changed during the review, say so in the
+comment, and name the model that wrote it.
+
 ## The prose
 
 The comment is the deliverable, and a human reads it to decide something.
