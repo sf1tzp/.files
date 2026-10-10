@@ -4,19 +4,19 @@
   # Declared here so `brew list --cask` is a file in git, and so a cask
   # that is not on this list is a decision, not a leftover.
   #
-  # cleanup is "none" for the first switch: nix-darwin would otherwise
-  # uninstall every formula not listed in `brews` (there are none), and
-  # the CLI set should resolve from /run/current-system/sw/bin first.
-  # Flip to "uninstall" once `which` agrees for each tool in
-  # modules/packages.nix; that removes the 103 formulae and every cask
-  # off this list (iTerm2, Alacritty, VS Code, Zed, KiCad, Steam, Whisky,
-  # XQuartz, primetime, and the SF Mono nerd font that only Alacritty used).
+  # cleanup is "uninstall": nix-darwin removes every formula not listed
+  # in `brews` (there are none) and every cask off this list. It was
+  # "none" for the first switch, until each tool in modules/packages.nix
+  # resolved from /run/current-system/sw/bin and zplug ran from the
+  # store. The casks it retires: iTerm2, Alacritty, VS Code, Zed, KiCad,
+  # Steam, Whisky, XQuartz, primetime, and the SF Mono nerd font that only
+  # Alacritty used.
   homebrew = {
     enable = true;
     onActivation = {
       autoUpdate = false;
       upgrade = false;
-      cleanup = "none";
+      cleanup = "uninstall";
     };
     taps = [
       "sf1tzp/tap"   # moment-tally
