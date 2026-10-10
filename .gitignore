@@ -20,6 +20,7 @@ homelab/services/timescaledb/postgres-data/
 homelab/services/timescaledb/pgadmin-data/
 homelab/services/traggo/.traggodata
 
+result
 
 # Claude Code cloud skill sync lands here through the ~/.claude/skills link
 shell/config/claude-skills/synced/

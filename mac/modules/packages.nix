@@ -52,7 +52,7 @@
     fastfetch
     watch
     shellcheck
-    pipes
+    pipes-rs
     gh
     git
     # media and documents
