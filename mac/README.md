@@ -18,13 +18,16 @@ home/steven.nix         the links into shell/
 ## Apply on macmini
 
 1. `brew services stop node_exporter` — the nix daemon takes :9100.
-2. The first time: `sudo nix run nix-darwin/master#darwin-rebuild -- switch --flake ~/.files/mac#macmini`.
-   After that, build as yourself and activate as root:
+2. Build as yourself and activate as root:
 
    ```
    cd ~/.files/mac && nix build .#darwinConfigurations.macmini.system
    sudo ./result/sw/bin/darwin-rebuild activate
    ```
+
+   The first time, before `darwin-rebuild` exists on the host, the build
+   is `nix run nix-darwin/master#darwin-rebuild -- build --flake
+   ~/.files/mac#<host>` as yourself, then the same `activate` as root.
 
    Not `sudo darwin-rebuild switch`: that evaluates the flake as root,
    and root fetches the inputs. The estate inputs (below) are on
@@ -81,9 +84,13 @@ To join a mesh:
 
 A later peers.json change is step 4 again: the activation syncs the
 running tunnel to the new conf in place (`wg syncconf`), and starts the
-daemon if the tunnel is down. `sudo wg show wg-staging` is the live
-state; it redacts the key. wg-quick warns that the conf is "world
-accessible": it is, by design, because it holds no key.
+daemon if the tunnel is down. The live state is `sudo wg show`; it
+redacts the key. On macOS the interface is a `utunN`, and only
+`wg-quick` knows it as `wg-staging` (the map is
+`/var/run/wireguard/wg-staging.name`, root-only), so `wg show wg-staging`
+answers "No such file or directory" while the tunnel is up. wg-quick
+warns that the conf is "world accessible": it is, by design, because it
+holds no key.
 
 ## macbook-air
 
