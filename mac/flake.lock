@@ -61,7 +61,24 @@
       "inputs": {
         "home-manager": "home-manager",
         "nix-darwin": "nix-darwin",
-        "nixpkgs": "nixpkgs"
+        "nixpkgs": "nixpkgs",
+        "staging": "staging"
+      }
+    },
+    "staging": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1791602570,
+        "narHash": "sha256-gL5kukosd1Sg8i8nMRp0Ky4+NHSmNsKxMcDnI/mycGQ=",
+        "ref": "refs/heads/main",
+        "rev": "835b2f79387aaebea57afe248c439dab2ec682e6",
+        "revCount": 10,
+        "type": "git",
+        "url": "ssh://git@gitea.zen.lofi:30022/sfi/staging"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://git@gitea.zen.lofi:30022/sfi/staging"
       }
     }
   },

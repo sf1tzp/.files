@@ -18,8 +18,20 @@ home/steven.nix         the links into shell/
 ## Apply on macmini
 
 1. `brew services stop node_exporter` — the nix daemon takes :9100.
-2. `sudo nix run nix-darwin/master#darwin-rebuild -- switch --flake ~/.files/mac#macmini`
-   the first time; `sudo darwin-rebuild switch --flake ~/.files/mac#macmini` after.
+2. The first time: `sudo nix run nix-darwin/master#darwin-rebuild -- switch --flake ~/.files/mac#macmini`.
+   After that, build as yourself and activate as root:
+
+   ```
+   cd ~/.files/mac && nix build .#darwinConfigurations.macmini.system
+   sudo ./result/sw/bin/darwin-rebuild activate
+   ```
+
+   Not `sudo darwin-rebuild switch`: that evaluates the flake as root,
+   and root fetches the inputs. The estate inputs (below) are on
+   gitea over ssh, and root has no key there. The build runs as you,
+   where the key is; `activate` from the built system's own `sw/bin`
+   sets the system profile to that exact path and runs its activation,
+   which is what `switch` does after its build.
    home-manager moves the hand-made links (`~/.zshrc`, `~/.claude/CLAUDE.md`, ...)
    aside as `*.hm-bak` and makes its own.
 3. Open a new shell. `which sops age wg kubectl` must answer under
@@ -39,6 +51,39 @@ home/steven.nix         the links into shell/
   the next switch once cleanup is on.
 - **by hand, still:** the WireGuard app's tunnels (one per estate), the
   Xcode install, `~/.config/nvim`, `~/gotea/bin` and `uv tool install fb-idb`.
+
+## The meshes
+
+A Mac joins an estate's mesh from here, not from the WireGuard app
+(`modules/mesh.nix`). The estate repo is a flake input (`flake = false`),
+its `mesh/peers.json` is read at build time, and nix-darwin's `wg-quick`
+module runs the tunnel as a launchd daemon. The private key is a
+root-only file the first switch mints on the host and nothing reads
+back; the conf in the store names the file and never holds the key.
+
+```
+sfi.meshes.staging = {
+  peersFile = "${inputs.staging}/mesh/peers.json";
+  interface = "wg-staging";      # estate.toml's interface
+  address = "10.2.0.96/24";      # last octet follows the LAN address
+};
+```
+
+To join a mesh:
+
+1. Declare it in the host file, build, activate. The activation mints the key.
+2. `sudo wg pubkey < /etc/wireguard/wg-staging.key` — the one output.
+3. In the estate: a `peers.<host>` entry by hand (`wg_vpn_ip`,
+   `wg_endpoint_ip` = the LAN address, the public key), then
+   `fort ssh-config --write`, `fort check --all`, PR.
+4. After that PR merges: `nix flake update staging` here, build,
+   activate. The forts pick the peer up on their own rebuild.
+
+A later peers.json change is step 4 again: the activation syncs the
+running tunnel to the new conf in place (`wg syncconf`), and starts the
+daemon if the tunnel is down. `sudo wg show wg-staging` is the live
+state; it redacts the key. wg-quick warns that the conf is "world
+accessible": it is, by design, because it holds no key.
 
 ## macbook-air
 

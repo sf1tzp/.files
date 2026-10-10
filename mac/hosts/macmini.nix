@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, inputs, ... }:
 {
   # macmini — the always-on Mac (CLAUDE.md "Machines"): Command Line Tools,
   # compile checks and swift test, never the heavy interactive verbs. On
@@ -9,6 +9,18 @@
 
   # Determinate Nix owns the daemon and /etc/nix/nix.conf.
   nix.enable = false;
+
+  # The staging mesh (sfi/staging estate.toml: 10.2.0.0/24, wg-staging),
+  # as a peer the forts dial at this Mac's LAN address: peers.macmini in
+  # that estate's mesh/peers.json, with the public key of the key this
+  # module mints (modules/mesh.nix). The last octet follows the LAN
+  # address, the lab convention. The deployments mesh stays in the
+  # WireGuard app for now; moving it here is a new key in that estate.
+  sfi.meshes.staging = {
+    peersFile = "${inputs.staging}/mesh/peers.json";
+    interface = "wg-staging";
+    address = "10.2.0.96/24";
+  };
 
   system.stateVersion = 6;
   system.primaryUser = "steven";

@@ -20,15 +20,24 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # The estates whose meshes a Mac is on (modules/mesh.nix): the repo,
+    # not a flake, for its mesh/peers.json. `nix flake update staging`
+    # follows a peers.json change; the lock says which peer set is live.
+    staging = {
+      url = "git+ssh://git@gitea.zen.lofi:30022/sfi/staging";
+      flake = false;
+    };
   };
 
-  outputs = { self, nixpkgs, nix-darwin, home-manager, ... }: {
+  outputs = { self, nixpkgs, nix-darwin, home-manager, ... }@inputs: {
     darwinConfigurations.macmini = nix-darwin.lib.darwinSystem {
+      specialArgs = { inherit inputs; };
       modules = [
         ./hosts/macmini.nix
         ./modules/packages.nix
         ./modules/shell.nix
         ./modules/homebrew.nix
+        ./modules/mesh.nix
         home-manager.darwinModules.home-manager
         {
           home-manager.useGlobalPkgs = true;
