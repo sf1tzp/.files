@@ -57,10 +57,36 @@ make one.
    it is also what the gitea→dotpm sync reads to move an issue to *review*,
    so a reference the keyword missed is both an issue nobody closes and a
    status that never moves.
-5. **Stop when it is a PR** — one that passes the checks and whose
-   description stands on its own. Do not wait for review, and do not merge:
-   the PR waits for a teammate, by branch protection.
-6. **Report** — your last message names the PR link and what, if anything,
+5. **Prove the branch still merges.** `main` moves while you work. Several
+   agents share this fort, and two branches cut from the same commit give one
+   clean merge and one conflict. Nothing else in this loop looks at the base
+   branch again, so look here — after the PR exists, and again after your
+   last push:
+
+   ```sh
+   git fetch origin main
+   git merge-base --is-ancestor origin/main HEAD   # exit 0: current. non-zero: behind
+   tea pr <n> --repo <owner/repo> -o json | grep '"mergeable"'
+   ```
+
+   If the branch is behind, **merge `origin/main` into it** — merge, not
+   rebase: the PR is open, and a history rewrite on a branch with an open PR
+   is a guardrail in `~/.claude/CLAUDE.md`. Then run the repo's checks again,
+   because `main` moved under them, and push.
+
+   Gitea recomputes `mergeable` in the background, so the field can lag your
+   last push. The git check is local and immediate — read the field as
+   confirmation, not as the first answer.
+
+   **A conflict you cannot resolve is not done.** Put it in the PR
+   description and in your report, and name the PR that the conflict came
+   from (`tea pr list --repo <owner/repo> --state closed` — the one that
+   changed the same lines). A teammate reads that and knows which branch to
+   re-cut.
+6. **Stop when it is a PR** — one that passes the checks, merges into `main`,
+   and whose description stands on its own. Do not wait for review, and do not
+   merge: the PR waits for a teammate, by branch protection.
+7. **Report** — your last message names the PR link and what, if anything,
    needs a teammate's decision. That message is what `herdr --remote sfi-dev`
    shows on the workspace.
 

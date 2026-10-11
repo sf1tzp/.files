@@ -11,6 +11,7 @@
   "skipWorkflowUsageWarning": true,
   "skipAutoPermissionPrompt": true,
   "useAutoModeDuringPlan": false,
+  "switchModelsOnFlag": false,
   "permissions": {
     "defaultMode": "auto",
     "ask": [

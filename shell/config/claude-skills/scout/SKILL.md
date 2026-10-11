@@ -109,6 +109,10 @@ make one.
    lands on the PR as it would for a dispatched task. Do not do this for
    anything you would not review in one sitting: the issue is the deliverable,
    and a half-done branch is worse than none.
+
+   **This is the one place a scout opens a pull, so prove it merges** — step 5
+   of `/pickup`, the same three commands. You cut this worktree off the default
+   branch when the scout started, and `main` moves while you look.
 7. **Report** — your last message names the haul's shape in a line, then every
    issue you filed, with links, one line each, and what you deliberately left
    unfiled and why. That message is what `herdr --remote sfi-dev` shows on the

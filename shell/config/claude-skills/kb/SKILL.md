@@ -13,15 +13,21 @@ so the bar is
 understanding why the technique exists, when to reach for it, and how to apply
 it — with the trade-offs stated honestly.
 
-**Find the repo before anything else.** It is nested in the Obsidian vault on
-a workstation and stands alone on a dev fort, so no absolute path is right in
-both layouts:
+**Resolve `sfi/knowledge` before anything else.** The repo is the thing; the
+path is per host, so no absolute path is right everywhere. A workstation
+nests it in the Obsidian vault. A dev fort holds it standalone under `~/src`
+(sfi/deployments#543).
 
 ```sh
 KB=$(ls -d ~/captains-log/knowledge ~/src/sfi/knowledge 2>/dev/null | head -1)
 ```
 
-Every path below is relative to `$KB`. If neither exists, clone it:
+**The order matters, and only on a workstation.** A fort has one of these and
+the choice is moot. A workstation can have both, and the vault nesting must
+win: Obsidian sees that tree, so a commit to a second clone elsewhere is a
+commit nobody opens. Add a candidate to the list rather than reorder it.
+
+Every path below is relative to `$KB`. If none exists, clone it:
 `git clone ssh://git@gitea.zen.lofi:30022/sfi/knowledge.git`.
 
 **What exists already:** `$KB/kb-map.txt` is the generated tree listing of the
