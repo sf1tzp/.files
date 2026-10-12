@@ -31,6 +31,21 @@ make one.
    body and the comments are the spec; a later comment revises an earlier
    plan. If the issue names blockers that are still open, say so in a comment
    and stop.
+
+   **Then the open pull request on this branch, if there is one.** A
+   dispatch after review feedback lands is why you are here, and the issue
+   does not carry that feedback:
+
+   ```sh
+   tea pr list --repo <owner/repo> --state open      # the row whose head is issue-<n>
+   tea pr <pr> --repo <owner/repo> --comments        # its description and the thread
+   tea pr review-comments <pr> --repo <owner/repo>   # the comments on the diff
+   ```
+
+   The description is what the branch claims; the review comments are the
+   work. Address each one, and say in the PR description what changed since
+   the review. A dispatch note names the comment to start with, when the
+   human had one in mind.
 2. **Work on the branch you are on.** Do not switch branches or make another
    worktree. Follow the repo's `CLAUDE.md` and the working conventions in
    `~/.claude/CLAUDE.md` (tree-shaped change descriptions, no stacked PRs,
@@ -112,9 +127,13 @@ message to the workspace are ordinary prose.
   of its own. If the PR shows no such comment after you finish, run
   `pickup-transcript <session-id>` yourself; the session id is in
   `~/.claude/projects/…`.
-- **Continuation** is a teammate's: `claude --resume <session-id>` from a pane
-  in this workspace keeps the task's attribution. A fresh dispatch of the
-  same issue reports this workspace instead of opening another.
+- **Continuation** is a teammate's: `gotea dispatch <issue or PR link>
+  --continue` prompts this session `/pickup` again, with a note, while it
+  sits idle in this workspace — the loop above runs again, and step 1 reads
+  the review that arrived. `claude --resume <session-id>` from a pane in
+  this workspace does the same by hand and keeps the task's attribution. A
+  fresh dispatch of the same issue, without the flag, reports this
+  workspace instead of opening another.
 
 ## Do not
 
