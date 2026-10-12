@@ -55,6 +55,13 @@ make one.
    - **Why before how.** The first paragraph is the problem and why it matters;
      the mechanism comes after. Quote the question you were sent with, so a
      reader knows where the issue came from.
+   - **Name the model and the effort you ran on**, in that same opening —
+     "Filed from a scout on sfi/gotea (2026-10-09, Fable 5.1 at effort
+     high)". The harness names the model in its system prompt, and
+     `CLAUDE_EFFORT` is in the env of every command you run. The fort keeps
+     no transcript for a scout, so this line is the only record of which
+     model wrote the issue, and the A/B of this skill per model
+     (sfi/.fortfiles#12) reads it.
    - **In Simplified Technical English** — short active sentences, one idea
      each, the same word for the same thing. The rules are in *The prose*
      below.

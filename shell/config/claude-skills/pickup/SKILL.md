@@ -106,9 +106,12 @@ message to the workspace are ordinary prose.
 - **The transcript** posts itself: a Stop hook on the fort
   (`pickup-transcript`) attaches this session's transcript to a comment on
   the PR (or the issue, when there is no PR yet) — the fort keeps nothing,
-  so that comment is the record. If the PR shows no such comment after you
-  finish, run `pickup-transcript <session-id>` yourself; the session id is
-  in `~/.claude/projects/…`.
+  so that comment is the record. It also says what this session was started
+  on — the model and effort the dispatch asked for, and the model ids the
+  transcript carries (sfi/deployments#704) — so a pickup writes no such line
+  of its own. If the PR shows no such comment after you finish, run
+  `pickup-transcript <session-id>` yourself; the session id is in
+  `~/.claude/projects/…`.
 - **Continuation** is a teammate's: `claude --resume <session-id>` from a pane
   in this workspace keeps the task's attribution. A fresh dispatch of the
   same issue reports this workspace instead of opening another.

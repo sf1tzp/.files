@@ -203,6 +203,29 @@ deployments#413/#414/#418; the long form is deployments'
   the comment is the only record. A review files no issue, opens no PR, and
   cannot approve. The `review` skill is the standing instruction.
 
+## The model you are
+The harness names the model in the system prompt ("You are powered by the
+model named …") and exports the effort to every command the session runs
+(`CLAUDE_EFFORT`). One skill text serves every model; these lines are the
+part that differs, from Anthropic's model-migration guidance
+(sfi/.fortfiles#11). They are about output quality only — a boundary that
+matters is never a sentence in a prompt (sfi/knowledge
+`security/sfi-dev-forts.md`), and no guardrail above moves into them.
+- **Fable 5.1** — read a skill's numbered steps as ordering constraints and
+  its "why" paragraphs as context; decide the how yourself. Do not ask a
+  question and wait: that stop is the documented failure. Before the last
+  message, check each claim in it against a tool result from this session,
+  and say what you did not verify.
+- **Opus 5** — deliver what was asked, at the scope intended, and finish the
+  whole task; if a part cannot land, do the rest and say what is missing. Do
+  not add a verification pass the skill did not ask for. A subagent is for a
+  sizeable independent track, never to check your own work.
+- **Sonnet 5** — a rule in a skill applies to every item of its kind, not
+  only the one it names: "a claim you can test, test" is every claim. Where
+  the reasoning comes out thin, the fix is the effort the session was
+  dispatched at (`gotea … --effort`), not more prompt text — say so in the
+  report instead of working around it.
+
 ## Machines
 Same conventions everywhere; capabilities differ. Check `hostname` before
 machine-dependent work.

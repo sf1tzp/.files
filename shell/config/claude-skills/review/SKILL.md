@@ -74,9 +74,14 @@ comment that you did.
    tea comments add <n> --repo <owner/repo> "$(cat /tmp/review.md)"
    ```
 
-   - **Quote the question you were sent with**, at the top. A reader who
-     finds this comment a week later must see what it answers and why it
-     exists.
+   - **Quote the question you were sent with**, at the top, and under it
+     one line with the model and the effort you answered on — "Answered on
+     Fable 5.1 at effort high". The harness names the model in its system
+     prompt, and `CLAUDE_EFFORT` is in the env of every command you run. A
+     reader who finds this comment a week later must see what it answers,
+     why it exists, and which model wrote it; the fort keeps no transcript
+     for a review, so this line is the only record, and the A/B of this
+     skill per model (sfi/.fortfiles#12) reads it.
    - **Answer first.** The first sentence is the answer. The reasoning comes
      after it, and the evidence after that — file and line, the command you
      ran and what it printed, the issue number that already decided this.
