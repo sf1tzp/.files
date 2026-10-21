@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "estate-hub": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1792612121,
+        "narHash": "sha256-qv1B2Ukm2sSGmmT8c6TCj/cwdfmrfVNLLpbyFTswpZo=",
+        "ref": "refs/heads/main",
+        "rev": "9ced60240fe63a5ca649cff3bb7372fbebe7f4f3",
+        "revCount": 7,
+        "type": "git",
+        "url": "ssh://git@gitea.zen.lofi:30022/sfi/estate-hub"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://git@gitea.zen.lofi:30022/sfi/estate-hub"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -59,6 +75,7 @@
     },
     "root": {
       "inputs": {
+        "estate-hub": "estate-hub",
         "home-manager": "home-manager",
         "nix-darwin": "nix-darwin",
         "nixpkgs": "nixpkgs",

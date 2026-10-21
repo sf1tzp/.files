@@ -18,23 +18,31 @@ home/steven.nix         the links into shell/
 ## Apply on macmini
 
 1. `brew services stop node_exporter` — the nix daemon takes :9100.
-2. Build as yourself and activate as root:
+2. Build as yourself, then set the profile and activate as root:
 
    ```
    cd ~/.files/mac && nix build .#darwinConfigurations.macmini.system
+   sudo nix-env -p /nix/var/nix/profiles/system --set "$(readlink ./result)"
    sudo ./result/sw/bin/darwin-rebuild activate
    ```
 
    The first time, before `darwin-rebuild` exists on the host, the build
    is `nix run nix-darwin/master#darwin-rebuild -- build --flake
-   ~/.files/mac#<host>` as yourself, then the same `activate` as root.
+   ~/.files/mac#<host>` as yourself, then the same two steps as root.
 
    Not `sudo darwin-rebuild switch`: that evaluates the flake as root,
    and root fetches the inputs. The estate inputs (below) are on
    gitea over ssh, and root has no key there. The build runs as you,
-   where the key is; `activate` from the built system's own `sw/bin`
-   sets the system profile to that exact path and runs its activation,
-   which is what `switch` does after its build.
+   where the key is; the two root steps are what `switch` does after
+   its build. The profile step is not optional, and it comes first:
+   `activate` alone runs the built system's activation and sets no
+   profile, and nix-darwin's boot daemon (`org.nixos.activate-system`)
+   re-activates whatever the profile names — at every boot, and in the
+   middle of any activation that replaces its plist. That re-activation
+   points `/etc/static` and `/run/current-system` at the profile's
+   generation and deletes the `/etc` links the newer system made. On
+   2026-10-21 the profile was eleven days behind and the wg-quick confs
+   went that way, in the same second the activation had linked them.
    home-manager moves the hand-made links (`~/.zshrc`, `~/.claude/CLAUDE.md`, ...)
    aside as `*.hm-bak` and makes its own.
 3. Open a new shell. `which sops age wg kubectl` must answer under
@@ -63,6 +71,15 @@ its `mesh/peers.json` is read at build time, and nix-darwin's `wg-quick`
 module runs the tunnel as a launchd daemon. The private key is a
 root-only file the first switch mints on the host and nothing reads
 back; the conf in the store names the file and never holds the key.
+One key per host, as the forts: every mesh here loads the same file
+(`sfi.meshKeyFile`), and every estate registers the same public key.
+One listen port per host, too: two interfaces cannot bind one UDP port.
+A client (a Mac behind NAT, no `wg_endpoint_ip` in peers.json) sets no
+`listenPort` and wg-quick picks a free one; a host the forts dial sets
+the port its peers.json entry gives, and the build refuses a mismatch.
+The daemons wait for the Nix volume (`wait4path /nix/store`) before
+they start: at boot the store mounts after launchd, and a daemon that
+names a store path then is a missing executable launchd never retries.
 
 ```
 sfi.meshes.staging = {
@@ -74,17 +91,22 @@ sfi.meshes.staging = {
 
 To join a mesh:
 
-1. Declare it in the host file, build, activate. The activation mints the key.
-2. `sudo wg pubkey < /etc/wireguard/wg-staging.key` — the one output.
-3. In the estate: a `peers.<host>` entry by hand (`wg_vpn_ip`,
-   `wg_endpoint_ip` = the LAN address, the public key), then
-   `fort ssh-config --write`, `fort check --all`, PR.
+1. Declare it in the host file, build, activate. The activation mints
+   the key if the host has none yet.
+2. `sudo wg pubkey < /etc/wireguard/mesh.key` — the one output
+   (`sfi.meshKeyFile`; on macmini the file is `wg-staging.key`).
+3. In the estate: a `clients.<host>` entry by hand (`wg_vpn_ip`, the
+   public key) for a Mac the forts cannot dial, or a `peers.<host>` entry
+   (plus `wg_endpoint_ip` = the LAN address, and `wg_endpoint_port`
+   matching `listenPort`) for one they can; then `fort ssh-config
+   --write`, `fort check --all`, PR.
 4. After that PR merges: `nix flake update staging` here, build,
    activate. The forts pick the peer up on their own rebuild.
 
 A later peers.json change is step 4 again: the activation syncs the
-running tunnel to the new conf in place (`wg syncconf`), and starts the
-daemon if the tunnel is down. The live state is `sudo wg show`; it
+running tunnel to the new conf in place (`wg syncconf`), and loads the
+daemon afresh (`launchctl bootout` then `bootstrap`) if the tunnel is
+down. The live state is `sudo wg show`; it
 redacts the key. On macOS the interface is a `utunN`, and only
 `wg-quick` knows it as `wg-staging` (the map is
 `/var/run/wireguard/wg-staging.name`, root-only), so `wg show wg-staging`

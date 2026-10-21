@@ -4,7 +4,11 @@
   # shell/ tree. One host per darwinConfigurations entry; macmini first,
   # macbook-air when its own Xcode-shaped list is written down.
   #
-  #   sudo darwin-rebuild switch --flake ~/.files/mac#macmini
+  #   nix build .#darwinConfigurations.macmini.system
+  #   sudo nix-env -p /nix/var/nix/profiles/system --set "$(readlink ./result)"
+  #   sudo ./result/sw/bin/darwin-rebuild activate
+  #
+  # (README.md: why not `switch`, and why the profile step is not optional.)
   #
   # The daemon is Determinate Nix's (nix.enable = false below), so this
   # flake manages nothing about nix itself.

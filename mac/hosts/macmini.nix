@@ -26,6 +26,10 @@
     interface = "wg-estate-hub";
     address = "10.3.0.96/24";
   };
+  # The one key for every mesh (modules/mesh.nix). This file was minted
+  # when the module made one key per mesh; its public key is what both
+  # estates register for macmini, so it stays where it is.
+  sfi.meshKeyFile = "/etc/wireguard/wg-staging.key";
 
   system.stateVersion = 6;
   system.primaryUser = "steven";
@@ -38,9 +42,14 @@
   # the two fight over :9100.
   launchd.daemons.node-exporter = {
     serviceConfig = {
+      # The store mounts after launchd starts its daemons; a program
+      # path under /nix/store is a missing executable at boot, and
+      # launchd parks the service (EX_CONFIG) rather than retry. Wait
+      # for the store, as nix-darwin's own activate-system plist does.
       ProgramArguments = [
-        "${pkgs.prometheus-node-exporter}/bin/node_exporter"
-        "--web.listen-address=:9100"
+        "/bin/sh"
+        "-c"
+        "/bin/wait4path /nix/store && exec ${pkgs.prometheus-node-exporter}/bin/node_exporter --web.listen-address=:9100"
       ];
       RunAtLoad = true;
       KeepAlive = true;
