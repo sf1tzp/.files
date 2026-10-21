@@ -27,6 +27,10 @@
       url = "git+ssh://git@gitea.zen.lofi:30022/sfi/staging";
       flake = false;
     };
+    estate-hub = {
+      url = "git+ssh://git@gitea.zen.lofi:30022/sfi/estate-hub";
+      flake = false;
+    };
   };
 
   outputs = { self, nixpkgs, nix-darwin, home-manager, ... }@inputs: {

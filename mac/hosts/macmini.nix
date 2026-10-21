@@ -21,6 +21,11 @@
     interface = "wg-staging";
     address = "10.2.0.96/24";
   };
+  sfi.meshes.estate-hub = {
+    peersFile = "${inputs.estate-hub}/mesh/peers.json";
+    interface = "wg-estate-hub";
+    address = "10.3.0.96/24";
+  };
 
   system.stateVersion = 6;
   system.primaryUser = "steven";
