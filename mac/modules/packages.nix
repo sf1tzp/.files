@@ -20,7 +20,11 @@
     kustomize
     kind
     k6
-    pulumi
+    # pulumi-bin, not pulumi: the source build in nixpkgs ships the CLI
+    # alone, and `fort provision` needs the Go language host that the
+    # official distribution puts beside its own binary (sfi/forts,
+    # internal/tools/tools.json names the attribute and the reason)
+    pulumi-bin
     # languages and their managers (fnm/rustup stay until the projects'
     # own flakes carry their toolchains). Python is one interpreter for
     # `python3` and uv for the rest: versions (`uv python`), venvs and
