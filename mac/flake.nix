@@ -46,6 +46,7 @@
         ./modules/shell.nix
         ./modules/homebrew.nix
         ./modules/mesh.nix
+        ./modules/lab-ca.nix
         home-manager.darwinModules.home-manager
         {
           home-manager.useGlobalPkgs = true;
