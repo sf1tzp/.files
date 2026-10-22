@@ -4,39 +4,10 @@
       "wg_vpn_ip": "10.1.0.1",
       "public_key": "EpvbuawUq6V5cCrGxpmCqvJr7BGgVznZSJ839IAGRD4="
     },
-    "devbox": {
-      "wg_vpn_ip": "10.1.0.3",
-      "public_key": "vNlWuO2Hz1vNYTGPpctq56Vw2LIlktIxLRHjAerLIUI="
-    },
-    "staging-k3s": {
-      "wg_vpn_ip": "10.1.0.13",
-      "wg_endpoint_ip": "10.0.0.40",
-      "public_key": "IN+Pa+00qs+0rD6v7csWojl30bblmodo2IJHpq7XhWk="
-    },
-    "db2-streetfortress-cloud": {
-      "wg_vpn_ip": "10.1.0.51",
-      "wg_endpoint_ip": "db2.streetfortress.cloud",
-      "public_key": "BmgDSTuXqzccVKbFyJNjNrGllDBaw4z/x/trI3X25H4="
-    },
-    "web2-streetfortress-cloud": {
-      "wg_vpn_ip": "10.1.0.52",
-      "wg_endpoint_ip": "web2.streetfortress.cloud",
-      "public_key": "5A3rjmLZyxZ6OW/5R9X9LmpYAWgF112o7sjx4Q1ZkFo="
-    },
     "luxor": {
       "wg_vpn_ip": "10.1.0.5",
       "wg_endpoint_ip": "10.0.0.5",
       "public_key": "eG2ppSDgD96+sBolpL6050g2p1RucGn7BR5GQLc5chU="
-    },
-    "sfi-fort-e33e2d5": {
-      "wg_vpn_ip": "10.1.0.15",
-      "wg_endpoint_ip": "10.0.0.41",
-      "public_key": "lBSypvDNKPFP2dfdyXx/6BNBV2eXR3DNCx1irioQVVo="
-    },
-    "sfi-fort-d54d5b3": {
-      "wg_vpn_ip": "10.1.0.16",
-      "wg_endpoint_ip": "10.0.0.42",
-      "public_key": "bn/7RqCgaK/3Boolryuf4wUK4VqIcDZ5g8t+NdNITyI="
     },
     "sfi-prod-439bf72": {
       "wg_vpn_ip": "10.1.0.54",
@@ -47,12 +18,18 @@
       "wg_vpn_ip": "10.1.0.4",
       "wg_endpoint_ip": "10.0.0.4",
       "public_key": "+1TndN1ZqLbO8lEhATB/fi/iYFOTEQoikGmnVBemdGk="
+    },
+    "sfi-dev-831c637": {
+      "wg_vpn_ip": "10.1.0.61",
+      "wg_endpoint_ip": "10.0.0.61",
+      "public_key": "vsVNxxKzAMQug+qDqIW64zOU7JnPy50PDXtewDG96Rc="
     }
   },
   "clients": {
-    "macbook-air": {
-      "wg_vpn_ip": "10.1.0.100",
-      "public_key": "Ds4OCjPV5+zS3InfJy+P7LDFHmalqFVPiyPbww3ptQc="
+    "macmini": {
+      "wg_vpn_ip": "10.1.0.96",
+      "wg_endpoint_ip": "10.0.0.96",
+      "public_key": "rH83IdVk5LpuBklMWpFAwf4h4gtkYyaxV1nFioJ/+mc="
     }
   }
 }
