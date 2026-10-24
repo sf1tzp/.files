@@ -3,11 +3,11 @@
     "estate-hub": {
       "flake": false,
       "locked": {
-        "lastModified": 1792624387,
-        "narHash": "sha256-AVsZ24bMTC/sQhIvVUyKY8eN41JT72QTvelEgAKCKtQ=",
+        "lastModified": 1792880800,
+        "narHash": "sha256-V7UAVNEI74ly7vG9ufPbVv4Cu/PWM5EogsOoc9L5v9Q=",
         "ref": "refs/heads/main",
-        "rev": "c7e57cbe69381e8b90af4a808e9b4c9bd0f37d05",
-        "revCount": 16,
+        "rev": "ae30ac481607f7d5870219f8f96f94dd5dbdfee2",
+        "revCount": 35,
         "type": "git",
         "url": "ssh://git@gitea.zen.lofi:30022/sfi/estate-hub"
       },
