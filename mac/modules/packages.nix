@@ -1,10 +1,13 @@
 { pkgs, ... }:
 {
-  # The CLI set, from what `brew leaves` held on macmini on 2026-10-10,
-  # minus the casks (modules/homebrew.nix) and what the revamp
-  # retires (pyenv, pipx, and the six CLI leaves). Every name here is a nixpkgs attribute on aarch64-darwin;
-  # Homebrew keeps nothing that is on this list once the cleanup in
-  # homebrew.nix is flipped to "uninstall".
+  # The CLI set, one list for every Mac: what `brew leaves` held on
+  # macmini on 2026-10-10, plus what macbook-air added on 2026-10-25
+  # (bash, coreutils-prefixed, exiv2, libheif), minus the casks
+  # (modules/homebrew.nix) and what the revamp retires (pyenv, pipx, the
+  # six CLI leaves; on the air, wimlib, speedtest and postgresql@18).
+  # Every name here is a nixpkgs attribute on aarch64-darwin; Homebrew
+  # keeps nothing that is on this list once the cleanup in the host file
+  # is "uninstall".
   environment.systemPackages = with pkgs; [
     # the estates: sops/age for every contract, the mesh, the forge
     age
@@ -38,6 +41,8 @@
     uv
     fnm
     # shell
+    bash                  # bash 5; macOS ships 3.2
+    coreutils-prefixed    # the g-prefixed names (gdate, gsed, ...), as brew's coreutils gave them
     starship
     zplug
     tmux
@@ -65,6 +70,8 @@
     ffmpeg
     pandoc
     pngquant
+    exiv2
+    libheif               # heif-convert and friends
     # the Mac itself
     smartmontools
     prometheus-node-exporter

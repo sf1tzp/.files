@@ -7,12 +7,16 @@ profile, tmux, starship and the Claude Code files are edited here and
 live at the next prompt, as before.
 
 ```
-flake.nix               the inputs and one darwinConfigurations entry per Mac
-hosts/macmini.nix       the host: platform, primary user, node_exporter as a launchd daemon
-modules/packages.nix    the CLI set (what `brew leaves` held, minus casks and the retired six)
-modules/shell.nix       zsh on
-modules/homebrew.nix    taps and casks declared; cleanup staged
-home/steven.nix         the links into shell/
+flake.nix                 the inputs, the module list every Mac shares, one darwinConfigurations entry per Mac
+hosts/macmini.nix         the host: platform, primary user, its two meshes, cleanup "uninstall"
+hosts/macbook-air.nix     the host: its two meshes, cleanup "none" for now, the laptop's own casks
+modules/packages.nix      the CLI set, one list for every Mac
+modules/homebrew.nix      the casks, one list for every Mac; a host adds its own
+modules/shell.nix         zsh on
+modules/mesh.nix          an estate mesh as a wg-quick launchd daemon, from the estate's peers.json
+modules/lab-ca.nix        the estate's CA roots in nix's bundle and the System keychain
+modules/node-exporter.nix node_exporter as a launchd daemon, :9100, for luxor's Prometheus
+home/steven.nix           the links into shell/
 ```
 
 ## Apply on macmini
@@ -116,11 +120,69 @@ holds no key.
 
 ## macbook-air
 
-Not declared yet. Its brew list differs (full Xcode, the verify and
-capture skills, the music apps), so it gets its own `hosts/` file and
-its own package list rather than a copy of this one. The SF Mono nerd
-font (tap `epk/epk`, cask `font-sf-mono-nerd-font`) dropped here with
-Alacritty; if that machine's terminal wants it, it comes back there.
+The primary Mac-app dev machine: full Xcode, the creative apps, `cliclick`
+for the capture skill. One CLI set and one cask list serve both Macs
+(`modules/packages.nix`, `modules/homebrew.nix`); the host file adds the
+laptop's own casks (Blender, Resolume Arena, LM Studio)
+and its meshes. Written from `brew list` on 2026-10-25, then unified:
+
+- **Into the common set** from the air: bash, coreutils-prefixed (the
+  g-prefixed names brew gave), exiv2, libheif; the sanesidebuttons,
+  keymapp and claude (Claude Desktop) casks; cliclick as the one brew
+  formula (not in nixpkgs).
+- **Dropped** from the air: wimlib, speedtest, postgresql@18 and libpq
+  (the server was no running service; its data,
+  `/opt/homebrew/var/postgresql@18`, survives the formula's removal), and
+  the casks inkscape, kdenlive, licecap, ghostty, visual-studio-code,
+  zed, raycast, pomatez, mgba, steam, primetime, xquartz, streamlabs.
+  From macmini: mysqlworkbench.
+- **Left to the cleanup flip**, undeclarable: alacritty (disabled
+  upstream, fails Gatekeeper), font-sf-mono-nerd-font (the epk/epk tap,
+  which brew refuses to load as untrusted), whisky (deprecated), and the
+  sunshine formula (lizardbyte tap, untrusted). Cleanup starts at
+  `"none"`, so all of the above stay on disk until step 6.
+- **tpm** is a clone the profile makes in `~/.tmux/plugins` (not in
+  nixpkgs; brew's copy was linked there).
+- The hand-written `~/.zshrc` here carried bun and the LM Studio CLI on
+  PATH. home-manager replaces that file with the link to
+  `shell/zsh/profile`, so the profile carries both now, guarded on the
+  directories.
+
+### Apply on macbook-air
+
+0. Nix is not installed. Determinate Nix, as on macmini:
+
+   ```
+   curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --determinate
+   ```
+
+   Then a new shell, and `nix --version` answers.
+1. `brew services stop node_exporter` — the nix daemon takes :9100.
+2. Build as yourself, then set the profile and activate as root (the
+   three commands above, with this host):
+
+   ```
+   cd ~/.files/mac && nix build .#darwinConfigurations.macbook-air.system
+   sudo nix-env -p /nix/var/nix/profiles/system --set "$(readlink ./result)"
+   sudo ./result/sw/bin/darwin-rebuild activate
+   ```
+
+   The build fetches the estate inputs over ssh from gitea.zen.lofi with
+   your key, which is why it runs as you. The activation mints
+   `/etc/wireguard/mesh.key` and brings both tunnels up with no peers
+   that know this host yet; that is expected until step 5.
+3. Open a new shell. `which sops age wg kubectl` must answer under
+   `/run/current-system/sw/bin`.
+4. The agent persona, once ("The agent persona" below): the token, the
+   bootstrap, and `Include ~/.ssh/sfi-agent.conf` as the first line of
+   `~/.ssh/config`.
+5. The meshes ("The meshes" above, steps 2 to 4): `sudo wg pubkey <
+   /etc/wireguard/mesh.key`, a `clients.macbook-air` entry in
+   sfi/staging (`10.2.0.208`) and in sfi/estate-hub (`10.3.0.208`) by
+   PR, then `nix flake update staging estate-hub` here, build, activate.
+6. Flip `homebrew.onActivation.cleanup` to `"uninstall"` in the host
+   file and switch again, once every tool resolves from the store. That
+   removes the dropped and undeclarable casks and formulae above.
 
 ## The agent persona
 

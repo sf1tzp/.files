@@ -24,6 +24,18 @@ if [[ -f "$HOME/.cargo/env" ]]; then
     source "$HOME/.cargo/env"
 fi
 
+# Bun
+if [[ -d "$HOME/.bun/bin" ]]; then
+    export BUN_INSTALL="$HOME/.bun"
+    export PATH="$BUN_INSTALL/bin:$PATH"
+    [[ -s "$BUN_INSTALL/_bun" ]] && source "$BUN_INSTALL/_bun"
+fi
+
+# LM Studio CLI (lms)
+if [[ -d "$HOME/.lmstudio/bin" ]]; then
+    export PATH="$PATH:$HOME/.lmstudio/bin"
+fi
+
 # Go Path
 if [[ -d /usr/local/go/bin/ ]]; then
     export PATH=$PATH:/usr/local/go/bin
@@ -66,9 +78,20 @@ fi
 if [[ -f /opt/homebrew/bin/brew ]]; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
     export ZPLUG_HOME="/opt/homebrew/opt/zplug"
-    if [[ -d /opt/homebrew/opt/tpm/share/tpm && ! -d ~/.tmux/plugins/tpm ]]; then
-        mkdir -p ~/.tmux/plugins
+fi
+
+# tpm (tmux.conf runs ~/.tmux/plugins/tpm/tpm). Brew's copy is linked
+# there where brew has one; elsewhere, and on a Mac once nix-darwin's
+# Homebrew cleanup has removed the formula (tpm is not in nixpkgs), the
+# upstream way: a clone. -e follows the link, so a dangling one counts
+# as absent and is replaced.
+if [[ ! -e ~/.tmux/plugins/tpm ]]; then
+    rm -f ~/.tmux/plugins/tpm
+    mkdir -p ~/.tmux/plugins
+    if [[ -d /opt/homebrew/opt/tpm/share/tpm ]]; then
         ln -s /opt/homebrew/opt/tpm/share/tpm ~/.tmux/plugins/tpm
+    elif which git &>/dev/null; then
+        git clone -q --depth 1 https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm &>/dev/null &!
     fi
 fi
 
