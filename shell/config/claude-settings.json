@@ -1,6 +1,18 @@
 {
   "env": {
-    "DISABLE_AUTOUPDATER": "1"
+    "DISABLE_AUTOUPDATER": "1",
+    "SFI_AGENT": "1",
+    "GIT_AUTHOR_NAME": "sfi-agent",
+    "GIT_AUTHOR_EMAIL": "support@streetfortress.com",
+    "GIT_COMMITTER_NAME": "sfi-agent",
+    "GIT_COMMITTER_EMAIL": "support@streetfortress.com",
+    "GIT_CONFIG_COUNT": "3",
+    "GIT_CONFIG_KEY_0": "user.signingkey",
+    "GIT_CONFIG_VALUE_0": "=sfi-agent <support@streetfortress.com>",
+    "GIT_CONFIG_KEY_1": "commit.gpgsign",
+    "GIT_CONFIG_VALUE_1": "true",
+    "GIT_CONFIG_KEY_2": "tag.gpgsign",
+    "GIT_CONFIG_VALUE_2": "true"
   },
   "includeCoAuthoredBy": false,
   "model": "claude-fable-5[1m]",
@@ -34,10 +46,10 @@
   "autoMode": {
     "soft_deny": [
       "$defaults",
-      "Publish steps on public/external services: PRs, issues, or releases on github.com, package registry pushes — Steven vets content before anything publishes",
+      "Publish steps on public/external services: PRs, issues, or releases on github.com, package registry pushes \u2014 Steven vets content before anything publishes",
       "Force-pushes or history rewrites on shared branches (main, or any branch with an open PR)",
-      "SSH or remote command execution on the production VPS hosts — web2/db2.streetfortress.cloud, mesh IPs 10.1.0.51 and 10.1.0.52 — in any spelling (hostname, IP, ssh alias, ansible limit), including read-only checks",
-      "Reading, printing, or editing rendered WireGuard configs or key material (/etc/wireguard/*, PrivateKey values, wg genkey output) by any means — cat, grep, sed, tee, redirection, sudo; change the Ansible template and re-run the playbook instead"
+      "SSH or remote command execution on the production VPS hosts \u2014 web2/db2.streetfortress.cloud, mesh IPs 10.1.0.51 and 10.1.0.52 \u2014 in any spelling (hostname, IP, ssh alias, ansible limit), including read-only checks",
+      "Reading, printing, or editing rendered WireGuard configs or key material (/etc/wireguard/*, PrivateKey values, wg genkey output) by any means \u2014 cat, grep, sed, tee, redirection, sudo; change the Ansible template and re-run the playbook instead"
     ]
   },
   "enabledPlugins": {

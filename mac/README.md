@@ -121,3 +121,36 @@ capture skills, the music apps), so it gets its own `hosts/` file and
 its own package list rather than a copy of this one. The SF Mono nerd
 font (tap `epk/epk`, cask `font-sf-mono-nerd-font`) dropped here with
 Alacritty; if that machine's terminal wants it, it comes back there.
+
+## The agent persona
+
+A Claude Code session on a Mac writes to forge.streetfortress.cloud as
+`sfi-agent`, not as you: the session's commits are sfi-agent's and
+signed, its pushes use sfi-agent's key, its pull requests open under
+sfi-agent. You review and merge as yourself, so branch protection and
+approvals apply to the agent's work. Outside a session nothing changes:
+your key, your login, your name.
+
+The mechanism is one environment variable. `shell/config/claude-settings.json`
+gives every session `SFI_AGENT=1` plus the git author, committer and
+signing settings; `shell/config/ssh/sfi-agent.conf` (linked to
+`~/.ssh/sfi-agent.conf`, included from `~/.ssh/config`'s first line)
+matches on that variable and hands ssh the persona's key for the forge
+alone. `tea` has no such switch: a session passes `--login sfi-agent`.
+
+Once per Mac, after the activate:
+
+1. Mint sfi-agent's token on the forge, as sfi-agent (Forgejo issues a
+   token only to its own account): scopes `write:repository`,
+   `write:issue`, `read:user`, `read:organization`.
+2. `SFI_AGENT_TOKEN=… sfi-agent-bootstrap` (`shell/scripts`): generates
+   `~/.ssh/sfi-agent` and the GPG key `sfi-agent <support@streetfortress.com>`
+   in `~/.gnupg`, registers both on the account titled `agent-<host>`,
+   through fj (forgejo-cli), stores the token in fj's login and adds the tea
+   login `sfi-agent`. Without the token it generates and
+   prints, and you register by hand.
+3. `Include ~/.ssh/sfi-agent.conf` as the first line of `~/.ssh/config`.
+
+The private halves stay on this Mac. gotea's agent-policy audits the
+bundle (sfi/gotea#120); the fix for a drifted one is the bootstrap, not
+`fort mint`.

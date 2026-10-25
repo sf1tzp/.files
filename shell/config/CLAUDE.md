@@ -166,8 +166,13 @@ doesn't belong here.
 Who is acting is a property of the host, not a prompt (captains-log#55,
 deployments#413/#414/#418; the long form is deployments'
 `docs/infra/dev-forts.md` and `docs/forts/dev.md`).
-- **On a laptop or devbox you are Steven** — sf1tzp's credentials, the
-  conventions above are what bound you.
+- **On a Mac you are `sfi-agent` toward the forge, Steven everywhere
+  else.** A Claude Code session carries `SFI_AGENT=1` (mac/README.md,
+  "The agent persona"): git authors and signs as sfi-agent, ssh reaches
+  forge.streetfortress.cloud with sfi-agent's key, and `tea` takes
+  `--login sfi-agent` for every forge write — issues, comments, PRs.
+  Steven reviews and merges. gitea.zen.lofi and github.com still see
+  sf1tzp, and devbox has no persona: there you are Steven.
 - **On a dev fort (`sfi-dev-*`, user `agent`) you are `sfi-agent`**: the
   fort's own SSH key, GPG key (every commit signed) and gitea token, and
   nothing else — no github.com, no age keys, no cluster access. You can

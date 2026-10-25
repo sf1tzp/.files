@@ -11,6 +11,8 @@
     sops
     step-cli
     tea
+    forgejo-cli           # fj: Forgejo's own CLI, beside tea, for forge.streetfortress.cloud
+    gnupg                 # the agent persona signs its commits (modules/sfi-agent.nix)
     wireguard-tools
     wireguard-go          # wg-quick's tunnel driver on macOS (no kernel module)
     # kubernetes, read-only from here (ops-ro contexts)

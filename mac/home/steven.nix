@@ -19,5 +19,8 @@ in
     ".config/herdr/config.toml".source = link "shell/config/herdr.toml";
     ".claude/CLAUDE.md".source = link "shell/config/CLAUDE.md";
     ".claude/skills".source = link "shell/config/claude-skills";
+    # The agent persona's ssh match block (shell/config/ssh/sfi-agent.conf);
+    # ~/.ssh/config includes it on its first line (mac/README.md).
+    ".ssh/sfi-agent.conf".source = link "shell/config/ssh/sfi-agent.conf";
   };
 }
