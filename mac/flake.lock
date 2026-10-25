@@ -1,19 +1,35 @@
 {
   "nodes": {
-    "estate-hub": {
+    "development": {
       "flake": false,
       "locked": {
-        "lastModified": 1792880800,
-        "narHash": "sha256-V7UAVNEI74ly7vG9ufPbVv4Cu/PWM5EogsOoc9L5v9Q=",
+        "lastModified": 1792962123,
+        "narHash": "sha256-XNppDc6ypMHogiszi47p4GSjZgR3m1836kfPSv49UIY=",
         "ref": "refs/heads/main",
-        "rev": "ae30ac481607f7d5870219f8f96f94dd5dbdfee2",
-        "revCount": 35,
+        "rev": "96c82061f6d4e2c07fd71725381ba06800940e76",
+        "revCount": 1,
         "type": "git",
-        "url": "ssh://git@gitea.zen.lofi:30022/sfi/estate-hub"
+        "url": "ssh://git@forge.streetfortress.cloud:30022/sfi/development"
       },
       "original": {
         "type": "git",
-        "url": "ssh://git@gitea.zen.lofi:30022/sfi/estate-hub"
+        "url": "ssh://git@forge.streetfortress.cloud:30022/sfi/development"
+      }
+    },
+    "estate-hub": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1792961323,
+        "narHash": "sha256-ZuqlftsqYWwEXeMPXw8p8a3sbNwVLvbm3zgt7R1eU0U=",
+        "ref": "refs/heads/main",
+        "rev": "9973582b77c8b3cf846cde45ecc96ad405fc408c",
+        "revCount": 45,
+        "type": "git",
+        "url": "ssh://git@forge.streetfortress.cloud:30022/sfi/estate-hub"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://git@forge.streetfortress.cloud:30022/sfi/estate-hub"
       }
     },
     "home-manager": {
@@ -75,6 +91,7 @@
     },
     "root": {
       "inputs": {
+        "development": "development",
         "estate-hub": "estate-hub",
         "home-manager": "home-manager",
         "nix-darwin": "nix-darwin",
@@ -85,17 +102,17 @@
     "staging": {
       "flake": false,
       "locked": {
-        "lastModified": 1791602570,
-        "narHash": "sha256-gL5kukosd1Sg8i8nMRp0Ky4+NHSmNsKxMcDnI/mycGQ=",
+        "lastModified": 1792961344,
+        "narHash": "sha256-SyIFKd4rYbtWCllYCt8IuS5wplMuXSopy5F/wiFcT+Q=",
         "ref": "refs/heads/main",
-        "rev": "835b2f79387aaebea57afe248c439dab2ec682e6",
-        "revCount": 10,
+        "rev": "4918f56bec5fb4f0dd1da0a45e333dbf1963016b",
+        "revCount": 20,
         "type": "git",
-        "url": "ssh://git@gitea.zen.lofi:30022/sfi/staging"
+        "url": "ssh://git@forge.streetfortress.cloud:30022/sfi/staging"
       },
       "original": {
         "type": "git",
-        "url": "ssh://git@gitea.zen.lofi:30022/sfi/staging"
+        "url": "ssh://git@forge.streetfortress.cloud:30022/sfi/staging"
       }
     }
   },

@@ -28,11 +28,15 @@
     # not a flake, for its mesh/peers.json. `nix flake update staging`
     # follows a peers.json change; the lock says which peer set is live.
     staging = {
-      url = "git+ssh://git@gitea.zen.lofi:30022/sfi/staging";
+      url = "git+ssh://git@forge.streetfortress.cloud:30022/sfi/staging";
       flake = false;
     };
     estate-hub = {
-      url = "git+ssh://git@gitea.zen.lofi:30022/sfi/estate-hub";
+      url = "git+ssh://git@forge.streetfortress.cloud:30022/sfi/estate-hub";
+      flake = false;
+    };
+    development = {
+      url = "git+ssh://git@forge.streetfortress.cloud:30022/sfi/development";
       flake = false;
     };
   };

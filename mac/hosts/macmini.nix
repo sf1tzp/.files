@@ -29,6 +29,14 @@
     interface = "wg-estate-hub";
     address = "10.3.0.96/24";
   };
+  # The development mesh (sfi/development estate.toml: 10.5.0.0/24): the
+  # dev fort sfi-dev lives there, and this Mac dispatches to it. Client
+  # entry clients.macmini in that estate's mesh/peers.json, same key.
+  sfi.meshes.development = {
+    peersFile = "${inputs.development}/mesh/peers.json";
+    interface = "wg-development";
+    address = "10.5.0.96/24";
+  };
   # The one key for every mesh (modules/mesh.nix). This file was minted
   # when the module made one key per mesh; its public key is what both
   # estates register for macmini, so it stays where it is.
