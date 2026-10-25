@@ -43,13 +43,21 @@ if [ -z "${SFI_AGENT_TOKEN:-}" ]; then
   exit 0
 fi
 
-# fj's login store: the token under the forge's name. Idempotent: a second
-# add-token replaces the entry for the same host.
+# fj's login store: the token under the forge's name. add-token keeps an
+# entry that exists ("key for <host> already exists") instead of
+# replacing it, so sign the host out first: a re-run with a new token
+# must store the new token.
+fj auth logout "${forge#https://}" >/dev/null 2>&1 || true
 printf '%s' "$SFI_AGENT_TOKEN" | fj auth add-token -H "$forge" >/dev/null
 # fj prints "currently signed into <user>@<host>" with invisible isolate
 # marks around the names, so match on the words rather than parse them.
-fj whoami -H "$forge" | grep -q "signed into.*sfi-agent.*forge.streetfortress.cloud" \
-  || { echo "the token is not sfi-agent's: $(fj whoami -H "$forge")" >&2; exit 1; }
+# A token the forge refuses, or another account's, leaves no login behind.
+if ! fj whoami -H "$forge" 2>/dev/null | grep -q "signed into.*sfi-agent.*forge.streetfortress.cloud"; then
+  echo "the token is not sfi-agent's on $forge: $(fj whoami -H "$forge" 2>&1 | head -1)" >&2
+  echo "check it: curl -sS -H \"Authorization: token \$SFI_AGENT_TOKEN\" $forge/api/v1/user" >&2
+  fj auth logout "${forge#https://}" >/dev/null 2>&1 || true
+  exit 1
+fi
 
 if fj user key list -H "$forge" | grep -q "agent-$host"; then
   echo "ssh key: agent-$host already registered"
