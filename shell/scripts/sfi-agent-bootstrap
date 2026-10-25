@@ -74,10 +74,9 @@ else
   echo "gpg key: registered"
 fi
 
-if tea logins list 2>/dev/null | grep -q "sfi-agent"; then
-  echo "tea: login sfi-agent exists"
-else
-  tea login add --name sfi-agent --url "$forge" --token "$SFI_AGENT_TOKEN" --ssh-key "$key" >/dev/null
-  echo "tea: login sfi-agent added (sessions pass --login sfi-agent)"
-fi
+# tea's login, replaced on every run: a re-run is how a token rotates,
+# and tea has no verb that swaps the token of a login in place.
+tea login delete sfi-agent >/dev/null 2>&1 || true
+tea login add --name sfi-agent --url "$forge" --token "$SFI_AGENT_TOKEN" --ssh-key "$key" >/dev/null
+echo "tea: login sfi-agent holds this token (sessions pass --login sfi-agent)"
 echo "done. Claude Code sessions on $host act as sfi-agent on the forge (SFI_AGENT=1 in their environment)."
