@@ -23,8 +23,8 @@
     kubectx
     kubernetes-helm
     kustomize
-    kind
     k6
+    fluxcd
     # pulumi-bin, not pulumi: the source build in nixpkgs ships the CLI
     # alone, and `fort provision` needs the Go language host that the
     # official distribution puts beside its own binary (sfi/forts,
