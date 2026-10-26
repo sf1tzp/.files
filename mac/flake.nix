@@ -39,6 +39,10 @@
       url = "git+ssh://git@forge.streetfortress.cloud:30022/sfi/development";
       flake = false;
     };
+    production = {
+      url = "git+ssh://git@forge.streetfortress.cloud:30022/sfi/production";
+      flake = false;
+    };
   };
 
   outputs = { self, nixpkgs, nix-darwin, home-manager, ... }@inputs:

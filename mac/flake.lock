@@ -89,6 +89,22 @@
         "type": "github"
       }
     },
+    "production": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1792996819,
+        "narHash": "sha256-qSERPnwq5YsffnMDhHypuI8fQDpvvuAAkOp1vuINv10=",
+        "ref": "refs/heads/main",
+        "rev": "c6d5f0397f5e39313312e65ff6e344f04caabc93",
+        "revCount": 20,
+        "type": "git",
+        "url": "ssh://git@forge.streetfortress.cloud:30022/sfi/production"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://git@forge.streetfortress.cloud:30022/sfi/production"
+      }
+    },
     "root": {
       "inputs": {
         "development": "development",
@@ -96,6 +112,7 @@
         "home-manager": "home-manager",
         "nix-darwin": "nix-darwin",
         "nixpkgs": "nixpkgs",
+        "production": "production",
         "staging": "staging"
       }
     },

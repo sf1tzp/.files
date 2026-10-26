@@ -37,6 +37,14 @@
     interface = "wg-development";
     address = "10.5.0.96/24";
   };
+  # The production mesh (sfi/production estate.toml: 10.4.0.0/24): the
+  # fort sfi-prod-c6959d0 lives there, and this Mac observes its rollout
+  # (sfi/production#18). Client entry clients.macmini, same key.
+  sfi.meshes.production = {
+    peersFile = "${inputs.production}/mesh/peers.json";
+    interface = "wg-production";
+    address = "10.4.0.96/24";
+  };
   # The one key for every mesh (modules/mesh.nix). This file was minted
   # when the module made one key per mesh; its public key is what both
   # estates register for macmini, so it stays where it is.
