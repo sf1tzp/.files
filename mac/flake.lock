@@ -19,11 +19,11 @@
     "estate-hub": {
       "flake": false,
       "locked": {
-        "lastModified": 1792961323,
-        "narHash": "sha256-ZuqlftsqYWwEXeMPXw8p8a3sbNwVLvbm3zgt7R1eU0U=",
+        "lastModified": 1792969941,
+        "narHash": "sha256-SsjKdSdsgGZ2XW6vuIzp1Xu7qBmyRiqCO+YFTFQw9dA=",
         "ref": "refs/heads/main",
-        "rev": "9973582b77c8b3cf846cde45ecc96ad405fc408c",
-        "revCount": 45,
+        "rev": "f4b320534376dd7ed28dc4f5d8b4f69ccbb9e0b0",
+        "revCount": 47,
         "type": "git",
         "url": "ssh://git@forge.streetfortress.cloud:30022/sfi/estate-hub"
       },
@@ -102,11 +102,11 @@
     "staging": {
       "flake": false,
       "locked": {
-        "lastModified": 1792961344,
-        "narHash": "sha256-SyIFKd4rYbtWCllYCt8IuS5wplMuXSopy5F/wiFcT+Q=",
+        "lastModified": 1792969987,
+        "narHash": "sha256-wiWnsAAt0mPXJpXHjz1u8L3DuFpGpYXU0KZP7wVtCEE=",
         "ref": "refs/heads/main",
-        "rev": "4918f56bec5fb4f0dd1da0a45e333dbf1963016b",
-        "revCount": 20,
+        "rev": "e226e4bc66dfeba86640798d7cefdb7f9d69d10d",
+        "revCount": 21,
         "type": "git",
         "url": "ssh://git@forge.streetfortress.cloud:30022/sfi/staging"
       },

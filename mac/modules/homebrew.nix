@@ -40,13 +40,11 @@
       "claude-code"
       "moment-tally"
       # audio and screen
-      "airfoil"
       "audio-hijack"
       "loopback"
       "soundsource"
       "obs"
       "superwhisper"
-      "ankerwork"
       # the desk
       "betterdisplay"
       "rectangle"
