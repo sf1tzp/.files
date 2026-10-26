@@ -3,11 +3,11 @@
     "development": {
       "flake": false,
       "locked": {
-        "lastModified": 1792962123,
-        "narHash": "sha256-XNppDc6ypMHogiszi47p4GSjZgR3m1836kfPSv49UIY=",
+        "lastModified": 1792970155,
+        "narHash": "sha256-Vdvy5kTjj1CUWkuSaL+idP4JpHee46fZnB6ju/snH4I=",
         "ref": "refs/heads/main",
-        "rev": "96c82061f6d4e2c07fd71725381ba06800940e76",
-        "revCount": 1,
+        "rev": "5a2296cc9436e64f00e8a1b3b14c1d5a56fc6ca8",
+        "revCount": 4,
         "type": "git",
         "url": "ssh://git@forge.streetfortress.cloud:30022/sfi/development"
       },
