@@ -144,8 +144,10 @@ doesn't belong here.
 - **No licensed binary assets in mirrored repos** — fonts especially
   (Palm Springs, Morganite). Brand assets live in `~/.sfi/brand-assets`
   and are injected at build/render time, never committed.
-- **Branch-guarded mains** (`.files`, `captains-log`): changes land via
-  branch + PR, never a direct push to main.
+- **Branch-guarded mains** (`.files`): changes land via branch + PR, never
+  a direct push to main. `captains-log` is unguarded as of 2026-10-27: an
+  obsidian-git loop owns its commit stream, and sessions there follow that
+  repo's `CLAUDE.md` (edit freely, don't commit note edits).
 - **Production forts are hands-off** — `sfi-prod-439bf72` (Linode, mesh
   10.1.0.54) is the production box; web2 and db2 are decommissioned
   (deployments#340). No SSH or remote command execution on it without an
