@@ -26,7 +26,20 @@
   "switchModelsOnFlag": false,
   "permissions": {
     "defaultMode": "auto",
+    "allow": [
+      "Bash(tea issues create*)",
+      "Bash(tea issues edit*)",
+      "Bash(tea issues close*)",
+      "Bash(tea issues reopen*)",
+      "Bash(tea comment*)",
+      "Bash(tea pr create*)",
+      "Bash(tea pr edit*)",
+      "Bash(tea labels*)",
+      "Bash(tea milestones*)"
+    ],
     "ask": [
+      "Bash(tea pr approve*)",
+      "Bash(tea pr merge*)",
       "Bash(gh pr create*)",
       "Bash(gh release*)",
       "Bash(git push --force*)",
