@@ -59,6 +59,7 @@ function checkout_branch() {
     command git checkout "$branch_name"
 }
 
+# With a branch name argument, skip fzf and use that name directly.
 function create_worktree() {
     # Resolve the repo name from the main worktree so this also works when
     # run from inside another worktree.
@@ -73,8 +74,10 @@ function create_worktree() {
 
     command git fetch --prune || echo "Fetch failed; continuing with local refs"
 
-    local branch_name
-    branch_name=$(_select_branch) || return 1
+    local branch_name="$1"
+    if [[ -z $branch_name ]]; then
+        branch_name=$(_select_branch) || return 1
+    fi
     _ensure_local_branch "$branch_name" || return 1
 
     local wt_path="$WORKTREE_DIR/$repo/$branch_name"
