@@ -3,9 +3,12 @@
 
 [Interface]
 Address = {{ peers_data.peers[inventory_hostname].wg_vpn_ip }}/24
-PrivateKey = {{ private_key }}
 ListenPort = {{ wg_port }}
 SaveConfig = false
+
+# The private key stays in its own root-owned file on the host; the playbook
+# renders this config without ever reading it. Must be the first PostUp.
+PostUp = wg set %i private-key /etc/wireguard/wg0.key
 
 # Uncomment to proxy requests to other hosts on the network
 # PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -A FORWARD -o wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE

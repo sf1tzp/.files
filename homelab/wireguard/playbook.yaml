@@ -4,9 +4,8 @@
   become: yes
   serial: 1  # serialize to avoid concurrent peers.json mutations
   vars:
-    vault_password: "{{ lookup('env', 'ANSIBLE_VAULT_PASSWORD') }}"
-    wg_keys_file: "~/.homelab-wireguard-keys.yaml"
     peers_file: "{{ playbook_dir }}/peers.json"
+    wg_key_file: /etc/wireguard/wg0.key
     wg_port: 51820
   tasks:
     - name: Install Wireguard packages
@@ -16,97 +15,63 @@
           - wireguard
         state: present
 
-    # --- Private key management (vault-encrypted keys file, unchanged from prior playbook) ---
-    - name: Check if private keys file exists
+    - name: Create Wireguard configuration directory
+      ansible.builtin.file:
+        path: /etc/wireguard
+        state: directory
+        mode: "0700"
+
+    # --- Private key management ---
+    # The key lives on the host, in /etc/wireguard/wg0.key, and nowhere else.
+    # (The vault-encrypted ~/.homelab-wireguard-keys.yaml practice is retired:
+    # every host it held besides soundship is decommissioned, and the control
+    # machine never needed a copy — the host is the key's trust boundary.)
+    # No task reads the key into a variable; the template points wg-quick at
+    # the file instead of embedding the key in the rendered config.
+    - name: Check for the key file
       ansible.builtin.stat:
-        path: "{{ wg_keys_file }}"
-      register: keys_file
-      delegate_to: localhost
-      become: no
+        path: "{{ wg_key_file }}"
+      register: wg_key
 
-    - name: Initialize private keys file with empty structure
-      ansible.builtin.copy:
-        content: "wireguard:\n  private_keys: {}\n"
-        dest: "{{ wg_keys_file }}"
-        mode: "0600"
-        force: false
-      when: not keys_file.stat.exists
-      delegate_to: localhost
-      become: no
+    - name: Check for a rendered wg0.conf to migrate the key out of
+      ansible.builtin.stat:
+        path: /etc/wireguard/wg0.conf
+      register: wg_conf
 
-    - name: Check for existing private key
-      ansible.builtin.command:
-        cmd: yq -e '.wireguard.private_keys.{{ inventory_hostname }}' {{ wg_keys_file }}
-      register: private_key_check
-      failed_when: false
-      changed_when: false
-      delegate_to: localhost
-      become: no
-
-    - name: Set fact if private key exists
-      ansible.builtin.set_fact:
-        private_key_not_set: "{{ private_key_check.rc != 0 }}"
-
-    - name: Generate Wireguard private key
-      ansible.builtin.command:
-        cmd: wg genkey
-      register: wg_private_key
-      when: private_key_not_set
-      delegate_to: localhost
-      become: no
-
-    - name: Encrypt private key
-      ansible.builtin.set_fact:
-        encrypted_private_key: "{{ wg_private_key.stdout | vault(vault_password) }}"
-      when: private_key_not_set
-
-    - name: Store encrypted private key in vault
-      ansible.builtin.command:
-        cmd: yq -i '.wireguard.private_keys.{{ inventory_hostname }} = "{{ encrypted_private_key }}"' {{ wg_keys_file }}
-      when: private_key_not_set
-      delegate_to: localhost
-      become: no
-
-    - name: Retrieve existing private key from vault
-      ansible.builtin.command:
-        cmd: yq -e '.wireguard.private_keys.{{ inventory_hostname }}' {{ wg_keys_file }}
-      register: existing_private_key
-      when: not private_key_not_set
-      delegate_to: localhost
-      become: no
-
-    - name: Decrypt existing private key
-      ansible.builtin.set_fact:
-        decrypted_private_key: "{{ existing_private_key.stdout | unvault(vault_password) }}"
-      when: not private_key_not_set
-
-    - name: Set private key fact for new key
-      ansible.builtin.set_fact:
-        current_private_key: "{{ wg_private_key.stdout }}"
-      when: private_key_not_set
-
-    - name: Set private key fact for existing key
-      ansible.builtin.set_fact:
-        current_private_key: "{{ decrypted_private_key }}"
-      when: not private_key_not_set
-
-    - name: Set private key for template
-      ansible.builtin.set_fact:
-        private_key: "{{ current_private_key }}"
-
-    - name: Derive public key from private key
+    - name: Migrate the private key out of an existing wg0.conf
       ansible.builtin.shell:
-        cmd: echo '{{ current_private_key }}' | wg pubkey
+        cmd: umask 077 && awk '/^PrivateKey/ {print $3}' /etc/wireguard/wg0.conf > {{ wg_key_file }}
+      args:
+        creates: "{{ wg_key_file }}"
+      no_log: true
+      when: not wg_key.stat.exists and wg_conf.stat.exists
+
+    - name: Generate a private key on a fresh host
+      ansible.builtin.shell:
+        cmd: umask 077 && wg genkey > {{ wg_key_file }}
+      args:
+        creates: "{{ wg_key_file }}"
+      no_log: true
+      when: not wg_key.stat.exists and not wg_conf.stat.exists
+
+    # Fails loudly on an empty or malformed key file (e.g. a wg0.conf that
+    # had no PrivateKey line to migrate). The derived pubkey is not secret.
+    - name: Derive the public key from the key file
+      ansible.builtin.shell:
+        cmd: wg pubkey < {{ wg_key_file }}
       register: wg_public_key
       changed_when: false
-      delegate_to: localhost
-      become: no
 
     # --- peers.json is the source of truth for all peer metadata ---
     - name: Read peers.json
       ansible.builtin.include_vars:
         file: "{{ peers_file }}"
         name: peers_data
+
+    - name: Fail if this host is missing from peers.json
+      ansible.builtin.fail:
+        msg: "{{ inventory_hostname }} is not listed under peers in {{ peers_file }}"
+      when: inventory_hostname not in peers_data.peers
 
     - name: Read committed pubkey for this host
       ansible.builtin.set_fact:
@@ -143,24 +108,13 @@
       ansible.builtin.fail:
         msg: >-
           peers.json has public_key '{{ committed_pubkey }}' for {{ inventory_hostname }},
-          but the private key in {{ wg_keys_file }} derives to '{{ wg_public_key.stdout }}'.
+          but {{ wg_key_file }} derives to '{{ wg_public_key.stdout }}'.
           Someone regenerated a key. Reconcile manually.
       when:
         - committed_pubkey != ""
         - committed_pubkey != wg_public_key.stdout
 
-    - name: Fail if this host is missing from peers.json
-      ansible.builtin.fail:
-        msg: "{{ inventory_hostname }} is not listed under peers in {{ peers_file }}"
-      when: inventory_hostname not in peers_data.peers
-
     # --- Render and deploy wg0.conf ---
-    - name: Create Wireguard configuration directory
-      ansible.builtin.file:
-        path: /etc/wireguard
-        state: directory
-        mode: "0700"
-
     - name: Render wg0.conf
       ansible.builtin.template:
         src: "{{ playbook_dir }}/templates/wg0.conf.j2"
@@ -176,7 +130,8 @@
 
     # Split-DNS: route *.lofi queries over the tunnel to soundship's dnsmasq.
     # Only needed on hosts that can't reach soundship on the LAN directly —
-    # the streetfortress.cloud VMs.
+    # the streetfortress.cloud VMs. (No such hosts remain; kept for the
+    # archaeology, removed whenever the inventory cleanup lands.)
     - name: Ensure systemd-resolved drop-in directory exists
       ansible.builtin.file:
         path: /etc/systemd/resolved.conf.d

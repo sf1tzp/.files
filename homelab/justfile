@@ -50,7 +50,7 @@ bootstrap +hosts:
     ansible-playbook vms/bootstrap-deployer.yaml --inventory inventory.yaml --limit "{{ hosts }}"
 
 wireguard +hosts="all":
-    ansible-playbook wireguard/playbook.yaml --inventory inventory.yaml --limit "{{ hosts }}" --vault-password-file ~/.ansible-password
+    ansible-playbook wireguard/playbook.yaml --inventory inventory.yaml --limit "{{ hosts }}"
 
 # soundship's storage drive: mount, Samba share, restic→B2 backup.
 # One-time mint steps in services/storage/README.md.

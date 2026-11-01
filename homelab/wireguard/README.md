@@ -7,8 +7,8 @@ Single source of truth for the homelab WireGuard mesh. Consumed by:
 
 ## Files
 
-- `peers.json` — per-peer `wg_vpn_ip`, optional `wg_endpoint_ip`, `public_key`. Public keys are not secret; private keys live elsewhere (ansible vault / sops).
-- `playbook.yaml` — installs `wireguard-tools`, manages per-host private keys in `~/.homelab-wireguard-keys.yaml` (vault-encrypted), writes derived pubkeys back into `peers.json`, and renders `/etc/wireguard/wg0.conf` from the template.
+- `peers.json` — per-peer `wg_vpn_ip`, optional `wg_endpoint_ip`, `public_key`. Public keys are not secret; each private key lives only on its own host (`/etc/wireguard/wg0.key`; sops for forts).
+- `playbook.yaml` — installs `wireguard-tools`, ensures the host's private key exists at `/etc/wireguard/wg0.key` (generated there if missing; migrated once out of an older rendered `wg0.conf`), writes the derived pubkey back into `peers.json`, and renders `/etc/wireguard/wg0.conf` from the template. No task reads the key: the rendered config points wg-quick at the key file. The vault-encrypted `~/.homelab-wireguard-keys.yaml` is retired (#121) — every host it held besides soundship is decommissioned, so the control machine holds no key copies.
 - `templates/wg0.conf.j2` — Jinja2 template that iterates `peers_data.peers` (mesh) and `peers_data.clients` (roaming).
 
 ## Conventions
@@ -28,7 +28,7 @@ Peers behind dynamic NAT with no fixed endpoint (soundship, devbox) omit `wg_end
 
 1. Add the peer's inventory hostvars to `../inventory.yaml` and put it in the `wireguard:` group.
 2. Add an entry under `peers.<name>` in `peers.json` with `wg_vpn_ip` (and `wg_endpoint_ip` if applicable). Leave `public_key` as `""`.
-3. Run `just wireguard <name>`. The playbook generates a private key, stores it vault-encrypted, derives the pubkey, writes it back into `peers.json`, and renders `wg0.conf`.
+3. Run `just wireguard <name>`. The playbook generates a private key on the host, derives the pubkey, writes it back into `peers.json`, and renders `wg0.conf`.
 4. Commit the updated `peers.json`.
 5. Re-run `just wireguard` against the other hosts so they pick up the new peer.
 
