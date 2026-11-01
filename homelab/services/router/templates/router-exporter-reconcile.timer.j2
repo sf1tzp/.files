@@ -1,0 +1,11 @@
+# Managed by homelab/services/router (sf1tzp/.files).
+[Unit]
+Description=Probe the router's node_exporter every five minutes
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=5min
+RandomizedDelaySec=30
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,9 @@
+# Managed by homelab/services/router (sf1tzp/.files).
+[Unit]
+Description=Reinstall the router's node_exporter when it stops answering
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/router-exporter/reconcile

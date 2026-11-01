@@ -77,3 +77,8 @@ _base_images_from_iso:
 x11-tunnel vm:
   DISPLAY=:0 ssh -X {{ vm }}
 
+# The router's node_exporter reconciler on soundship. One-time mint
+# steps (router UI SSH + key) in services/router/README.md.
+router:
+    ansible-playbook services/router/playbook.yaml --inventory inventory.yaml
+
