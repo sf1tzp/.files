@@ -1,0 +1,11 @@
+# Managed by homelab/services/storage (sf1tzp/.files).
+[Unit]
+Description=Nightly restic backup of /mnt/storage
+
+[Timer]
+OnCalendar=*-*-* 03:30:00
+Persistent=true
+RandomizedDelaySec=1800
+
+[Install]
+WantedBy=timers.target

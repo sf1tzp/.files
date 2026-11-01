@@ -1,0 +1,25 @@
+# Managed by homelab/services/storage (sf1tzp/.files).
+[Unit]
+Description=restic backup of /mnt/storage to B2
+RequiresMountsFor=/mnt/storage
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/restic/storage-b2.env
+Nice=10
+IOSchedulingClass=idle
+ExecStart=/usr/bin/restic backup /mnt/storage \
+  --exclude '$RECYCLE.BIN' \
+  --exclude 'System Volume Information' \
+  --exclude '.Spotlight-V100' \
+  --exclude '.fseventsd' \
+  --exclude '.Trashes' \
+  --exclude '.TemporaryItems' \
+  --exclude '.DS_Store'
+# Unlike a fort, this host's B2 key may delete (README.md): retention is
+# enforced here, not by a central prune job.
+ExecStart=/usr/bin/restic forget --prune --keep-daily 7 --keep-weekly 5 --keep-monthly 12
+# Freshness metric for the central backup rules — only after success.
+ExecStartPost=/usr/local/bin/restic-storage-metrics

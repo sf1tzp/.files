@@ -1,0 +1,44 @@
+# Managed by homelab/services/storage (sf1tzp/.files). Do not hand-edit:
+# the playbook overwrites this file.
+#
+# Design notes (estate-hub#93):
+# - Authenticated-only. macOS Tahoe requires signed SMB sessions by
+#   default; a guest session has no session key, so guest mounts succeed
+#   but every operation fails client-side (EACCES listings, Finder
+#   error 100093 on copy). A real user session signs fine.
+# - No fruit/streams_xattr. The drive is exFAT, which has no extended
+#   attributes: streams_xattr fails every AFP_AfpInfo stream write and
+#   ad_convert fails during directory enumeration. Without advertised
+#   stream support, macOS falls back to AppleDouble (._*) files, which
+#   work on any filesystem.
+# - ea support / store dos attributes off for the same reason: every EA
+#   read on exFAT fails with "Operation not supported" and only fills
+#   the logs.
+
+[global]
+   server role = standalone server
+   server string = %h
+   server min protocol = SMB3_00
+   map to guest = Bad User
+
+   ea support = no
+   store dos attributes = no
+
+   log file = /var/log/samba/log.%m
+   max log size = 1000
+   dns proxy = no
+
+[Storage]
+   comment = Storage
+   path = /mnt/storage
+   valid users = steven
+   # The exFAT mount owns every file as nobody:nogroup (uid=nobody in
+   # fstab). Impersonating the authenticated user would leave them with
+   # "other" permissions only, so file operations run as the owner.
+   force user = nobody
+   force group = nogroup
+   read only = no
+   create mask = 0664
+   directory mask = 0775
+   veto files = /.DS_Store/
+   delete veto files = yes
