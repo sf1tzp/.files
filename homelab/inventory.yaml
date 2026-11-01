@@ -6,7 +6,11 @@ all:
         soundship:
           ansible_host: 10.0.0.2
           wg_vpn_ip: 10.1.0.1
-          logging_endpoint_ip: 10.0.0.2 # Self-hosted logging
+          # sfi-central's Loki (the monitoring hub, a VM on this host's own
+          # bridge): NodePort 31100, reachable over the LAN. The old
+          # self-hosted stack on 10.0.0.2:3100 is gone.
+          logging_endpoint_ip: 10.0.0.6
+          logging_endpoint_port: 31100
           # Mesh→LAN inference forward (symbology#166, deployments#79): LM
           # Studio serves LLM + embeddings on 11434 from the win11 VM, which
           # is LAN-only and deliberately NOT a mesh peer (personal machine
