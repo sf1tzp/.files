@@ -68,6 +68,7 @@
     git
     # media and documents
     ffmpeg
+    vhs                   # terminal-session renderer for the demo tapes (bundles ttyd)
     pandoc
     pngquant
     exiv2
