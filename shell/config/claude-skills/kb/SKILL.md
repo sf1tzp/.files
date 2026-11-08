@@ -28,7 +28,7 @@ win: Obsidian sees that tree, so a commit to a second clone elsewhere is a
 commit nobody opens. Add a candidate to the list rather than reorder it.
 
 Every path below is relative to `$KB`. If none exists, clone it:
-`git clone ssh://git@gitea.zen.lofi:30022/sfi/knowledge.git`.
+`git clone ssh://git@forge.streetfortress.cloud:30022/sfi/knowledge.git`.
 
 **What exists already:** `$KB/kb-map.txt` is the generated tree listing of the
 repo — consult it (not the per-directory READMEs) to see current coverage.
