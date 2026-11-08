@@ -59,6 +59,7 @@
       "equinox"
       "bitwarden"
       "dropbox"
+      "nghialuong/fileoctopus/fileoctopus"
       # tools that are apps
       "ogdesign-eagle"
       "moonlight"
