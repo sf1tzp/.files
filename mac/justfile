@@ -1,0 +1,8 @@
+rebuild:
+  #!/usr/bin/env bash
+  set -euo pipefail
+
+  nix build .#darwinConfigurations.$(hostname).system
+  sudo nix-env -p /nix/var/nix/profiles/system --set "$(readlink ./result)"
+  sudo ./result/sw/bin/darwin-rebuild activate
+
