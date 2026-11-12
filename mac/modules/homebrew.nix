@@ -28,42 +28,39 @@
       "cliclick"     # the capture skill's clicks; not in nixpkgs
     ];
     casks = [
-      # terminals and editors (the terminal is Claude Code's, the editor
-      # is neovim)
-      "obsidian"
-      # browsers
+      # Dev work
       "firefox"
-      "google-chrome"
       "polypane"
-      # ours
-      "claude"       # Claude Desktop
+      "obsidian"
+      "claude"
       "claude-code"
-      "moment-tally"
-      # audio and screen
+      # Audio / Video
       "audio-hijack"
       "loopback"
       "soundsource"
       "obs"
-      "superwhisper"
-      # the desk
-      "betterdisplay"
-      "rectangle"
-      "stats"
-      "clocker"
-      "datweatherdoe"
-      "mac-mouse-fix"
-      "sanesidebuttons"
-      "keymapp"
-      "grandperspective"
-      "macusb"
-      "equinox"
-      "bitwarden"
-      "dropbox"
-      "nghialuong/fileoctopus/fileoctopus"
-      # tools that are apps
-      "ogdesign-eagle"
       "moonlight"
+      # Things MacOS lacks out of the box
+      "betterdisplay"     # menu bar display controls
+      "rectangle"         # menu bar window snapping
+      "stats"             # menu bar utilization stats
+      "clocker"           # menu bar clock (timezones)
+      "datweatherdoe"     # menu bar weather
+      "moment-tally"      # menu bar timer
+      "mac-mouse-fix"     # use the mouse wheel to zoom etc
+      "sanesidebuttons"   # more mouse fix
+      "keymapp"           # keyboard layers
+      "equinox"           # create dynamic wallpapers (light/dark mode)
+      "grandperspective"  # disk consumption visualizer
+      "macusb"            # usb formatter ala 'rufus'
+      "nghialuong/fileoctopus/fileoctopus" # better finder: panes
+      "Sanyam-G/switch/switch" # better alt+tab: fullscreen apps
+      # Tools that are apps
+      "dropbox"
+      "bitwarden"
+      "superwhisper"      # local model dictation
       "basictex"
+      "ogdesign-eagle"
       "paper-design"
     ];
   };
