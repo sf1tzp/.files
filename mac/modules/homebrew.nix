@@ -30,10 +30,11 @@
     casks = [
       # Dev work
       "firefox"
-      "polypane"
       "obsidian"
       "claude"
       "claude-code"
+      "polypane"
+      "google-chrome"
       # Audio / Video
       "audio-hijack"
       "loopback"
@@ -47,7 +48,7 @@
       "clocker"           # menu bar clock (timezones)
       "datweatherdoe"     # menu bar weather
       "moment-tally"      # menu bar timer
-      "mac-mouse-fix"     # use the mouse wheel to zoom etc
+      "mac-mouse-fix"     # use cmd + the mouse wheel to 'pinch to zoom'
       "sanesidebuttons"   # more mouse fix
       "keymapp"           # keyboard layers
       "equinox"           # create dynamic wallpapers (light/dark mode)
@@ -58,10 +59,10 @@
       # Tools that are apps
       "dropbox"
       "bitwarden"
-      "superwhisper"      # local model dictation
       "basictex"
-      "ogdesign-eagle"
-      "paper-design"
+      "ogdesign-eagle"    # asset organizer
+      "paper-design"      # ala figma
+      "superwhisper"      # local model dictation
     ];
   };
 }
