@@ -64,6 +64,7 @@
       "ogdesign-eagle"
       "moonlight"
       "basictex"
+      "paper-design"
     ];
   };
 }
