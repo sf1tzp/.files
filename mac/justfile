@@ -6,3 +6,5 @@ rebuild:
   sudo nix-env -p /nix/var/nix/profiles/system --set "$(readlink ./result)"
   sudo ./result/sw/bin/darwin-rebuild activate
 
+gc:
+  nix-collect-garbage

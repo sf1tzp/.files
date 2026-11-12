@@ -22,7 +22,8 @@
       upgrade = false;
     };
     taps = [
-      "sf1tzp/tap"   # moment-tally
+      "sf1tzp/tap"
+      "sanyam-g/switch"
     ];
     brews = [
       "cliclick"     # the capture skill's clicks; not in nixpkgs
@@ -54,8 +55,8 @@
       "equinox"           # create dynamic wallpapers (light/dark mode)
       "grandperspective"  # disk consumption visualizer
       "macusb"            # usb formatter ala 'rufus'
+      "switch"            # better alt+tab: fullscreen apps
       "nghialuong/fileoctopus/fileoctopus" # better finder: panes
-      "Sanyam-G/switch/switch" # better alt+tab: fullscreen apps
       # Tools that are apps
       "dropbox"
       "bitwarden"
