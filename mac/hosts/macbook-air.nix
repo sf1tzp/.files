@@ -11,12 +11,12 @@
   # Determinate Nix owns the daemon and /etc/nix/nix.conf.
   nix.enable = false;
 
-  # The two estate meshes, as a client (a Mac behind NAT the forts cannot
+  # The estate meshes, as a client (a Mac behind NAT the forts cannot
   # dial: a `clients.macbook-air` entry in each peers.json, no endpoint,
   # no listenPort). The last octet follows the LAN address (10.0.0.208),
   # the lab convention. The key is modules/mesh.nix's default,
   # /etc/wireguard/mesh.key, minted by the first activation; the public
-  # key goes into both estates by PR (README.md "The meshes"). This Mac
+  # key goes into each estate by PR (README.md "The meshes"). This Mac
   # was on no estate mesh before: the WireGuard app holds only the
   # homelab tunnel, which stays there.
   sfi.meshes.staging = {
@@ -28,6 +28,15 @@
     peersFile = "${inputs.estate-hub}/mesh/peers.json";
     interface = "wg-estate-hub";
     address = "10.3.0.208/24";
+  };
+  # The development mesh (sfi/development estate.toml: 10.5.0.0/24): the
+  # dev fort sfi-dev lives there, and this Mac dispatches to it (gotea),
+  # as macmini did before it moved. Client entry clients.macbook-air in
+  # that estate's mesh/peers.json, same key.
+  sfi.meshes.development = {
+    peersFile = "${inputs.development}/mesh/peers.json";
+    interface = "wg-development";
+    address = "10.5.0.208/24";
   };
 
   system.stateVersion = 6;
