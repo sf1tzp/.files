@@ -1,0 +1,82 @@
+---
+# The router's node_exporter, reconciled from soundship.
+#
+# The ASUS RT-AX1800S runs stock firmware: the filesystem is read-only
+# outside /tmp, /tmp is RAM, and nothing hooks boot — so an exporter
+# installed by hand dies on every reboot (the old
+# services/monitoring/router_exporters.sh ritual). Instead of persisting
+# anything on the router, soundship probes the exporter every five
+# minutes and reinstalls it over SSH when it stops answering. The router
+# reboots, the timer notices, the metrics come back.
+#
+# One-time mint steps in README.md (enable SSH in the router UI, paste
+# the reconciler's public key). Run with: just router
+- name: Router node_exporter reconciler
+  hosts: soundship
+  become: true
+  vars:
+    node_exporter_version: "1.10.2"
+    router_host: 10.0.0.1
+    # Stock ASUS SSH accepts the admin UI user.
+    router_ssh_user: admin
+
+  tasks:
+    - name: Create the service directory
+      ansible.builtin.file:
+        path: /opt/router-exporter
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    # mipsle: the RT-AX1800S (original revision) is MediaTek MT7621,
+    # little-endian MIPS. The v2 revision would need arm64 — check the
+    # sticker before bumping hardware.
+    - name: Fetch the mipsle node_exporter build
+      ansible.builtin.unarchive:
+        src: "https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.linux-mipsle.tar.gz"
+        remote_src: true
+        dest: /opt/router-exporter
+        extra_opts: ["--strip-components=1"]
+        creates: /opt/router-exporter/node_exporter
+
+    - name: Generate the reconciler's SSH key
+      ansible.builtin.command:
+        cmd: ssh-keygen -t ed25519 -N "" -C router-exporter@soundship -f /root/.ssh/router_exporter_ed25519
+        creates: /root/.ssh/router_exporter_ed25519
+
+    - name: Read the public key
+      ansible.builtin.slurp:
+        src: /root/.ssh/router_exporter_ed25519.pub
+      register: reconciler_pubkey
+
+    - name: Show the public key to paste into the router UI
+      ansible.builtin.debug:
+        msg: "Router UI → Administration → System → Authorized Keys: {{ reconciler_pubkey.content | b64decode | trim }}"
+
+    - name: Install the reconcile script
+      ansible.builtin.template:
+        src: templates/reconcile.sh.j2
+        dest: /opt/router-exporter/reconcile
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Install the reconciler service and timer
+      ansible.builtin.template:
+        src: "templates/{{ item }}.j2"
+        dest: "/etc/systemd/system/{{ item }}"
+        owner: root
+        group: root
+        mode: "0644"
+      loop:
+        - router-exporter-reconcile.service
+        - router-exporter-reconcile.timer
+      register: reconcile_units
+
+    - name: Enable the reconciler timer
+      ansible.builtin.systemd:
+        name: router-exporter-reconcile.timer
+        state: started
+        enabled: true
+        daemon_reload: "{{ reconcile_units.changed }}"

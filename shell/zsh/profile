@@ -24,6 +24,18 @@ if [[ -f "$HOME/.cargo/env" ]]; then
     source "$HOME/.cargo/env"
 fi
 
+# Bun
+if [[ -d "$HOME/.bun/bin" ]]; then
+    export BUN_INSTALL="$HOME/.bun"
+    export PATH="$BUN_INSTALL/bin:$PATH"
+    [[ -s "$BUN_INSTALL/_bun" ]] && source "$BUN_INSTALL/_bun"
+fi
+
+# LM Studio CLI (lms)
+if [[ -d "$HOME/.lmstudio/bin" ]]; then
+    export PATH="$PATH:$HOME/.lmstudio/bin"
+fi
+
 # Go Path
 if [[ -d /usr/local/go/bin/ ]]; then
     export PATH=$PATH:/usr/local/go/bin
@@ -32,6 +44,16 @@ fi
 
 if [[ -d ~/go/bin/ ]]; then
     export PATH=$PATH:/go/bin
+fi
+
+# nix
+if [[ -d /nix/var/nix/profiles/default/bin/ ]]; then
+    export PATH="$PATH:/nix/var/nix/profiles/default/bin"
+fi
+
+# Gotea
+if [[ -d "$HOME/gotea/bin" ]]; then
+    export PATH="$PATH:$HOME/gotea/bin"
 fi
 
 # if [[ -d .venv ]]; then
@@ -56,11 +78,73 @@ fi
 if [[ -f /opt/homebrew/bin/brew ]]; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
     export ZPLUG_HOME="/opt/homebrew/opt/zplug"
-    if [[ -d /opt/homebrew/opt/tpm/share/tpm && ! -d ~/.tmux/plugins/tpm ]]; then
-        mkdir -p ~/.tmux/plugins
+fi
+
+# tpm (tmux.conf runs ~/.tmux/plugins/tpm/tpm). Brew's copy is linked
+# there where brew has one; elsewhere, and on a Mac once nix-darwin's
+# Homebrew cleanup has removed the formula (tpm is not in nixpkgs), the
+# upstream way: a clone. -e follows the link, so a dangling one counts
+# as absent and is replaced.
+if [[ ! -e ~/.tmux/plugins/tpm ]]; then
+    rm -f ~/.tmux/plugins/tpm
+    mkdir -p ~/.tmux/plugins
+    if [[ -d /opt/homebrew/opt/tpm/share/tpm ]]; then
         ln -s /opt/homebrew/opt/tpm/share/tpm ~/.tmux/plugins/tpm
+    elif which git &>/dev/null; then
+        git clone -q --depth 1 https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm &>/dev/null &!
     fi
 fi
+
+# nix-darwin (mac/): the system profile wins over Homebrew, and zplug
+# comes from nixpkgs. Absent on every other host, so nothing changes there.
+if [[ -d /run/current-system/sw/bin ]]; then
+    export PATH="/run/current-system/sw/bin:/etc/profiles/per-user/$USER/bin:$PATH"
+    # zplug's install (init.zsh) is in the store, read-only; its plugins
+    # and cache go to the default ~/.zplug (shell/zsh/zplug reads both).
+    if [[ -f /run/current-system/sw/share/zplug/init.zsh ]]; then
+        export ZPLUG_ROOT="/run/current-system/sw/share/zplug"
+        unset ZPLUG_HOME
+    fi
+fi
+
+
+# Alacritty Config
+if [ ! -f ~/.config/alacritty/alacritty.toml ]; then
+	mkdir -p ~/.config/alacritty
+	ln -s ~/.files/shell/config/alacritty.toml ~/.config/alacritty/alacritty.toml
+fi
+
+# Sync Alacritty theme with the OS appearance (alacritty-theme-switch).
+# Runs per shell startup; Alacritty live-reloads its config, so opening a
+# new terminal after an OS light/dark switch updates all open windows.
+_alacritty_sync_os_theme() {
+    local light="everforest_light.toml" dark="everforest_dark.toml" desired=""
+    case "$(uname -s)" in
+    Darwin)
+        if defaults read -g AppleInterfaceStyle &>/dev/null; then
+            desired=$dark
+        else
+            desired=$light
+        fi
+        ;;
+    Linux)
+        if which gsettings &>/dev/null; then
+            case "$(gsettings get org.gnome.desktop.interface color-scheme 2>/dev/null)" in
+            *dark*) desired=$dark ;;
+            *) desired=$light ;;
+            esac
+        fi
+        ;;
+    esac
+    [[ -z "$desired" ]] && return
+    # ats rewrites the config on every run; skip if already active
+    grep -q "themes/$desired" ~/.config/alacritty/alacritty.toml 2>/dev/null && return
+    ats --select "$desired" &>/dev/null
+}
+if which ats &>/dev/null; then
+    _alacritty_sync_os_theme &!
+fi
+
 
 # Just
 if which just &>/dev/null; then
@@ -93,6 +177,25 @@ if which herdr &>/dev/null; then
         mkdir -p "$HOME/.config/herdr"
         ln -s "$HOME/.files/shell/config/herdr.toml" "$HOME/.config/herdr/config.toml"
     fi
+fi
+
+# Claude Code global instructions (home-manager manages this on NixOS)
+if [[ ! -f "$HOME/.claude/CLAUDE.md" && -f "$HOME/.files/shell/config/CLAUDE.md" ]]; then
+    mkdir -p "$HOME/.claude"
+    ln -s "$HOME/.files/shell/config/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
+fi
+
+# Claude Code personal skills (home-manager manages this on NixOS)
+if [[ ! -e "$HOME/.claude/skills" && -d "$HOME/.files/shell/config/claude-skills" ]]; then
+    mkdir -p "$HOME/.claude"
+    ln -s "$HOME/.files/shell/config/claude-skills" "$HOME/.claude/skills"
+fi
+
+# Claude Code shared settings — merged, not symlinked (Claude Code's atomic
+# writes replace symlinks; see the sync script). All hosts, NixOS included:
+# the target must stay a writable regular file.
+if [[ -x "$HOME/.files/shell/scripts/claude-settings-sync.sh" ]]; then
+    "$HOME/.files/shell/scripts/claude-settings-sync.sh"
 fi
 
 # Updating Clock
@@ -137,10 +240,12 @@ zvm_after_init_commands+=('
 ')
 
 if which kubectl &>/dev/null; then
+    export KUBECONFIG=~/.kube/config$(fd -t f --glob '*.config' ~/.kube | sed 's/^/:/' | tr -d '\n')
     source "$HOME/.files/shell/k8s/k8s.sh"
 fi
 
 if which sops &>/dev/null; then
+  export SOPS_AGE_KEY_FILE="$HOME/.config/sops/age/keys.txt"
   source <(sops completion zsh)
 fi
 
@@ -157,3 +262,5 @@ if which zoxide &>/dev/null; then
       eval "$(zoxide init --cmd cd zsh)"
     fi
 fi
+
+if [ -e /home/steven/.nix-profile/etc/profile.d/nix.sh ]; then . /home/steven/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer

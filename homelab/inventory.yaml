@@ -6,7 +6,23 @@ all:
         soundship:
           ansible_host: 10.0.0.2
           wg_vpn_ip: 10.1.0.1
-          logging_endpoint_ip: 10.0.0.2 # Self-hosted logging
+          # sfi-central's Loki (the monitoring hub, a VM on this host's own
+          # bridge): NodePort 31100, reachable over the LAN. The old
+          # self-hosted stack on 10.0.0.2:3100 is gone.
+          logging_endpoint_ip: 10.0.0.6
+          logging_endpoint_port: 31100
+          # Mesh→LAN inference forward (symbology#166, deployments#79): LM
+          # Studio serves LLM + embeddings on 11434 from the win11 VM, which
+          # is LAN-only and deliberately NOT a mesh peer (personal machine
+          # stays outside the production trust boundary). Mesh peers reach it
+          # at 10.1.0.1:11434. Local inference is best-effort by policy —
+          # workers fall back to outsourced LLM calls (symbology#146). Flip
+          # dest to 10.0.0.4 when llm-server runs instead of win11, then
+          # `just wireguard soundship`.
+          wg_forwards:
+            - port: 11434
+              dest: 10.0.0.99
+              oif: br0
 
     vms:
       children:
@@ -22,31 +38,6 @@ all:
               wg_vpn_ip: 10.1.0.3
               logging_endpoint_ip: 10.0.0.2
 
-        junktown:
-          hosts:
-            junktown:
-              ansible_host: 10.0.0.5
-              os: "ubuntu-server-24.04"
-              ansible_user: deployer
-              vcpus: 8
-              memory: 24
-              disk_size: "150G"
-              gpu_passthrough: false
-              wg_vpn_ip: 10.1.0.5
-
-        llm-server:
-          hosts:
-            llm-server:
-              ansible_host: 10.0.0.4
-              os: "ubuntu-server-24.04"
-              vcpus: 4
-              memory: 8
-              disk_size: "150G"
-              gpu_passthrough: true
-              gpu_domain: "0x0000"
-              gpu_bus: "0x01"
-              gpu_slot: "0x00"
-              logging_endpoint_ip: 10.0.0.2
 
         custom-image-builder:
           hosts:
@@ -138,16 +129,11 @@ all:
               wg_endpoint_ip: web2.streetfortress.cloud
               logging_endpoint_ip: 10.1.0.1
 
-    nvidia:
-      children:
-        llm-server: {}
-
     containerd:
       children:
         hypervisor: {}
         devbox: {}
         junktown: {}
-        llm-server: {}
         staging-1g: {}
         staging-v2: {}
         staging-web: {}
@@ -160,7 +146,6 @@ all:
         hypervisor: {}
         devbox: {}
         junktown: {}
-        llm-server: {}
         staging-web: {}
         staging-db: {}
         db2-streetfortress-cloud: {}
@@ -179,3 +164,27 @@ all:
       children:
         staging-1g: {}
         staging-v2: {}
+
+    # NixOS hosts: raised by the fort CLI in the deployments repo (`fort
+    # provision`), configured declaratively there (deployments nixos/).
+    # Deliberately NOT in `vms`/`containerd`/`monitoring` — those apply
+    # apt-based setup. ansible_host MUST match the static IP in the host's
+    # nixos config (deployments nixos/hosts/<name>/default.nix).
+    nixos:
+      hosts:
+        staging-k3s:
+          ansible_host: 10.0.0.40
+          vcpus: 4
+          memory: 8
+          disk_size: "40G"
+          # On the WireGuard mesh; the peer entry is deployments'
+          # wireguard/peers.json, mirrored here for the ubuntu members.
+          wg_vpn_ip: 10.1.0.13
+          wg_endpoint_ip: 10.0.0.40
+        luxor:
+          ansible_host: 10.0.0.5
+          vcpus: 4
+          memory: 8
+          disk_size: "40G"
+          wg_vpn_ip: 10.1.0.5
+          wg_endpoint_ip: 10.0.0.5

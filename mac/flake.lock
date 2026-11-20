@@ -1,0 +1,138 @@
+{
+  "nodes": {
+    "development": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1792970155,
+        "narHash": "sha256-Vdvy5kTjj1CUWkuSaL+idP4JpHee46fZnB6ju/snH4I=",
+        "ref": "refs/heads/main",
+        "rev": "5a2296cc9436e64f00e8a1b3b14c1d5a56fc6ca8",
+        "revCount": 4,
+        "type": "git",
+        "url": "ssh://git@forge.streetfortress.cloud:30022/sfi/development"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://git@forge.streetfortress.cloud:30022/sfi/development"
+      }
+    },
+    "estate-hub": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1792969941,
+        "narHash": "sha256-SsjKdSdsgGZ2XW6vuIzp1Xu7qBmyRiqCO+YFTFQw9dA=",
+        "ref": "refs/heads/main",
+        "rev": "f4b320534376dd7ed28dc4f5d8b4f69ccbb9e0b0",
+        "revCount": 47,
+        "type": "git",
+        "url": "ssh://git@forge.streetfortress.cloud:30022/sfi/estate-hub"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://git@forge.streetfortress.cloud:30022/sfi/estate-hub"
+      }
+    },
+    "home-manager": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1791484883,
+        "narHash": "sha256-iKxFHJrg7Sltwhq3ssCZYQ4CFEDVvReVVuVuO9dj3sE=",
+        "owner": "nix-community",
+        "repo": "home-manager",
+        "rev": "dfadbe5162d5e86bc0808badec8f346f81b4b3f0",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "home-manager",
+        "type": "github"
+      }
+    },
+    "nix-darwin": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1786845137,
+        "narHash": "sha256-oQFip+v0luP8NIxJzmiW4Wu8bILsbFWom5l0zonl8hQ=",
+        "owner": "nix-darwin",
+        "repo": "nix-darwin",
+        "rev": "4cff07de74b50e64bdd68cd4e722ab5b6b35ee48",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-darwin",
+        "ref": "master",
+        "repo": "nix-darwin",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1791366222,
+        "narHash": "sha256-o0N4g6uSOIppU7CGToNvGlMf5vC+B6O6ukFHKY/TKOY=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "39ad350a0602fa0a58a544344e3e9187526ea45c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixpkgs-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "production": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1792996819,
+        "narHash": "sha256-qSERPnwq5YsffnMDhHypuI8fQDpvvuAAkOp1vuINv10=",
+        "ref": "refs/heads/main",
+        "rev": "c6d5f0397f5e39313312e65ff6e344f04caabc93",
+        "revCount": 20,
+        "type": "git",
+        "url": "ssh://git@forge.streetfortress.cloud:30022/sfi/production"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://git@forge.streetfortress.cloud:30022/sfi/production"
+      }
+    },
+    "root": {
+      "inputs": {
+        "development": "development",
+        "estate-hub": "estate-hub",
+        "home-manager": "home-manager",
+        "nix-darwin": "nix-darwin",
+        "nixpkgs": "nixpkgs",
+        "production": "production",
+        "staging": "staging"
+      }
+    },
+    "staging": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1792969987,
+        "narHash": "sha256-wiWnsAAt0mPXJpXHjz1u8L3DuFpGpYXU0KZP7wVtCEE=",
+        "ref": "refs/heads/main",
+        "rev": "e226e4bc66dfeba86640798d7cefdb7f9d69d10d",
+        "revCount": 21,
+        "type": "git",
+        "url": "ssh://git@forge.streetfortress.cloud:30022/sfi/staging"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://git@forge.streetfortress.cloud:30022/sfi/staging"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}

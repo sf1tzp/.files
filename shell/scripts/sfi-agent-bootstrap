@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+# The agent persona on a Mac (mac/README.md "The agent persona"): the two
+# keys sfi-agent signs and pushes with from Claude Code sessions here,
+# generated once per Mac, registered on the forge with fj (forgejo-cli),
+# and the two logins (fj's store, and tea's for the sessions' PRs).
+#
+#   sfi-agent-bootstrap                      # the keys; prints what to register
+#   SFI_AGENT_TOKEN=... sfi-agent-bootstrap  # also registers them and adds the logins
+#
+# The token is sfi-agent's own (scopes: write:repository, write:issue,
+# read:user, read:organization); Forgejo issues it only to that account,
+# so a person mints it. The private halves never leave this Mac:
+# ~/.ssh/sfi-agent and the key in ~/.gnupg; nothing here is committed.
+set -euo pipefail
+forge=https://forge.streetfortress.cloud
+host=$(hostname -s)
+uid="sfi-agent <support@streetfortress.com>"
+key=$HOME/.ssh/sfi-agent
+
+if [ ! -f "$key" ]; then
+  ssh-keygen -q -t ed25519 -N "" -C "sfi-agent@$host" -f "$key"
+  echo "ssh key: generated $key"
+else
+  echo "ssh key: $key exists"
+fi
+
+if ! gpg --batch --list-secret-keys "=$uid" >/dev/null 2>&1; then
+  gpg --batch --pinentry-mode loopback --passphrase "" --quick-generate-key "$uid" ed25519 sign never
+  echo "gpg key: generated for $uid"
+else
+  echo "gpg key: $uid exists"
+fi
+fpr=$(gpg --batch --list-keys --with-colons "=$uid" | awk -F: '/^fpr/{print $10; exit}')
+
+echo
+echo "ssh public key (title agent-$host):"; cat "$key.pub"
+echo
+echo "gpg fingerprint: $fpr"
+
+if [ -z "${SFI_AGENT_TOKEN:-}" ]; then
+  echo
+  echo "SFI_AGENT_TOKEN unset: register the two keys on $forge as sfi-agent by hand, or rerun with the token."
+  exit 0
+fi
+
+# fj's login store: the token under the forge's name. add-token keeps an
+# entry that exists ("key for <host> already exists") instead of
+# replacing it, so sign the host out first: a re-run with a new token
+# must store the new token.
+fj auth logout "${forge#https://}" >/dev/null 2>&1 || true
+printf '%s' "$SFI_AGENT_TOKEN" | fj auth add-token -H "$forge" >/dev/null
+# fj prints "currently signed into <user>@<host>" with invisible isolate
+# marks around the names, so match on the words rather than parse them.
+# A token the forge refuses, or another account's, leaves no login behind.
+if ! fj whoami -H "$forge" 2>/dev/null | grep -q "signed into.*sfi-agent.*forge.streetfortress.cloud"; then
+  echo "the token is not sfi-agent's on $forge: $(fj whoami -H "$forge" 2>&1 | head -1)" >&2
+  echo "check it: curl -sS -H \"Authorization: token \$SFI_AGENT_TOKEN\" $forge/api/v1/user" >&2
+  fj auth logout "${forge#https://}" >/dev/null 2>&1 || true
+  exit 1
+fi
+
+if fj user key list -H "$forge" | grep -q "agent-$host"; then
+  echo "ssh key: agent-$host already registered"
+else
+  fj user key upload -H "$forge" -t "agent-$host" "$key.pub"
+  echo "ssh key: registered as agent-$host"
+fi
+
+if fj user gpg list -H "$forge" | grep -qi "${fpr:(-16)}"; then
+  echo "gpg key: already registered"
+else
+  # --no-verify: the key's email is the account's, which is what verification would prove
+  fj user gpg upload -H "$forge" --no-verify "$fpr"
+  echo "gpg key: registered"
+fi
+
+# tea's login, replaced on every run: a re-run is how a token rotates,
+# and tea has no verb that swaps the token of a login in place.
+tea login delete sfi-agent >/dev/null 2>&1 || true
+tea login add --name sfi-agent --url "$forge" --token "$SFI_AGENT_TOKEN" --ssh-key "$key" >/dev/null
+echo "tea: login sfi-agent holds this token (sessions pass --login sfi-agent)"
+echo "done. Claude Code sessions on $host act as sfi-agent on the forge (SFI_AGENT=1 in their environment)."

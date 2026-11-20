@@ -29,6 +29,28 @@ pipeline:
       workers: 2
 
 ---
+# The host journal, labelled like a fort's (estate-hub
+# flux/infrastructure/controllers/fluent-bit: job=systemd, host) so the
+# central Loki rules and dashboards read both the same way. No unit
+# label: unit names are unbounded, and Loki labels are cardinality.
+pipeline:
+  inputs:
+    - name: systemd
+      tag: journal.*
+      db: /var/lib/fluent-bit/journal.db
+      read_from_tail: on
+      strip_underscores: on
+
+  outputs:
+    - name: loki
+      match: journal.*
+      host: {{ logging_endpoint_ip | default('10.0.0.2') }}
+      port: {{ logging_endpoint_port | default(3100) }}
+      labels: job=systemd, host={{ inventory_hostname }}
+      line_format: json
+      workers: 2
+
+---
 pipeline:
   inputs:
     - name: tail

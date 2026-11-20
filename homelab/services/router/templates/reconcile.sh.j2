@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# Managed by homelab/services/router (sf1tzp/.files). Reinstalls the
+# router's node_exporter when it stops answering — stock ASUS firmware
+# keeps nothing across reboots, so absence is expected, not an error.
+set -euo pipefail
+
+ROUTER={{ router_host }}
+SSH_USER={{ router_ssh_user }}
+BIN=/opt/router-exporter/node_exporter
+SSH_OPTS=(-i /root/.ssh/router_exporter_ed25519
+          -o StrictHostKeyChecking=accept-new
+          -o ConnectTimeout=10)
+
+# Healthy: nothing to do. The timer runs this every five minutes, so
+# this exit is the common path and stays silent.
+if curl -sf -m 5 "http://$ROUTER:9100/metrics" >/dev/null; then
+  exit 0
+fi
+
+echo "node_exporter not answering on $ROUTER:9100 — reinstalling"
+
+# The router's filesystem is read-only outside /tmp and dropbear has no
+# scp/sftp; pipe the binary over the ssh channel instead.
+ssh "${SSH_OPTS[@]}" "$SSH_USER@$ROUTER" \
+  'cat > /tmp/node_exporter && chmod +x /tmp/node_exporter' < "$BIN"
+
+# nohup with every stream redirected, or the ssh session never closes.
+ssh "${SSH_OPTS[@]}" "$SSH_USER@$ROUTER" \
+  'nohup /tmp/node_exporter >/dev/null 2>&1 &'
+
+sleep 3
+if curl -sf -m 5 "http://$ROUTER:9100/metrics" >/dev/null; then
+  echo "node_exporter is back"
+else
+  # The timer retries in five minutes; failing loudly here puts the
+  # attempt in the journal, which ships to the hub's Loki.
+  echo "reinstall did not take — check ssh access and the router's state" >&2
+  exit 1
+fi

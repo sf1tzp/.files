@@ -116,17 +116,32 @@
     enabled: yes
   become: true
 
-- name: Configure Fluent Bit service to use YAML config
-  lineinfile:
-    path: /lib/systemd/system/fluent-bit.service
-    regexp: "^ExecStart=/opt/fluent-bit.*"
-    line: "ExecStart=/opt/fluent-bit/bin/fluent-bit -c /etc/fluent-bit/fluent-bit.yaml"
-    state: present
+# A drop-in, not lineinfile on /lib/systemd/system: the package owns that
+# file and a fluent-bit upgrade silently reverts the edit — found on
+# soundship 2026-10-31, where the unit was back on the stock .conf (cpu →
+# stdout) and shipped nothing (estate-hub#93 follow-up).
+- name: Ensure Fluent Bit unit override directory
+  file:
+    path: /etc/systemd/system/fluent-bit.service.d
+    state: directory
+    mode: "0755"
+  become: true
+
+- name: Point Fluent Bit at the YAML config (drop-in survives upgrades)
+  copy:
+    dest: /etc/systemd/system/fluent-bit.service.d/override.conf
+    content: |
+      [Service]
+      ExecStart=
+      ExecStart=/opt/fluent-bit/bin/fluent-bit -c /etc/fluent-bit/fluent-bit.yaml
+    mode: "0644"
   become: true
   register: service_config_changed
 
-- name: Reload systemd if service configuration changed
+- name: Reload systemd and restart Fluent Bit if the unit changed
   systemd:
+    name: fluent-bit
+    state: restarted
     daemon_reload: yes
   become: true
   when: service_config_changed.changed
