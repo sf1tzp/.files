@@ -39,10 +39,10 @@
       # Audio / Video
       "audio-hijack"
       "loopback"
-      "soundsource"
       "obs"
       "moonlight"
       # Things MacOS lacks out of the box
+      "thaw"              # menu bar manager (revisit after macOS 27 update, new OS features here)
       "betterdisplay"     # menu bar display controls
       "rectangle"         # menu bar window snapping
       "stats"             # menu bar utilization stats
